@@ -1,0 +1,54 @@
+# CI (docs/deployment.md §5). Node runs only in the css-fresh job, never in the image.
+# Day 9 adds the build-and-push job (image → GHCR).
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: dcs, POSTGRES_PASSWORD: dcs, POSTGRES_DB: dcs_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dcs" --health-interval 5s --health-retries 10
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      SECRET_KEY: ci-only
+      DATABASE_URL: postgres://dcs:dcs@localhost:5432/dcs_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: requirements/*.txt }
+      - run: pip install -r requirements/dev.txt
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: basedpyright
+      - run: python manage.py makemigrations --check --dry-run
+      - run: pytest --cov=apps --cov-config=.coveragerc --cov-fail-under=85
+
+  css-fresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The npm pipeline arrives on Day 2; until then this job has nothing to check.
+      - name: Is there an npm pipeline yet?
+        id: npm
+        run: |
+          if [ -f package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.npm.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - if: steps.npm.outputs.present == 'true'
+        run: npm ci
+      - if: steps.npm.outputs.present == 'true'
+        run: npm run build:css
+      - if: steps.npm.outputs.present == 'true'
+        name: Compiled CSS must match the committed file
+        run: git diff --exit-code -- static/css/main.css
+      - if: steps.npm.outputs.present == 'true'
+        name: No source-map references may ship
+        run: "! grep -q 'sourceMappingURL' static/css/main.css"
