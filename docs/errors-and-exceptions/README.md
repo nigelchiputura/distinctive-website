@@ -9,7 +9,7 @@ log browsable, since the folder names sort by error name, not by date.
 
 | Date | Error | Layer/Area | Severity | Folder |
 |---|---|---|---|---|
-| — | No errors logged yet | — | — | — |
+| 2026-11-03 11:05 | Prod `collectstatic` failed: Bootstrap's vendored JS bundle referenced a missing `.map` file (the Consult 360 Chart.js lesson, again) | Infra/Docker | High (caught before shipping) | [bootstrap-js-sourcemap-breaks-whitenoise-collectstatic__2026-11-03_1105](./bootstrap-js-sourcemap-breaks-whitenoise-collectstatic__2026-11-03_1105/) |
 
 ## How to add an entry
 

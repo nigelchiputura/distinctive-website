@@ -1,0 +1,16 @@
+// Entry point. Order matters (docs/frontend.md §2):
+// tokens → Bootstrap overrides → Bootstrap → our rules.
+// Compile with `npm run build:css`; commit static/css/main.css.
+
+@import "tokens";
+@import "variables";
+@import "bootstrap/scss/bootstrap";
+
+@import "fonts";
+@import "base";
+
+@import "components/topbar";
+@import "components/navbar";
+@import "components/footer";
+// Added as their days arrive: components/hero (Day 5), section (Day 5), cards (Day 5),
+// forms (Day 8), cookie-banner (Day 8); pages/home, about, services, contact.

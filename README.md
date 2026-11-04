@@ -12,7 +12,7 @@ commands in `docs/commands/Phase_1/`.
 
 ## Local setup
 
-Needs Docker (with Compose) and, from Day 2, Node 20+ for compiling SCSS on your machine.
+Needs Docker (with Compose) and, from Day 2, Node 22+ for compiling SCSS on your machine.
 
 ```bash
 cp .env.example .env            # then set SECRET_KEY

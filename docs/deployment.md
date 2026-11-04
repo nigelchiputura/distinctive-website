@@ -204,13 +204,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run build:css
       - name: Compiled CSS must match the committed file
         run: git diff --exit-code -- static/css/main.css
       - name: No source-map references may ship
-        run: "! grep -q 'sourceMappingURL' static/css/main.css"
+        run: "! grep -q 'sourceMappingURL' static/css/main.css static/vendor/bootstrap/bootstrap.bundle.min.js"
 
   build-and-push:
     needs: [test, css-fresh]

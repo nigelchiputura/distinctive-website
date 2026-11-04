@@ -1,7 +1,7 @@
 # Phase 1 · Day 1: Project skeleton, settings, Docker, CI
 
 **Cards:** `Phase_1/Task_Breakdown.md`, Day 1
-**Completed:** 2026-11-03 · **Revised:** —
+**Completed:** 2026-11-03 · **Revised:** 2026-11-03 (Day 2): step 3, `SECRET_KEY` needs 50+ characters; the `check --deploy` in step 10 warns otherwise
 
 Run from the repo root. Commands are bash; on Windows or macOS see
 [`../Terminal_Note.md`](../Terminal_Note.md). Steps marked **ONE-TIME** are needed only the
@@ -53,7 +53,12 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Open `.env` and set `SECRET_KEY` to any long random string. Leave the rest as is.
+Generate a key and paste it into `.env` as `SECRET_KEY` (50+ characters; a shorter one makes
+`check --deploy` warn in step 10). Leave the rest as is.
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+```
 
 **Expect:** `.env` exists and is **not** listed by `git status` (it's ignored).
 

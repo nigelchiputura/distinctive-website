@@ -1,15 +1,11 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Distinctive Consultancy Services</title>
-</head>
-<body>
-  <main>
-    <h1>Distinctive Consultancy Services</h1>
-    <p>The new website is being built. Phase 1, Day 1: the project skeleton.</p>
-    <p><a href="/healthz/">Health check</a></p>
-  </main>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="placeholder-hero">
+    <div class="container">
+      <h1 class="display-5 fw-bold">{{ site.company_name }}</h1>
+      <p class="lead">{{ site.tagline }}</p>
+      <p class="mb-0">The new website is being built. Home arrives on Day 5.</p>
+    </div>
+  </section>
+{% endblock %}

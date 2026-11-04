@@ -40,4 +40,5 @@ commands/
 
 | Phase | Day | File | Summary |
 |---|---|---|---|
-| 1 | 1 | [Phase_1/day-1.md](./Phase_1/day-1.md) | Skeleton: create the repo and push, `.env`, `up --build`, health check, migration order (users before admin), superuser, data survives `down`/`up`, the CI checks in the container, `check --deploy`, the stale-image guard, branch protection |
+| 1 | 1 | [Phase_1/day-1.md](./Phase_1/day-1.md) | Revised 2026-11-03: `SECRET_KEY` 50+ characters. Skeleton: create the repo and push, `.env`, `up --build`, health check, migration order (users before admin), superuser, data survives `down`/`up`, the CI checks in the container, `check --deploy`, the stale-image guard, branch protection |
+| 1 | 2 | [Phase_1/day-2.md](./Phase_1/day-2.md) | Sass pipeline and layout: branch, unzip over the repo, `SECRET_KEY` length, Node 22, `npm ci` + `build:css` (no change), `npm run vendor` (no change), the layout at 1280/768/375 px, prod `collectstatic` + `check --deploy`, the CI checks (28 tests), PR with both checks green, optional proof that `css-fresh` fails on stale CSS |
