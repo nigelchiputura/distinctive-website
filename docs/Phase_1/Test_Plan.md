@@ -60,16 +60,16 @@ Controller:
 
 ### 3.4 Content services
 
-- [ ] `PageService.get_page`: unpublished sections excluded; ordered by `sort_order`; a missing
+- [x] `PageService.get_page`: unpublished sections excluded; ordered by `sort_order`; a missing
   or unpublished page raises `NotFoundError`.
-- [ ] `PageSection.anchor` is generated from the heading, unique within its page, and stable when
+- [x] `PageSection.anchor` is generated from the heading, unique within its page, and stable when
   the heading changes (only set when empty).
-- [ ] `OfferingService.home_cards()`: published services with `show_on_home`, ordered, at most
+- [x] `OfferingService.home_cards()`: published services with `show_on_home`, ordered, at most
   six.
-- [ ] `OfferingService.all()`: every published service, ordered; each has a unique anchor.
+- [x] `OfferingService.all()`: every published service, ordered; each has a unique anchor.
 - [ ] `TeamService.leadership()`: published members, ordered.
 - [ ] `PartnerService.partners()` / `.clients()` split by `kind`, published only.
-- [ ] `seed_site_content` is idempotent: running it twice leaves the same row counts.
+- [x] `seed_site_content` is idempotent: running it twice leaves the same row counts.
 
 ### 3.5 Users (`users.md` §8)
 

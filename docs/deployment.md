@@ -92,7 +92,9 @@ DJANGO_SETTINGS_MODULE=config.settings.prod SECRET_KEY=build-only python manage.
 2. Waits up to 30 seconds for Postgres, using the app's own `DATABASE_URL`.
 3. Runs `migrate --noinput` (this also prints the `core.W00x` checks into the logs) and, from
    Day 8, `createcachetable` (the rate limiter's shared cache).
-4. Runs `seed_site_content` when `SEED_SITE_CONTENT=true` (first deploy only; it's idempotent).
+4. Runs `seed_site_content` when `SEED_SITE_CONTENT=true` (first deploy only). It adds only
+   what's missing and never changes an editor's work; its images are copied into the media
+   volume like any upload.
 5. `exec "$@"`: gunicorn in the image, `runserver` under docker-compose.
 
 Phase 2 adds `rebuild_search_index` after step 4.

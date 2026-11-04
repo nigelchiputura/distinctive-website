@@ -12,7 +12,7 @@ def test_healthz_reports_the_database(client):
 
 
 @pytest.mark.django_db
-def test_placeholder_home_page(client):
+def test_home_page(client):
     response = client.get("/")
     assert response.status_code == 200
     assert b"Distinctive Consultancy Services" in response.content

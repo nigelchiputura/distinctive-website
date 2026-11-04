@@ -54,6 +54,7 @@ in both files.**
      `css-fresh` job only.
    - Colours only through the brand tokens (`$dcs-*` in SCSS, `var(--dcs-*)` in CSS).
    - Markdown becomes HTML only through `MarkdownService` / the `{% markdown %}` filter.
+   - Template comments: `{# #}` on one line only; longer ones are `{% comment %}…{% endcomment %}`.
 10. **Local Docker:** always `docker compose -f docker/docker-compose.yml up --build`. The
     source is bind-mounted, but the packages live in the image.
 

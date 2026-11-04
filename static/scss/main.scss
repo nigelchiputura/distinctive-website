@@ -13,5 +13,9 @@
 @import "components/navbar";
 @import "components/footer";
 @import "components/auth";
-// Added as their days arrive: components/hero (Day 5), section (Day 5), cards (Day 5),
-// forms (Day 8), cookie-banner (Day 8); pages/home, about, services, contact.
+@import "components/buttons";
+@import "components/hero";
+@import "components/section";
+@import "components/cards";
+// Added as their days arrive: forms (Day 8), cookie-banner (Day 8);
+// pages/about, services, contact (Days 6–8) when a page needs rules of its own.

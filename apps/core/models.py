@@ -2,6 +2,7 @@
 
 from typing import ClassVar
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -76,6 +77,62 @@ class SluggedMixin(models.Model):
         while others.filter(slug=candidate).exists():
             candidate, n = f"{base}-{n}", n + 1
         return candidate
+
+
+def image_upload_path(instance: models.Model, filename: str) -> str:
+    """Uploads go in a folder per kind of content, e.g. media/pages/sections/team.jpg."""
+    folder = getattr(instance, "image_upload_to", "uploads")
+    return f"{folder}/{filename}"
+
+
+class ImageMixin(models.Model):
+    """An optional image with its alt text and stored size.
+
+    Width and height are saved with the file, so templates can set them on <img> and the page
+    doesn't jump while images load. Alt text is required unless the image is ticked as
+    decorative (docs/frontend.md §6).
+    """
+
+    image_upload_to: ClassVar[str] = "uploads"
+
+    image = models.ImageField(
+        upload_to=image_upload_path,
+        width_field="image_width",
+        height_field="image_height",
+        blank=True,
+    )
+    image_alt = models.CharField(
+        "image description",
+        max_length=200,
+        blank=True,
+        help_text="What the image shows, for people who can't see it. "
+        "Required for meaningful images.",
+    )
+    image_decorative = models.BooleanField(
+        "decorative image",
+        default=False,
+        help_text="Tick if the image is only decoration and needs no description.",
+    )
+    image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def clean(self) -> None:
+        super().clean()
+        if self.image and not self.image_decorative and not self.image_alt.strip():
+            raise ValidationError(
+                {
+                    "image_alt": "Describe the image, or tick “decorative image” "
+                    "if it needs no description."
+                }
+            )
+
+    @property
+    def alt_text(self) -> str:
+        """The alt attribute: empty for decorative images."""
+        return "" if self.image_decorative else self.image_alt
 
 
 class SiteSettings(BaseModel):

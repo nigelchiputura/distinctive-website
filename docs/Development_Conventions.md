@@ -92,6 +92,9 @@ From `frontend.md`:
   checking only, is not on the PATH, and is never shipped.
 - Colours only through brand tokens (`$dcs-*` / `var(--dcs-*)`).
 - HTML from admin-entered text only through `MarkdownService` (sanitised with `nh3`).
+- Template comments: `{# … #}` for one line only; anything longer is `{% comment %} … {% endcomment %}`.
+  A `{#` closed on a later line isn't a comment, and tags inside it run
+  (`errors-and-exceptions/multiline-template-comment-recursion__2026-11-03_1135/`; a test enforces it).
 
 ## 8. Local Docker
 

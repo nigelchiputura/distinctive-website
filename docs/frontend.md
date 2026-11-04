@@ -1,7 +1,7 @@
 # Frontend
 
-**Project-wide · revised 2026-11-03** (Day 2 as built: sampled brand colours, inline SVG icons,
-Node 22; 2026-11-02: npm and SCSS at the repo root as in Consult 360, Phase 1 pages, Jobs and
+**Project-wide · revised 2026-11-03** (Day 5 as built: Home, the section partial, the hero
+slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at the repo root as in Consult 360, Phase 1 pages, Jobs and
 Search designs moved to `Phase_2/Phase2_Scope.md`)
 
 Django templates (SSR) + Bootstrap 5 (customised) + vanilla JS ES modules + CSS compiled from
@@ -69,16 +69,14 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "base";
 @import "components/topbar";
 @import "components/navbar";
-@import "components/hero";
-@import "components/section";
-@import "components/cards";
-@import "components/forms";
 @import "components/footer";
-@import "components/cookie-banner";
-@import "pages/home";
-@import "pages/about";
-@import "pages/services";
-@import "pages/contact";
+@import "components/auth";                   // Day 4: the sign-in pages
+@import "components/buttons";                // Day 5: .btn-outline-gold, .btn-outline-gold-dark
+@import "components/hero";                   // Day 5: the slider and the hero_text band
+@import "components/section";                // Day 5: bands, CTA, value blocks
+@import "components/cards";                  // Day 5: service cards
+// Day 8: components/forms, components/cookie-banner.
+// pages/about, pages/services, pages/contact only if a page needs rules of its own.
 ```
 
 `@import` is fine for now: `--silence-deprecation=import` quiets Dart Sass's warning about our own
@@ -97,6 +95,7 @@ outside `_tokens.scss`.
 | `$dcs-black` | `#000` | Top bar, footer, dark bands | — |
 | `$dcs-black-soft` | `#0d0d0d` | Footer navigation strip | — |
 | `$dcs-charcoal` | `#242424` | Home services band, capability band | — |
+| `$dcs-charcoal-light` | `#333` | The mat around service-card images | — |
 | `$dcs-grey` | `#666` | Navbar links, muted text on white | 5.7:1 on white |
 | `$dcs-grey-on-dark` | `#a6a6a6` | Copyright line on black (the old `#666` was 3.7:1) | 8.6:1 on black |
 | `$dcs-text` | `#222` | Body text | — |
@@ -119,19 +118,33 @@ Bootstrap overrides: `$primary: $dcs-gold`, `$body-color`, `$font-family-sans-se
 
 ```
 base.html
- ├─ includes/_seo.html            <title>, meta description, canonical, OG/Twitter, JSON-LD
+ ├─ includes/_seo.html            <title>, meta description, canonical, OG/Twitter, JSON-LD (Day 9)
  ├─ includes/_topbar.html         phones, email, social icons (site_info)
  ├─ includes/_navbar.html         logo + nav items from the context processor
  ├─ <main id="main"> {% block main %}{% block content %}   pages fill "content";
  │                                 a layout can wrap it by overriding "main"
  ├─ includes/_footer.html         "Reach Us", footer nav, copyright, "Cookie settings" link
- └─ includes/_cookie_banner.html
+ ├─ includes/_cookie_banner.html  (Day 8)
+ └─ Bootstrap's bundle (defer), then js/main.js (type="module")
+
+pages/home.html                   includes/_hero_slider.html, then includes/_section.html per section
+includes/_section.html            one PageSection, by section_type (table below)
+includes/_service_card.html       one offerings.Service on Home
+includes/_image.html              an admin image with its stored width/height and alt text
 ```
 
 The site's details are `site_info` in every template (not `site`: allauth's views use that name).
 `templates/allauth/layouts/base.html` overrides `main` to put every allauth page (sign in,
 set password, sign out …) in a card on a light grey band; `templates/account/` holds our own
 sign-in and set-password pages (`users.md` §3).
+
+**Template comments:** `{# … #}` must open and close on one line; anything longer is
+`{% comment %} … {% endcomment %}` (`Development_Conventions.md` §7; a test enforces it).
+
+**Images from the admin** go through `includes/_image.html`. `ImageMixin` (`apps/core/models.py`)
+stores each upload's width and height, so `<img>` always has them and the page doesn't jump while
+images load; alt text is required unless the editor ticks "decorative image" (then `alt=""`).
+Images are `loading="lazy"` except the first hero slide, which gets `fetchpriority="high"`.
 
 `includes/_section.html` renders a `PageSection` by `section_type`, with `id="{{ section.anchor }}"`:
 
@@ -141,8 +154,12 @@ sign-in and set-password pages (`users.md` §3).
 | `intro_dark` | Black band, gold heading, white text ("What We Do") |
 | `band_light` / `band_dark` | Alternating bands used on Services; heading left- or right-aligned |
 | `two_column` | "Our Story" style: heading and short text left, long text right |
-| `value_block` | Image one side, heading and paragraph the other; alternates |
+| `value_block` | Image one side (the section's "image position"), heading and paragraph the other; image first on phones. Consecutive value blocks share one white band |
+| `service_cards` | Charcoal band with the services ticked "show on Home" (at most six), as framed cards linking to `/services/#<anchor>`. Card titles are `h2` when the section has no heading, `h3` under one |
 | `cta` | A centred line and an outlined gold button ("Get In Touch") |
+
+The editor picks the look per section and orders sections freely, so Home's order (cards, CTA,
+value blocks) is data, not template code.
 
 Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). Nothing else turns admin text into HTML.
 
@@ -166,11 +183,16 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
 
 ### Home
 
-1. Hero slider, 3 slides (`HeroSlide`): team photo with "Distinctive Consultancy Services —
-   Bringing excellence into your world."
-2. Charcoal band with six service cards: Industrial / Employee Relations, HR Audits, Talent
-   Acquisition, People Strategy, Research Surveys, Organisational Design. Framed image, gold
-   title, short blurb (`Service.show_on_home`); each links to `/services/#<anchor>`.
+1. Hero slider (`HeroSlide`): the first slide's heading is the page's `h1` ("Distinctive
+   Consultancy Services", "Bringing excellence into your world."). The old site had three slides
+   over a team photo; the seed has one slide and no photo (the old screenshots have the text
+   printed over the photo), so it shows on a black-and-gold background until the original photo
+   is uploaded. With no slides at all, a visually hidden `h1` keeps the page's outline.
+2. Charcoal band with six service cards (a `service_cards` section): Industrial / Employee
+   Relations, HR Audits, Talent Acquisition, People Strategy, Research Surveys, Organisational
+   Design. Framed image, gold title, short blurb; each links to `/services/#<anchor>`. Card images
+   are fitted inside a fixed 3:2 frame without cropping (`object-fit: contain`), because several
+   have words in them.
 3. CTA: "Get the best specialised business consultancy services in Africa." + outlined gold
    "Get In Touch" → `/contact/`.
 4. Two value blocks on white: **People Centred** and **Proactive**, image alternating.
@@ -213,6 +235,10 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
   "can't load Google Maps correctly" (a key or billing problem), so test the key on the preview
   host.
 
+**Seed images.** Until the client sends the originals, the card and value-block images are cut
+from the old site's screenshots (`apps/core/seed/images/`, 8 files, 164 KB). They look right at
+their displayed size but are small; replacing them is an upload in the admin (Phase 1 Q5).
+
 ### Phase 2 pages
 
 Jobs (list and detail) and Search (dropdown, results page, highlighting) are designed in
@@ -220,15 +246,19 @@ Jobs (list and detail) and Search (dropdown, results page, highlighting) are des
 
 ## 5. JavaScript modules (Phase 1)
 
-| Module | Responsibility |
-|---|---|
-| `http.js` | `fetch` wrapper: CSRF header from the cookie, JSON parsing, the `{ok, data, errors}` envelope, a timeout |
-| `contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js`, shows field errors and the success state; the form still works by normal POST if JS fails |
-| `cookie-consent.js` | The banner, the stored choice (`localStorage`, wrapped in `try/catch`), a `consent:granted` event, the "Cookie settings" link; injects the GA4 tag and the map iframe only after consent |
-| `main.js` | Imports and initialises the above; initialises Bootstrap components (carousel, collapse) |
+| Module | Responsibility | Day |
+|---|---|---|
+| `main.js` | The entry point (`<script type="module">` after Bootstrap's bundle); initialises each module | 5 |
+| `modules/hero-slider.js` | Starts the Home carousel (6 s per slide) unless the visitor prefers reduced motion; pauses on hover and while keyboard focus is inside; shows a **Pause slides / Play slides** button (`aria-pressed`) that stops it until pressed again. Without JavaScript, or with reduced motion, the slides change only by the arrows and dots | 5 |
+| `modules/http.js` | `fetch` wrapper: CSRF header from the cookie, JSON parsing, the `{ok, data, errors}` envelope, a timeout | 8 |
+| `modules/contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js`, shows field errors and the success state; the form still works by normal POST if JS fails | 8 |
+| `modules/cookie-consent.js` | The banner, the stored choice (`localStorage`, wrapped in `try/catch`), a `consent:granted` event, the "Cookie settings" link; injects the GA4 tag and the map iframe only after consent | 8 |
 
-Conventions: ES modules (`<script type="module">`), no globals, feature-detect and fail quietly,
-`data-*` attributes for hooks, never inline event handlers.
+Conventions: ES modules, no globals, feature-detect and fail quietly, `data-*` attributes for
+hooks, never inline event handlers. Module imports are relative (`./modules/hero-slider.js`);
+Django's manifest storage serves them under their plain names, so a changed module reaches
+browsers at their next cache refresh, not instantly. If that matters later, switch on the
+storage's `support_js_module_import_aggregation`.
 
 ## 6. Accessibility and performance
 
@@ -236,8 +266,8 @@ Conventions: ES modules (`<script type="module">`), no globals, feature-detect a
 - Contrast: gold on black passes; gold text on white uses `$dcs-gold-dark`.
 - Images: `loading="lazy"` except the hero, explicit `width`/`height`, `alt` required in the admin
   for meaningful images (empty `alt` allowed for decorative ones).
-- Slider: pauses on hover and focus, keyboard-operable controls, no auto-advance with
-  `prefers-reduced-motion`.
+- Slider: pauses on hover and focus, keyboard-operable controls, a pause button (moving content
+  needs one), no auto-advance with `prefers-reduced-motion`.
 - Fonts with `font-display: swap`; compressed CSS; nothing third-party before consent.
 - Lighthouse targets on every Phase 1 page: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95.
 

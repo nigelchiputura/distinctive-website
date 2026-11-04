@@ -7,7 +7,6 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 
 from apps.core.controllers.health_controller import HealthController
-from apps.core.controllers.placeholder_controller import PlaceholderController
 
 urlpatterns = [
     # One sign-in page for everyone: the admin's own login form redirects to allauth's, which
@@ -20,7 +19,7 @@ urlpatterns = [
     path(settings.ADMIN_URL_PATH, admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("healthz/", HealthController.as_view(), name="healthz"),
-    path("", PlaceholderController.as_view(), name="home"),
+    path("", include("apps.pages.urls")),
 ]
 
 if settings.DEBUG:

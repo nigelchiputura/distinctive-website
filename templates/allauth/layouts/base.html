@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{# Every allauth page (sign in, password reset, sign out …) inside the site's own layout. allauth
-   pages fill "content" and "head_title"; this wraps them in a card. #}
+{% comment %} Every allauth page (sign in, password reset, sign out …) inside the site's own layout. allauth
+   pages fill "content" and "head_title"; this wraps them in a card. {% endcomment %}
 {% block title %}{% block head_title %}{% endblock head_title %} · {{ site_info.company_name }}{% endblock title %}
 {% block extra_head %}<meta name="robots" content="noindex">{% endblock extra_head %}
 
