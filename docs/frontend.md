@@ -27,8 +27,8 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 {
   "private": true,
   "scripts": {
-    "build:css": "sass static/scss/main.scss static/css/main.css --style=compressed --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
-    "watch:css": "sass static/scss/main.scss static/css/main.css --watch --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
+    "build:css": "sass static/scss/main.scss:static/css/main.css static/scss/admin.scss:static/css/admin.css --style=compressed --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
+    "watch:css": "sass static/scss/main.scss:static/css/main.css static/scss/admin.scss:static/css/admin.css --watch --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
     "vendor": "node scripts/copy-vendor.mjs"
   },
   "engines": { "node": ">=22" },
@@ -45,8 +45,10 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
   developer machine and in CI's `css-fresh` job. **Neither is in any image or on any server.**
 - Versions are pinned exactly (`npm install --save-dev --save-exact`), so CI compiles
   byte-identical CSS.
-- `static/css/main.css` is committed. CI rebuilds it and fails on any difference, or if a
-  `sourceMappingURL` slipped in (`deployment.md` §5).
+- Two stylesheets: `static/css/main.css` (the site) and `static/css/admin.css` (a few rules for
+  the Jazzmin admin, from `static/scss/admin.scss`, using the same tokens). Both are committed. CI
+  rebuilds them and fails on any difference in `static/css/`, or if a `sourceMappingURL` slipped
+  in (`deployment.md` §5).
 - Run `npm run build:css` before committing any SCSS change.
 - After changing a vendored package, run `npm run vendor` and the local prod `collectstatic`
   (`deployment.md` §2): WhiteNoise rejects CSS or JS that references a missing file, including
@@ -118,12 +120,18 @@ Bootstrap overrides: `$primary: $dcs-gold`, `$body-color`, `$font-family-sans-se
 ```
 base.html
  ├─ includes/_seo.html            <title>, meta description, canonical, OG/Twitter, JSON-LD
- ├─ includes/_topbar.html         phones, email, social icons (SiteSettings)
+ ├─ includes/_topbar.html         phones, email, social icons (site_info)
  ├─ includes/_navbar.html         logo + nav items from the context processor
- ├─ <main id="main"> {% block content %}
+ ├─ <main id="main"> {% block main %}{% block content %}   pages fill "content";
+ │                                 a layout can wrap it by overriding "main"
  ├─ includes/_footer.html         "Reach Us", footer nav, copyright, "Cookie settings" link
  └─ includes/_cookie_banner.html
 ```
+
+The site's details are `site_info` in every template (not `site`: allauth's views use that name).
+`templates/allauth/layouts/base.html` overrides `main` to put every allauth page (sign in,
+set password, sign out …) in a card on a light grey band; `templates/account/` holds our own
+sign-in and set-password pages (`users.md` §3).
 
 `includes/_section.html` renders a `PageSection` by `section_type`, with `id="{{ section.anchor }}"`:
 

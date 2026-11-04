@@ -1,26 +1,21 @@
 # Users Module
 
-**Project-wide · revised 2026-11-02** (built in Phase 1: the model on Day 1, allauth and the admin
-on Day 4; Google redirect URIs for the preview host and the live domain; emails through Resend)
+**Project-wide · as built on Phase 1 Day 4 (2026-11-03)**: the model on Day 1, the email-login
+manager on Day 3, allauth, onboarding, the Content Editor group and the Jazzmin admin on Day 4.
 
-Who logs in: **staff only**. The public site has no accounts and no registration. An admin onboards
-each user; users sign in with email + password or with Google. The Django admin (themed with Jazzmin)
-is the content-management interface.
+Who signs in: **staff only**. The public site has no accounts and no registration. An admin
+onboards each user; users sign in with email and password, or with Google if their Google
+account has the same address. The Django admin, themed with Jazzmin, is where content is managed.
 
 ## 1. Custom user model
 
-`AbstractUser` (not `AbstractBaseUser`): we keep Django's permission machinery, groups and admin
-integration, and adjust fields as needed.
+`AbstractUser` (not `AbstractBaseUser`): we keep Django's permissions, groups and admin
+integration.
 
 ```python
 # apps/users/models.py
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-
 class User(AbstractUser):
     email = models.EmailField("email address", unique=True)
-    # Login is by email; username kept (AbstractUser requires it) but auto-filled.
-    # Add profile fields here only when needed (display name, job title).
 
     objects = UserManager()       # apps/users/managers.py
 
@@ -28,148 +23,139 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []          # createsuperuser asks only for the email and password
 ```
 
-Notes:
-- **Set `AUTH_USER_MODEL = "users.User"` before the first migration of any app.** Changing it later is painful. So the `User` model and its `0001` migration are created on **Phase 1 Day 1**, before anything else is migrated; allauth and the admin follow on Day 4.
-- Username: `UserManager` (`apps/users/managers.py`, added Phase 1 Day 3) generates it from the email's local part (`tendai.m`, then `tendai.m2` if taken), so admins and `createsuperuser` only type an email. It lives on the manager, not in a service, because Django's own machinery (createsuperuser, the admin, test fixtures) calls `create_user`/`create_superuser` directly.
-- Email is lower-cased on save and unique (case-insensitive).
-- No `role` field. Roles are Django **Groups** (see §4).
+- **`AUTH_USER_MODEL = "users.User"` came before any other migration** (Phase 1 Day 1).
+- **Username:** `UserManager.username_for` makes it from the email's local part (`tendai.m`, then
+  `tendai.m2` if taken). It lives on the manager because Django's own machinery
+  (`createsuperuser`, the admin, test fixtures) calls `create_user`/`create_superuser` directly.
+  Users never see it: allauth's messages name people by email (`ACCOUNT_USER_DISPLAY`).
+- Email is lower-cased and trimmed on save, and unique.
+- No `role` field: roles are Django groups (§4).
 
-## 2. Layers for the users app
-
-The same pattern as everywhere else, kept small:
+## 2. Layers
 
 | Layer | Contents |
 |---|---|
-| Model | `User` |
-| Repository | `UserRepository(BaseRepository)`: `get_by_email`, `create`, `set_active` |
-| Service | `UserService`: `onboard_user(email, first_name, last_name, group)`, `deactivate`, username generation |
-| Controller | allauth supplies login/logout/password views; we add none unless needed |
-| View | Branded allauth templates in `templates/account/` |
-| Adapters | `AccountAdapter`, `SocialAccountAdapter` in `apps/users/adapters.py` — the only custom allauth code |
+| Model | `User`, `UserManager` |
+| Repository | `UserRepository`: `get_by_email` (case-insensitive), `create_user`, `set_active`, `add_to_group`, `set_group_permissions` |
+| Service | `UserService`: `onboard_user`, `welcome` (set-password link + email), `set_password_link`, `active_user_for_email`, `deactivate`, `sync_content_editor_group`. The repository, the mailer and the token maker are injected, so its tests need no database |
+| Controller | allauth's views (sign in, sign out, password reset); none of our own |
+| View | `templates/allauth/layouts/base.html` (every allauth page in the site's layout, in a card), `templates/account/login.html`, `password_reset_from_key.html`, `password_reset_from_key_done.html` |
+| Adapters | `AccountAdapter`, `SocialAccountAdapter` in `apps/users/adapters.py`: the only custom allauth code |
+| Command | `manage.py onboard_user EMAIL [--first] [--last] [--group] [--no-email]` |
 
-Admin screens create users directly through the ORM (documented exception); `UserService.onboard_user`
-exists for the management command and tests, and keeps one definition of "how a user is onboarded"
-(unusable password until they set one, welcome/password-reset email sent).
+## 3. allauth
 
-## 3. allauth configuration
+`django-allauth[socialaccount]` 65.x. Settings in `config/settings/base.py`:
 
-Install `django-allauth` with the Google provider. Check the current allauth docs at install time;
-setting names have changed across recent versions. Intended configuration:
+- `ACCOUNT_LOGIN_METHODS = {"email"}`; `ACCOUNT_EMAIL_VERIFICATION = "none"` (admins create the
+  accounts, so there is nothing to verify); "Keep me signed in" box on the form.
+- **Sign-up is closed** in both adapters. `/accounts/signup/` shows "Sign Up Closed" and a POST
+  creates nothing.
+- **One sign-in page.** The admin's own login URL redirects to `/accounts/login/` (keeping
+  `?next=`), so Google sign-in and allauth's rate limiting on failed attempts apply to the admin
+  too. After signing in, people land in the admin (`LOGIN_REDIRECT_URL`).
+- The sign-in page is our own: allauth's default tells visitors to "sign up first".
+- **Set-password page:** a new user's link and a forgotten-password link both land on
+  "Set your password". An used or expired link says so and offers a new one.
 
-```python
-INSTALLED_APPS += [
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
-]
-SITE_ID = 1
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-]
+**Google** (`SocialAccountAdapter.pre_social_login`): once Google answers,
 
-# Email-based login, no self-service sign-up
-ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]   # irrelevant: signup is closed
-ACCOUNT_EMAIL_VERIFICATION = "optional"       # admins pre-create verified users
-ACCOUNT_ADAPTER = "apps.users.adapters.AccountAdapter"
-SOCIALACCOUNT_ADAPTER = "apps.users.adapters.SocialAccountAdapter"
+- an already-connected Google account signs in, unless its user has been deactivated;
+- otherwise the Google account's **verified** email is matched to an **active** staff user
+  (case-insensitive) and connected on first use;
+- anything else (no such user, an unverified email, a deactivated user) is refused with "That
+  Google account isn't linked to a staff account on this website…" on the sign-in page. Nobody is
+  ever created.
 
-# Google: only an EXISTING user may sign in; match by verified email
-SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SOCIALACCOUNT_AUTO_SIGNUP = False
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {"SCOPE": ["profile", "email"], "AUTH_PARAMS": {"access_type": "online"}},
-}
-LOGIN_REDIRECT_URL = "/admin/"       # or the env-driven admin path
-LOGOUT_REDIRECT_URL = "/"
-```
+There is no domain restriction (decided 2026-10-08).
 
-```python
-# apps/users/adapters.py
-from allauth.account.adapter import DefaultAccountAdapter
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+The button appears only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set (the provider
+app is configured from them in settings; nothing to add in the admin). It POSTs, with CSRF
+(`SOCIALACCOUNT_LOGIN_ON_GET = False`), and asks Google to show the account chooser.
 
-class AccountAdapter(DefaultAccountAdapter):
-    def is_open_for_signup(self, request):
-        return False                     # no public registration
+**Google Cloud setup (owner):** an OAuth client of type *Web application* with these authorised
+redirect URIs, all three now so the cutover needs no Google change:
 
-class SocialAccountAdapter(DefaultSocialAccountAdapter):
-    def is_open_for_signup(self, request, sociallogin):
-        return False                     # Google can log in existing users, never create new ones
-```
+- `http://localhost:8000/accounts/google/login/callback/`
+- `https://new.distinctive.co.zw/accounts/google/login/callback/` (the preview host)
+- `https://distinctive.co.zw/accounts/google/login/callback/` (live)
 
-**Google sign-in behaviour:** a Google account whose verified email matches an existing active user
-is connected and logged in; any other Google account is refused with a friendly message. There is
-**no domain restriction** (decided 2026-10-08); if one is ever wanted, the adapter is where that
-check would live.
+The OAuth consent screen needs the app name, a support email and the `email` and `profile`
+scopes. Put the client ID and secret in `.env` (never committed).
 
-Google Cloud setup: OAuth client (Web), authorised redirect URIs per host:
-`http://localhost:8000/accounts/google/login/callback/`,
-`https://new.distinctive.co.zw/accounts/google/login/callback/` (the preview host) and
-`https://distinctive.co.zw/accounts/google/login/callback/` (live). Register all three on Phase 1
-Day 4 so the cutover needs no Google change.
-Credentials go in `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` env vars (not committed).
+`django.contrib.sites` is named "Distinctive Consultancy Services" by a migration
+(`users.0003_site_name`), because allauth uses it in its emails.
+
+**Template context:** allauth's views put that `Site` record into the context as `site`. The
+site's own details are therefore `site_info` (see `errors-and-exceptions/allauth-site-context-hid-site-details__2026-11-03_1120/`).
 
 ## 4. Roles and permissions
 
-Roles are not a concern this phase. Minimal, extensible setup:
-
-| Group | Permissions | Created by |
+| Group | Permissions | How |
 |---|---|---|
 | **Superuser** | Everything | `createsuperuser` |
-| **Content Editor** | Add/change/delete pages, sections, slides, services, team, partners, redirects; change site settings; view and mark contact submissions; **no** user management. Phase 2 adds jobs (a further data migration) | Data migration in `users` |
+| **Content Editor** | Add, change, delete and view pages, sections, slides, partners, redirects, services and team members; change site settings; view and change (mark handled, resend) contact submissions. **No** users, groups or sign-in records | `apps/users/permissions.py` |
 
-Staff users need `is_staff=True` to reach the admin. A user with no group sees nothing.
+`UserService.sync_content_editor_group` gives the group **exactly** that list. It runs after
+every `migrate` (a `post_migrate` handler in `UsersConfig.ready`), so a model added on a later day
+gets its permissions the moment its migration runs; nothing else needs updating. Phase 2 adds the
+jobs model to the list.
+
+Staff users need `is_staff` to reach the admin. Someone with no group sees an empty admin.
 
 ## 5. Admin (Jazzmin)
 
-```python
-INSTALLED_APPS = ["jazzmin", ...]       # before django.contrib.admin
-JAZZMIN_SETTINGS = {
-    "site_title": "Distinctive Admin",
-    "site_header": "Distinctive",
-    "site_brand": "Distinctive",
-    "site_logo": "img/logo.png",
-    "welcome_sign": "Sign in to manage the website",
-    "copyright": "Distinctive Consultancy Services",
-    "search_model": ["offerings.Service", "team.TeamMember"],      # Phase 2 adds jobs.JobPosting
-    "order_with_respect_to": ["pages", "offerings", "team", "contact", "core", "users"],
-    "icons": {"team.TeamMember": "fas fa-users", "contact.ContactSubmission": "fas fa-envelope"},
-    "show_ui_builder": False,
-}
-JAZZMIN_UI_TWEAKS = {"navbar": "navbar-dark", "accent": "accent-warning"}   # gold-ish accent
-```
+`django-jazzmin` 3.x, configured in `config/settings/base.py` (`JAZZMIN_SETTINGS`,
+`JAZZMIN_UI_TWEAKS`):
 
-Admin ergonomics that matter to this project:
-- Page admin with **inline** sections and slides, drag-to-reorder via `sort_order`.
-- Contact submissions: read-only fields, `email_sent` / `handled` / `source_page` filters, "Mark as handled" and "Resend notification email" actions.
-- Site settings: a single row, no add or delete once it exists.
-- Redirects: old path, new path, hit count (so unused ones can be pruned later).
-- Phase 2: the job admin with the EasyMDE Markdown editor (vendored), filters for department / employment type / open vs closed, closing date in `list_display`.
-- Image fields with preview thumbnails; `alt_text` fields required for meaningful images.
-- Admin served at an env-driven path (`ADMIN_URL_PATH`), not `/admin/`, in production.
+- title "Distinctive Admin", the logo on a white strip at the top of the sidebar, gold accent,
+  "View website" in the top bar;
+- the Sites, social-account and email-address tables are hidden (nothing for an editor to do
+  there);
+- `custom_css: css/admin.css`, compiled by `npm run build:css` from `static/scss/admin.scss` with
+  the site's tokens (`frontend.md` §1);
+- `use_google_fonts_cdn: False`: no third-party requests in the admin either.
+
+**Users screen:**
+
+- **Add user** asks for an email, a name and groups (Content Editor ticked by default). No
+  password: the user gets none, is made staff, and is emailed a set-password link. If the email
+  can't be sent, the link is shown on screen to pass on.
+- Actions: **Deactivate** (never yourself) and **Email a new set-password link**.
+- The change screen shows the username and dates as read-only.
+
+**Site settings** (Day 3): a single row, no add or delete.
+
+Later days add: the page admin with inline sections and slides (Day 5), team and partners
+(Day 6), services and contact submissions (Day 7), redirects (Day 9), and Phase 2's job admin.
+
+The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 
 ## 6. Security checklist
 
 - Password validators on; minimum length 12.
-- allauth login rate limiting on; admin path not guessable; `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT` in production settings.
-- Deactivate rather than delete leaving users.
-- No user data is exposed in templates; search index never contains user data.
-- 2FA is deferred (backlog).
+- allauth's rate limits on failed sign-ins; the admin path not guessable in production;
+  secure session and CSRF cookies, HTTPS redirect and HSTS in production settings.
+- The Google button posts with CSRF; only verified Google emails are matched.
+- Leavers are deactivated, never deleted.
+- Set-password links work once and expire after `PASSWORD_RESET_TIMEOUT` (3 days).
+- No user data in public templates; Phase 2's search index never contains user data.
+- 2FA is in the backlog.
 
-## 7. Onboarding flow
+## 7. Onboarding
 
-1. Superuser opens Admin → Users → Add: email, name, group, `is_staff` ticked.
-2. User receives a set-password email, sent through Resend (`deployment.md` §6), or just uses Google if their Google email matches. Before Resend is verified, run `onboard_user` and give the user a password reset link from the console output instead.
-3. User signs in at the admin path; sees only the sections their group allows.
+1. **Admin → Users → Add user**: email, name, groups. Or on the server:
+   `python manage.py onboard_user rudo.moyo@distinctive.co.zw --first Rudo --last Moyo`.
+2. They receive "Your Distinctive website account" with a set-password link (through Resend,
+   `deployment.md` §6). Before Resend is verified, use `--no-email` (or the admin's on-screen link)
+   and pass the link on yourself.
+3. They set a password, sign in at `/accounts/login/` (or with Google, if configured), and see only
+   what their group allows.
 
-## 8. Tests (`Phase_1/Test_Plan.md` §3.5)
+## 8. Tests
 
-- `is_open_for_signup` returns False for both adapters; the signup URL returns 404/redirect.
-- Google login: existing email → logged in; unknown email → refused; inactive user → refused.
-- `UserService.onboard_user` generates unique usernames and lower-cases emails.
-- Content Editor group cannot access user management.
+`apps/users/tests/`: `test_user_service.py` (fakes, no database), `test_adapters.py` (the Google
+rules), `test_sign_in.py` (sign in, sign up closed, the admin redirect, the Google button and its
+first redirect to Google, onboarding through to setting a password, the admin's add screen and
+actions, Content Editor permissions, `ADMIN_URL_PATH`), `test_user_model.py`. The full Google round
+trip is a manual check on each host (`Phase_1/Test_Plan.md` §4).

@@ -13,7 +13,7 @@ distinctive-site/
 │       └── deploy-vps.yml              # manual: SSH to the VPS, compose pull + up -d
 ├── apps/
 │   ├── core/                           # base classes, SiteSettings, SEO, Markdown, checks, redirects middleware
-│   ├── users/                          # custom User + email-login manager, allauth adapters, onboarding
+│   ├── users/                          # User + manager, allauth adapters, UserService, onboard_user, permissions
 │   ├── pages/                          # Page, PageSection, HeroSlide, Partner, Redirect
 │   ├── offerings/                      # Service (the consulting services)
 │   ├── team/                           # TeamMember
@@ -42,6 +42,7 @@ distinctive-site/
 ├── static/
 │   ├── scss/                           # SOURCE, compiled on the dev machine (not in the image)
 │   │   ├── main.scss                   # entry: tokens → variables → bootstrap → partials
+│   │   ├── admin.scss                  # the Jazzmin admin's few rules → static/css/admin.css
 │   │   ├── _tokens.scss                # $dcs-* brand tokens and --dcs-* custom properties
 │   │   ├── _variables.scss             # Bootstrap variable overrides
 │   │   ├── _fonts.scss
@@ -54,6 +55,7 @@ distinctive-site/
 │   │   │   ├── _cards.scss             # service card, team card
 │   │   │   ├── _forms.scss
 │   │   │   ├── _footer.scss
+│   │   │   ├── _auth.scss              # sign-in and the other allauth pages
 │   │   │   └── _cookie-banner.scss
 │   │   └── pages/
 │   │       ├── _home.scss
@@ -61,7 +63,8 @@ distinctive-site/
 │   │       ├── _services.scss
 │   │       └── _contact.scss           # Phase 2 adds _jobs.scss and components/_search.scss
 │   ├── css/
-│   │   └── main.css                    # COMPILED, minified, committed
+│   │   ├── main.css                    # COMPILED, minified, committed
+│   │   └── admin.css                   # COMPILED from admin.scss, committed
 │   ├── js/
 │   │   ├── main.js                     # entry (ES module)
 │   │   └── modules/
@@ -85,7 +88,8 @@ distinctive-site/
 │   ├── errors/
 │   │   ├── 404.html
 │   │   └── 500.html
-│   └── account/                        # allauth templates, branded
+│   ├── allauth/layouts/                # base.html wraps every allauth page in the site's layout
+│   └── account/                        # our sign-in and set-password pages
 ├── media/                              # local uploads in dev (git-ignored); a Docker volume in prod
 ├── requirements/
 │   ├── base.txt
