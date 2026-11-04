@@ -13,7 +13,7 @@ distinctive-site/
 │       └── deploy-vps.yml              # manual: SSH to the VPS, compose pull + up -d
 ├── apps/
 │   ├── core/                           # base classes, SiteSettings, SEO, Markdown, checks, redirects middleware
-│   ├── users/                          # custom User, allauth adapters, onboarding
+│   ├── users/                          # custom User + email-login manager, allauth adapters, onboarding
 │   ├── pages/                          # Page, PageSection, HeroSlide, Partner, Redirect
 │   ├── offerings/                      # Service (the consulting services)
 │   ├── team/                           # TeamMember
@@ -23,6 +23,7 @@ distinctive-site/
 ├── config/
 │   ├── settings/
 │   │   ├── base.py
+│   │   ├── email.py                    # EMAIL_PROVIDER → backend and email settings
 │   │   ├── dev.py
 │   │   ├── test.py
 │   │   └── prod.py
@@ -70,7 +71,7 @@ distinctive-site/
 │   ├── vendor/                         # copied from node_modules by `npm run vendor`, committed
 │   │   ├── bootstrap/                  # bootstrap.bundle.min.js (source-map line removed)
 │   │   └── open-sans/                  # latin woff2, 400/600/700, normal and italic
-│   └── img/                            # logo.png (stand-in until the real logo), later favicons and defaults
+│   └── img/                            # logo.png (the client's logo, 172 × 100), later favicons and defaults
 ├── templates/
 │   ├── base.html
 │   ├── includes/
@@ -148,16 +149,18 @@ apps/core/
 ├── services/
 │   ├── base.py                # BaseService
 │   ├── markdown_service.py    # Markdown → sanitised HTML
+│   ├── navigation_service.py  # the nav items, with the current page marked
+│   ├── site_details.py        # SiteDetails value + DEFAULTS (the old site's details)
 │   └── site_settings_service.py
 ├── controllers/
 │   └── base.py                # BaseController (View) + error mapping
 ├── exceptions.py              # ServiceError, NotFoundError, ValidationError, ExternalServiceError
 ├── checks.py                  # core.W001–W003 (email configuration)
-├── context_processors.py      # site_settings, nav items, GA4 id, maps key
+├── context_processors.py      # site (SiteDetails), nav_items, current_year
 ├── middleware.py              # RedirectMiddleware (old WordPress URLs → 301)
 ├── seo.py                     # SeoMixin, SeoData, sitemaps
 ├── templatetags/
-│   └── core_extras.py         # {% markdown %}, {% active_nav %}
+│   └── core_extras.py         # the |markdown filter
 ├── management/commands/
 │   └── seed_site_content.py   # loads the old site's real content (idempotent)
 └── tests/

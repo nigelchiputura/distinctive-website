@@ -255,7 +255,8 @@ Consult 360 and CVision. Why:
   plan blocks it outright (the error that moved Consult 360 to Resend). An HTTPS API works
   anywhere the app can reach the web.
 - **The provider is a setting.** `EMAIL_PROVIDER` (`resend`, `smtp` or `console`) picks
-  `EMAIL_BACKEND` in `config/settings/base.py`; any other value stops start-up. Changing provider
+  `EMAIL_BACKEND` in `config/settings/email.py` (default `console` locally, `resend` with prod
+  settings); any other value stops start-up with `ImproperlyConfigured`. Changing provider
   later is a setting and a key, not a code change. `smtp` stays available as a fallback (for
   example Google Workspace's `smtp.gmail.com:587` with an app password, if the VPS allows it).
 
@@ -279,8 +280,8 @@ backend.
 **Misconfiguration is loud** (learned on Consult 360, where the demo silently sent from
 `noreply@localhost`):
 
-- `apps/core/checks.py` warns at every start, from `migrate` in the entrypoint, so it lands in
-  the container logs: **W001** the sender isn't on a real domain (`localhost`, `example.*`, or
+- `apps/core/checks.py` warns at every start whenever the provider isn't `console`, from
+  `migrate` in the entrypoint, so it lands in the container logs: **W001** the sender isn't on a real domain (`localhost`, `example.*`, or
   empty); **W002** Resend without a key; **W003** SMTP without a login.
 - `LOGGING` in `base.py` sends warnings and errors to the container output. Without it, Django
   logs almost nothing with `DEBUG` off.

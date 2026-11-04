@@ -92,23 +92,24 @@ critical-path cards. A day also isn't done until `commands/Phase_1/day-N.md` is 
 
 **Goal:** the shared building blocks exist, and the header and footer read from the database.
 
-- [ ] **Base classes.** `BaseModel`, `PublishableMixin`, `OrderableMixin`, `SluggedMixin`,
+- [x] **Base classes.** `BaseModel`, `PublishableMixin`, `OrderableMixin`, `SluggedMixin`,
   `BaseRepository[T]`, `BaseService`, `BaseController`, `ServiceError` family
   (`architecture.md` §4).
   AC: unit tests for the generic repository methods (DB) and the controller's error mapping.
-- [ ] **SiteSettings singleton.** Phone(s), enquiries email, recruitment email, address, hours,
+- [x] **SiteSettings singleton.** Phone(s), enquiries email, recruitment email, address, hours,
   footer blurb, social URLs, default meta description, default OG image, GA4 ID, map query.
   Repository, service (defaults when empty), context processor, admin (one row, no delete).
   AC: top bar, footer and social icons render from the DB; an empty URL hides its icon.
-- [ ] **Markdown.** `MarkdownService` (`markdown` + `nh3`, allow-list in `architecture.md` §4)
+- [x] **Markdown.** `MarkdownService` (`markdown` + `nh3`, allow-list in `architecture.md` §4)
   and the `{% markdown %}` filter.
   AC: the sanitiser tests in `Phase_1/Test_Plan.md` §3.2 pass.
-- [ ] **Layering test.** `apps/core/tests/test_layering.py` (`architecture.md` §2).
+- [x] **Layering test.** `apps/core/tests/test_layering.py` (`architecture.md` §2).
   AC: adding `from apps.pages.repositories …` to a controller fails the test.
-- [ ] **Logging and checks.** `LOGGING` to the console at WARNING; `apps/core/checks.py` with
+- [x] **Logging and checks.** `LOGGING` to the console at WARNING; `apps/core/checks.py` with
   `core.W001` (sender not on a real domain), `W002` (Resend without a key), `W003` (SMTP without
   a login) (`deployment.md` §6).
   AC: `check` with prod settings and no `DEFAULT_FROM_EMAIL` prints `core.W001`.
+- [x] **Logo** (added 2026-11-03): the client's logo replaces the stand-in.
 
 **Done when:** footer and top bar read from the DB, and the layering test guards the rules.
 
@@ -195,8 +196,9 @@ wired to a page).
   with the submitter as `Reply-To`; failure logged with the provider's message, never raised
   to the visitor (`architecture.md` §5).
   AC: the ContactService tests in `Phase_1/Test_Plan.md` §3.3 pass.
-- [ ] **Resend wiring.** `django-anymail[resend]`; `EMAIL_PROVIDER` = `console` | `resend` |
-  `smtp` (`deployment.md` §6).
+- [ ] **Resend wiring.** `django-anymail` and the `EMAIL_PROVIDER` setting (`console` | `resend` |
+  `smtp`) were added on Day 3 with the email checks (`config/settings/email.py`); today proves a
+  real send (`deployment.md` §6).
   AC: with `EMAIL_PROVIDER=resend` locally and a real key, a test enquiry arrives in the
   mailbox.
 - [ ] **Resend domain (owner).** Verify the sending subdomain in the existing Resend account;

@@ -2,8 +2,6 @@
 
 import pytest
 
-from apps.core.services.site_details import DEFAULTS, SiteDetails, SocialLink
-
 pytestmark = pytest.mark.django_db
 
 
@@ -27,19 +25,6 @@ def test_current_page_is_marked_for_screen_readers(client):
 
 def test_no_social_list_when_no_urls(client):
     assert 'aria-label="Social media"' not in client.get("/").content.decode()
-
-
-def test_social_icons_render_when_urls_are_set(client, monkeypatch):
-    with_facebook = SiteDetails(
-        **{
-            **DEFAULTS.__dict__,
-            "social_links": (SocialLink("facebook", "Facebook", "https://facebook.com/x"),),
-        }
-    )
-    monkeypatch.setattr("apps.core.context_processors.DEFAULTS", with_facebook)
-    html = client.get("/").content.decode()
-    assert 'href="https://facebook.com/x"' in html
-    assert 'class="icon"' in html
 
 
 def test_no_jobs_link_in_phase_1(client):

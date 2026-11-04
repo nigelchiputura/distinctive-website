@@ -1,7 +1,7 @@
 # Phase 1 · Day 1: Project skeleton, settings, Docker, CI
 
 **Cards:** `Phase_1/Task_Breakdown.md`, Day 1
-**Completed:** 2026-11-03 · **Revised:** 2026-11-03 (Day 2): step 3, `SECRET_KEY` needs 50+ characters; the `check --deploy` in step 10 warns otherwise
+**Completed:** 2026-11-03 · **Revised:** 2026-11-03 (Day 2): step 3, `SECRET_KEY` needs 50+ characters; the `check --deploy` in step 10 warns otherwise. 2026-11-03 (Day 3): step 7, `createsuperuser` no longer asks for a username
 
 Run from the repo root. Commands are bash; on Windows or macOS see
 [`../Terminal_Note.md`](../Terminal_Note.md). Steps marked **ONE-TIME** are needed only the
@@ -95,7 +95,8 @@ docker compose -f docker/docker-compose.yml exec web python manage.py showmigrat
 docker compose -f docker/docker-compose.yml exec web python manage.py createsuperuser
 ```
 
-It asks for an email address, a username and a password (12 characters or more).
+It asks for an email address and a password (12 characters or more). (Before Day 3 it also
+asked for a username.)
 
 **Expect:** `Superuser created successfully.` Then sign in at <http://localhost:8000/admin/>
 with the email and password, and see **Users** listed.

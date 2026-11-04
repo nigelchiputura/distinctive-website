@@ -80,13 +80,13 @@ testability, no extra files.
 | `PublishableMixin` | `is_published`, `published_at`. |
 | `OrderableMixin` | `sort_order`, with default ordering. |
 | `SluggedMixin` | `slug` generated from a title field; unique. |
-| `BaseRepository[T]` | `get`, `get_or_none`, `list`, `create`, `update`, `delete`, `exists`, `count`; `published()` for publishable models. Subclasses set `model`. |
+| `BaseRepository[T]` | `get` (raises `NotFoundError`, so ORM exceptions never reach services), `get_or_none`, `list`, `create`, `update`, `delete`, `exists`, `count`; `published()` for publishable models. Subclasses set `model`. |
 | `BaseService` | Holds the repository; `get_or_raise` raising `NotFoundError`. |
 | `ServiceError` family | `NotFoundError`, `ValidationError`, `ExternalServiceError`. Services raise these, never `Http404`. |
 | `BaseController` (a `View`) | `render_page`, `json_ok`, `json_error`, `is_ajax`; maps `ServiceError` to responses (404, 400, 503). |
 | `SeoMixin` + `SeoData` | Controllers return title, description, canonical and OG image; `_seo.html` renders them with JSON-LD. |
-| `MarkdownService` + `{% markdown %}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: headings, paragraphs, lists, emphasis, blockquotes, links (`http`, `https`, `mailto`, `tel`, with `rel="noopener noreferrer"`). |
-| `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Exposed by a context processor. |
+| `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
+| `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template. |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
 

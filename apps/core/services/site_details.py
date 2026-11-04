@@ -1,7 +1,7 @@
-"""The company's contact details and links, as shown in the top bar and the footer.
+"""The company's details and links, as shown in the top bar, the footer and the page head.
 
-Day 2 uses DEFAULTS, the values on the old site. Day 3 adds the SiteSettings model, editable in
-the admin, and SiteSettingsService falls back to these same DEFAULTS for anything left empty.
+SiteSettingsService builds a SiteDetails from the admin-edited SiteSettings row, falling back to
+DEFAULTS (the old site's values) for anything left empty.
 """
 
 from dataclasses import dataclass, field
@@ -26,6 +26,10 @@ class SiteDetails:
     hours: str
     footer_blurb: str
     social_links: tuple[SocialLink, ...] = field(default_factory=tuple)
+    meta_description: str = ""
+    og_image_url: str = ""
+    ga_measurement_id: str = ""
+    map_query: str = ""
 
     @property
     def visible_social_links(self) -> tuple[SocialLink, ...]:
@@ -54,4 +58,10 @@ DEFAULTS = SiteDetails(
         SocialLink("instagram", "Instagram", ""),
         SocialLink("x", "X (Twitter)", ""),
     ),
+    meta_description=(
+        "Distinctive Consultancy Services, Harare: HR and business consultancy in industrial "
+        "relations, HR audits, talent acquisition, people strategy, research surveys and "
+        "organisational design."
+    ),
+    map_query="62 Mutare Road, Msasa, Harare, Zimbabwe",
 )

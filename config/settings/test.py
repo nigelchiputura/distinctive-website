@@ -9,4 +9,5 @@ ALLOWED_HOSTS = ["testserver", "localhost"]
 # (a lesson logged on Consult 360).
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
+EMAIL_PROVIDER = "console"  # no start-up email checks in tests (they're tested directly)
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
