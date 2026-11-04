@@ -234,26 +234,37 @@ mailbox.
 **Goal:** visitors can send enquiries from Contact and Services; nothing third-party loads before
 consent.
 
-- [ ] **Forms and controller.** `ContactForm` (name, email, message) and `EnquiryForm` (first
+- [x] **Forms and controller.** `ContactForm` (name, email, message) and `EnquiryForm` (first
   name, last name, email, message); honeypot field; rate limit (5 per IP per hour, Django's
   database cache so all gunicorn workers share it); `ContactController` answering HTML or the
   JSON envelope.
   AC: controller tests: valid, invalid, honeypot, rate-limited, non-AJAX fallback.
-- [ ] **Contact page.** Black band with the form left and "Reach Us" right (including the
+  *(As built: `RateLimitService` in core counts accepted enquiries only; the visitor's address
+  is read behind Caddy through `TRUSTED_PROXY_COUNT`; `createcachetable` is in the entrypoint.)*
+- [x] **Contact page.** Black band with the form left and "Reach Us" right (including the
   vacancies line, assumption A3), map band below (`frontend.md` §4).
   AC: the form works with JavaScript off (full-page POST and redirect with a message).
-- [ ] **`contact-form.js` and `http.js`.** AJAX submit, field errors, success state, CSRF
+  *(As built: `contact_form` and `map` section types, seeded today rather than on Day 9.)*
+- [x] **`contact-form.js` and `http.js`.** AJAX submit, field errors, success state, CSRF
   header (`frontend.md` §5).
   AC: errors show next to their fields without a reload.
-- [ ] **Services enquiry block.** The gold "Get In Touch With Us" block posts to the same
+- [x] **Services enquiry block.** The gold "Get In Touch With Us" block posts to the same
   controller with `source_page=services`; button "Send enquiry".
   AC: its submissions show "services" in the admin.
-- [ ] **Cookie consent.** `_cookie_banner.html`, `cookie-consent.js` (accept / decline, stored
-  choice, `consent:granted` event, footer link to reopen) (`frontend.md` §8).
+  *(As built: an `enquiry_form` section type, seeded after the client logos.)*
+- [x] **Cookie consent.** `_cookie_banner.html`, `cookie-consent.js` (accept / decline, stored
+  choice, `consent:granted` event, footer link to reopen) (`frontend.md` §7).
   AC: before a choice, no request goes to Google.
-- [ ] **GA4 and the map.** GA4 tag injected only after "Accept"; Maps Embed iframe injected only
+- [x] **GA4 and the map.** GA4 tag injected only after "Accept"; Maps Embed iframe injected only
   after "Accept", with the address and a "Get directions" link before.
   AC: the Test Plan §4 consent checks pass in the browser's network tab.
+  *(Checked in a headless browser with a placeholder GA id and key: no Google request before a
+  choice, GA4 and the map after Accept, neither after Decline. The real key and GA4 property are
+  the owner's; `commands/Phase_1/day-8.md` steps 8–9.)*
+- [ ] **Maps key and GA4 property (owner).** Create the Maps Embed API key restricted by HTTP
+  referrer to the preview and live hosts, and the GA4 property; put them in `.env` / Site
+  settings.
+  AC: on the preview host the map shows after Accept, and GA4's Realtime view sees the visit.
 
 **Done when:** an enquiry from either form lands in the admin and the mailbox, and GA and the
 map load only after consent.
@@ -280,7 +291,8 @@ runs locally.
   hero; explicit image sizes.
   AC: Lighthouse on Home, About, Services, Contact: Performance ≥ 90, Accessibility ≥ 90,
   SEO ≥ 95.
-- [ ] **Seed, part 3.** Services, clients and Contact content; `SiteSettings` values.
+- [ ] **Seed, part 3.** Services, clients and Contact content *(all three seeded by Day 8)*;
+  `SiteSettings` values.
   AC: a fresh database plus `seed_site_content` gives the complete site.
 - [ ] **Production files.** `docker/docker-compose.prod.yml` (web from GHCR, db with health
   check, caddy; volumes `pg_data`, `media_data`, `caddy_data`), `docker/Caddyfile` (serves

@@ -66,6 +66,9 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         CLIENTS = "clients", "Corporate clients (logos)"
         TEAM = "team", "Leadership team"
         CTA = "cta", "Call to action (a line and a button)"
+        CONTACT_FORM = "contact_form", "Contact form beside “Reach Us” (Contact page)"
+        ENQUIRY_FORM = "enquiry_form", "Enquiry form on gold (Services page)"
+        MAP = "map", "Map (shown after the visitor accepts cookies)"
 
     class ImagePosition(models.TextChoices):
         LEFT = "left", "Left"

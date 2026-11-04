@@ -17,7 +17,8 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
-# Caddy terminates TLS and forwards the scheme (docs/deployment.md §7).
+# Caddy terminates TLS and forwards the scheme and the visitor's address (docs/deployment.md §7).
+TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT", default=1)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 SESSION_COOKIE_SECURE = True

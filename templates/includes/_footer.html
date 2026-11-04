@@ -26,7 +26,8 @@
   <div class="site-footer__bottom">
     <div class="container">
       <p class="mb-0">&copy; {{ current_year }} {{ site_info.company_name }}. All rights reserved.</p>
-      {# Day 8 adds the "Cookie settings" link here. #}
+      {# Shown by cookie-consent.js, which is what it needs to work. #}
+      <button type="button" class="site-footer__cookies link-button" data-cookie-settings hidden>Cookie settings</button>
       {% if site_info.visible_social_links %}
         <ul class="site-footer__social list-unstyled mb-0" aria-label="Social media">
           {% for link in site_info.visible_social_links %}

@@ -1,6 +1,7 @@
 # Architecture
 
-**Project-wide · revised 2026-11-04** (Day 7: Services page, enquiries, the seed fills blanks;
+**Project-wide · revised 2026-11-04** (Day 8: the contact controller, rate limit, form and map
+sections; Day 7: Services page, enquiries, the seed fills blanks;
 Day 6: team, partners, the page blocks; Day 5:
 `ImageMixin`, pages and services as built, the seed; 2026-11-02: two phases; Resend; local media; VPS go-live)
 
@@ -92,7 +93,7 @@ testability, no extra files.
 | `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
 | `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template as **`site_info`** (not `site`, which allauth's views use for the Sites record). |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
-| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name). For an item that's already there it fills in only **empty** text fields and a missing image (`blank_fields`), so a later day's fuller content reaches a database seeded earlier; flags, numbers and anything an editor has filled in are never changed. Day 5 seeded Home and its six services, Day 6 About, its team and partners, Day 7 Services, the full text of all 13 services and ten clients; Day 9 adds Contact. |
+| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name). For an item that's already there it fills in only **empty** text fields and a missing image (`blank_fields`), so a later day's fuller content reaches a database seeded earlier; flags, numbers and anything an editor has filled in are never changed. Day 5 seeded Home and its six services, Day 6 About, its team and partners, Day 7 Services, the full text of all 13 services and ten clients, Day 8 Contact (its form and map sections) and the Services enquiry block. |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
 
 ## 5. Request flow — worked example
@@ -107,28 +108,57 @@ sequenceDiagram
     participant R as ContactRepository
     participant M as Email (anymail → Resend)
     JS->>C: POST /contact/ (form data, CSRF header)
-    C->>C: validate ContactForm, honeypot, rate limit
+    C->>C: rate limit, honeypot, validate ContactForm
     C->>S: submit(data, source_page="contact")
     S->>R: create(...)   (saved first)
     S->>M: send to CONTACT_RECIPIENT, Reply-To = visitor
     S->>R: mark_emailed() or record_email_error(msg)
     S-->>C: submission
-    C-->>JS: 200 {ok: true} / 400 {ok: false, errors}
+    C-->>JS: 200 {ok: true} / 400 {ok: false, errors} / 429
 ```
 
 The submission is **saved before** the email is attempted. A provider failure never loses an
 enquiry: it stays in the admin with `email_sent=False` and the provider's message, and an admin
 action resends it.
 
-**As built on Day 7** (the form and controller arrive on Day 8): `ContactService.submit(data,
+**The service, as built on Day 7:** `ContactService.submit(data,
 source_page, ip, user_agent)` saves through `ContactRepository.create`, then calls its mailer
 (by default Django's `EmailMessage.send`, so the configured backend: Resend in production). Any
 exception from the mailer is caught, logged as a warning (`apps.contact`) and stored, cut to 1,000
 characters, as `email_error`. The email is plain text to `CONTACT_RECIPIENT`, `Reply-To` the
 visitor, subject "Website enquiry from <name> (<page>)"; line breaks are removed from the name
 so it can't add headers. The visitor's IP is stored only as an HMAC-SHA256 keyed with
-`SECRET_KEY` (`ip_hash`), for Day 8's rate limit. The repository and mailer are injected, so the
+`SECRET_KEY` (`ip_hash`). The repository and mailer are injected, so the
 service's tests use fakes.
+
+**The controller, as built on Day 8:** `ContactController` (`apps/contact/controllers/`) is a
+`PageController` for `slug = "contact"`, so GET shows the Contact page from its sections. POST
+takes either form, chosen by the hidden `form` field: `contact` (`ContactForm`: name, email,
+message) or `enquiry` (`EnquiryForm` on Services: first name, last name, email, message; the
+names are joined, and the enquiry is saved with `source_page="services"`). In order:
+
+1. **Rate limit.** `RateLimitService("contact")` (`apps/core/services/`) counts in Django's cache,
+   keyed by the same `ip_hash`: five accepted enquiries per visitor per hour
+   (`CONTACT_RATE_LIMIT`). The cache is the database cache (`CACHES`, table `django_cache`, made
+   by `createcachetable` in the entrypoint), so every gunicorn worker shares the counts; tests use
+   memory. Over the limit: 429 with a message naming the enquiries address. Invalid posts don't
+   count, so a visitor fixing typos isn't locked out. The visitor's address is
+   `BaseController.client_ip`: `REMOTE_ADDR`, or behind Caddy (`TRUSTED_PROXY_COUNT=1`) the last
+   `X-Forwarded-For` entry, the one Caddy added.
+2. **Honeypot.** A `website` field placed off-screen (`aria-hidden`, `tabindex="-1"`). If it is
+   filled, the reply is the normal success and nothing is saved or emailed.
+3. **Validation**, then `ContactService.submit`.
+
+Replies: with `X-Requested-With: XMLHttpRequest` (contact-form.js) the JSON envelope (§6); field
+errors keyed by field name, general ones under `__all__`. Without JavaScript: a redirect back to
+the form's page (`/contact/#contact-form`, `/services/#enquiry-form`) with a success message
+(Django's messages, tagged with the form's kind), or the page again with the errors (400) or the
+limit message (429), keeping what the visitor typed. CSRF is Django's own: the form carries the
+token, and `http.js` also sends it as `X-CSRFToken`.
+
+The forms reach the page through `PageController.form_context`: a page with a `contact_form` or
+`enquiry_form` section gets an empty form (or the submitted one, with its errors), and a page with
+a `map` section gets `GOOGLE_MAPS_EMBED_KEY`.
 
 **A visitor opens `/about/`.** `AboutController` (a `PageController` with `slug = "about"`) →
 `PageService.get_page("about")` (the published page, its published sections and slides, in order;
@@ -138,8 +168,11 @@ which calls `TeamService.leadership()` because a section is a `team` block and
 `pages/page.html`.
 
 **A visitor opens `/services/`.** `ServicesController` does the same with `slug = "services"`;
-its `service_bands` section brings in `OfferingService.all()` and its `clients` section
-`PartnerService.clients()`.
+its `service_bands` section brings in `OfferingService.all()`, its `clients` section
+`PartnerService.clients()`, and its `enquiry_form` section an empty `EnquiryForm`.
+
+**A visitor opens `/contact/`.** `ContactController` does the same with `slug = "contact"`; its
+`contact_form` section gets an empty `ContactForm` and its `map` section the Maps key.
 
 **A visitor opens `/`.** `HomeController` does the same with `slug = "home"` and
 `pages/home.html`; its `service_cards` section brings in `OfferingService.home_cards()`
@@ -189,14 +222,14 @@ erDiagram
     }
 ```
 
-**As built (Days 5–7):**
+**As built (Days 5–8):**
 
 - `Page`: one row per fixed page (`home`, `about`, `services`, `contact`), created by the
   migration `pages.0002_the_four_pages`, so every URL works on a fresh database. Title, published,
   and the search-engine title and description. The admin can't add or delete pages.
 - `PageSection`: `section_type` (`hero_text`, `intro_dark`, `band_light`, `band_dark`,
   `two_column`, `value_block`, `service_cards`, `service_bands`, `partners`, `clients`, `team`,
-  `cta`), heading
+  `cta`, and from Day 8 `contact_form`, `enquiry_form`, `map`), heading
   and its position, a short text (`intro`, the left column of `two_column`), Markdown body,
   optional image (`ImageMixin`) and its position, an optional button, order, published, and an `anchor`. The
   anchor is made from the heading when empty, unique within its page (`our-story`, `our-story-2`),

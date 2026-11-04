@@ -90,6 +90,9 @@ class SeedService(BaseService):
         self._seed_page(
             report, "services", content.SERVICES_META_DESCRIPTION, content.SERVICES_SECTIONS
         )
+        self._seed_page(
+            report, "contact", content.CONTACT_META_DESCRIPTION, content.CONTACT_SECTIONS
+        )
         return report
 
     # ---- parts -----------------------------------------------------------------------------

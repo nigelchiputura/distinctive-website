@@ -1,0 +1,80 @@
+// Contact's details column, the gold enquiry band (Services) and the map band.
+
+.contact-details {
+  padding: 1.75rem;
+  border: 1px solid rgba($dcs-gold, 0.45);
+
+  &__list {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+
+    dt {
+      color: $dcs-gold;
+      font-weight: 600;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  &__body {
+    margin-top: 1.25rem;
+  }
+
+  a {
+    color: $dcs-white;
+    overflow-wrap: anywhere;
+
+    &:hover,
+    &:focus-visible {
+      color: $dcs-gold;
+    }
+  }
+}
+
+.band--gold {
+  color: $dcs-black;
+  background: $dcs-gold;
+}
+
+.band__heading--on-gold {
+  color: $dcs-black;
+  font-weight: 700;
+}
+
+.map-band {
+  background: $dcs-grey-light;
+
+  &__text {
+    padding-block: 2.5rem;
+  }
+
+  &__heading {
+    color: $dcs-gold-dark;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+    font-weight: 700;
+  }
+
+  &__address {
+    font-size: 1.1rem;
+  }
+
+  &__frame {
+    border-top: 1px solid rgba($dcs-black, 0.1);
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: clamp(18rem, 45vw, 28rem);
+      border: 0;
+    }
+  }
+
+  &__note {
+    padding-block: 1.25rem;
+    margin: 0;
+    color: $dcs-grey;
+  }
+}

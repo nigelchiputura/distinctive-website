@@ -1,0 +1,137 @@
+// The enquiry forms (templates/includes/_enquiry_form.html): on black (Contact) and on gold
+// (Services). Error text is never shown by colour alone: it is a sentence under the field.
+
+.enquiry-form {
+  .form-label {
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+
+  .form-control {
+    border-radius: 0;
+    border: 1px solid $dcs-grey;
+    padding: 0.65rem 0.8rem;
+
+    &:focus {
+      border-color: $dcs-gold;
+      box-shadow: 0 0 0 0.2rem rgba($dcs-gold, 0.45);
+    }
+
+    &[aria-invalid="true"] {
+      border-width: 2px;
+    }
+  }
+
+  &__submit {
+    margin-top: 1.5rem;
+    min-width: 10rem;
+
+    &[aria-busy="true"] {
+      cursor: progress;
+      opacity: 0.75;
+    }
+  }
+}
+
+.form-note {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.form-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-alert,
+.form-success {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid currentcolor;
+}
+
+.form-success {
+  font-weight: 600;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+  }
+}
+
+// Off-screen, not display:none: some bots skip fields that aren't rendered.
+.form-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+// On black: gold labels, white fields, errors in a light red that reads on black (9.2:1).
+.on-dark .enquiry-form {
+  .form-label {
+    color: $dcs-gold;
+  }
+
+  .form-error {
+    color: $dcs-error-on-dark;
+  }
+
+  .form-control[aria-invalid="true"] {
+    border-color: $dcs-error-on-dark;
+  }
+}
+
+.on-dark .form-alert {
+  color: $dcs-error-on-dark;
+  background: rgba($dcs-white, 0.06);
+}
+
+.on-dark .form-success {
+  color: $dcs-gold;
+  background: rgba($dcs-white, 0.06);
+}
+
+.on-dark .form-note {
+  color: $dcs-grey-on-dark;
+}
+
+// On gold: black text throughout (10:1); errors in a dark red that reads on gold (6.0:1).
+.band--gold .enquiry-form {
+  .form-label {
+    color: $dcs-black;
+  }
+
+  .form-control {
+    border-color: $dcs-black;
+  }
+
+  .form-error {
+    color: $dcs-error-on-gold;
+  }
+
+  .form-control[aria-invalid="true"] {
+    border-color: $dcs-error-on-gold;
+  }
+
+  .form-control:focus {
+    border-color: $dcs-black;
+    box-shadow: 0 0 0 0.2rem rgba($dcs-black, 0.35);
+  }
+}
+
+.band--gold .form-alert {
+  color: $dcs-error-on-gold;
+  background: rgba($dcs-white, 0.45);
+}
+
+.band--gold .form-success {
+  color: $dcs-black;
+  background: rgba($dcs-white, 0.45);
+}

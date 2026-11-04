@@ -214,6 +214,28 @@ JAZZMIN_UI_TWEAKS = {
 # Google Analytics 4. The admin's SiteSettings value wins; this is the fallback.
 GA_MEASUREMENT_ID: str = env("GA_MEASUREMENT_ID", default="")
 
+# The Contact page's map (Maps Embed API). The key is public by design (it is in the iframe's
+# address), so restrict it to the site's addresses in Google Cloud (docs/deployment.md §8).
+# Empty: the map band shows the address and "Get directions" only.
+GOOGLE_MAPS_EMBED_KEY: str = env("GOOGLE_MAPS_EMBED_KEY", default="")
+
+# Shared by every gunicorn worker, so the enquiry rate limit counts across them. The table is
+# created by `manage.py createcachetable` (docker/entrypoint.sh).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+
+# Enquiries: at most this many from one visitor's address per hour (docs/architecture.md §5).
+CONTACT_RATE_LIMIT = env.int("CONTACT_RATE_LIMIT", default=5)
+CONTACT_RATE_WINDOW = 60 * 60  # seconds
+
+# How many proxies stand in front of Django and add the visitor's address to X-Forwarded-For.
+# 0 locally (the address is REMOTE_ADDR); 1 in production (Caddy).
+TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT", default=0)
+
 # Warnings and errors go to the container output. Without this, Django logs almost nothing
 # with DEBUG off (lesson from Consult 360; docs/deployment.md §6).
 LOGGING = {

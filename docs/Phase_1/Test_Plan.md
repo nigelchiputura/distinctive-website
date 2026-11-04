@@ -50,13 +50,13 @@ Service (fake repository and fake mailer):
 
 Controller:
 
-- [ ] Valid AJAX POST → 200 `{ok: true}`; invalid → 400 with field errors.
-- [ ] Valid non-AJAX POST → redirect with a success message; invalid → the page re-rendered with
+- [x] Valid AJAX POST → 200 `{ok: true}`; invalid → 400 with field errors.
+- [x] Valid non-AJAX POST → redirect with a success message; invalid → the page re-rendered with
   errors.
-- [ ] Honeypot filled → treated as success to the bot, **nothing saved**.
-- [ ] Sixth submission from one IP within the hour → 429 (JSON) or a friendly message (HTML).
-- [ ] The Services enquiry form stores `source_page=services`.
-- [ ] POST without a CSRF token → 403.
+- [x] Honeypot filled → treated as success to the bot, **nothing saved**.
+- [x] Sixth submission from one IP within the hour → 429 (JSON) or a friendly message (HTML).
+- [x] The Services enquiry form stores `source_page=services`.
+- [x] POST without a CSRF token → 403.
 
 ### 3.4 Content services
 
@@ -86,13 +86,13 @@ Controller:
 
 Status code, template and one expected string for each:
 
-- [ ] `/`, `/about/`, `/services/`, `/contact/` → 200.
+- [x] `/`, `/about/`, `/services/`, `/contact/` → 200 (`apps/core/tests/test_consent.py`).
 - [ ] `/sitemap.xml` (lists the four pages, not the admin), `/robots.txt` (points to the
   sitemap) → 200.
 - [ ] An unknown URL → the branded 404.
 - [ ] A seeded old URL (for example `/about-us/`) → 301 to its new page.
 - [ ] Each page's `<title>`, meta description and canonical are present and unique.
-- [ ] No `googletagmanager` or `maps.googleapis`/`google.com/maps/embed` URL appears in the
+- [x] No `googletagmanager` or `maps.googleapis`/`google.com/maps/embed` URL appears in the
   initial HTML of any page (both are injected by JavaScript after consent).
 
 ### 3.7 Security settings

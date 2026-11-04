@@ -31,6 +31,9 @@ PY
 # 3. Migrations (this also prints Django's system checks into the logs).
 python manage.py migrate --noinput
 
+# 3a. The database cache's table (the enquiry rate limit). Does nothing if it is already there.
+python manage.py createcachetable
+
 # 4. First deploy only: load the old site's content (the command arrives on Day 5).
 if [ "$SEED_SITE_CONTENT" = "true" ]; then
   python manage.py seed_site_content

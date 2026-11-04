@@ -1,6 +1,7 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-04** (Day 7: Services page, enquiries, Nunito Sans; Day 6: team,
+**Project-wide · revised 2026-11-04** (Day 8: Contact, enquiry forms, rate limit, cookie
+consent; Day 7: Services page, enquiries, Nunito Sans; Day 6: team,
 partners, page blocks; Day 5: seed content,
 Home templates, JS; 2026-11-02: npm
 and SCSS at the repo root, as in Consult 360; Phase 2 apps marked; no R2)
@@ -55,7 +56,8 @@ distinctive-site/
 │   │   │   ├── _hero.scss
 │   │   │   ├── _section.scss           # alternating dark/light bands
 │   │   │   ├── _cards.scss             # service card, team card
-│   │   │   ├── _forms.scss
+│   │   │   ├── _forms.scss             # the enquiry forms, on black and on gold
+│   │   │   ├── _contact.scss           # Reach Us, the gold enquiry band, the map band
 │   │   │   ├── _footer.scss
 │   │   │   ├── _auth.scss              # sign-in and the other allauth pages
 │   │   │   ├── _buttons.scss           # the outlined gold buttons
@@ -63,11 +65,8 @@ distinctive-site/
 │   │   │   ├── _team.scss              # Our Leadership, Read more
 │   │   │   ├── _services.scss          # the Services page links and bands
 │   │   │   └── _cookie-banner.scss
-│   │   └── pages/
-│   │       ├── _home.scss
-│   │       ├── _about.scss
-│   │       ├── _services.scss
-│   │       └── _contact.scss           # Phase 2 adds _jobs.scss and components/_search.scss
+│   │   └── pages/                      # empty so far: no page has needed rules of its own
+│   │                                   # (Phase 2 adds _jobs.scss and components/_search.scss)
 │   ├── css/
 │   │   ├── main.css                    # COMPILED, minified, committed
 │   │   └── admin.css                   # COMPILED from admin.scss, committed
@@ -77,8 +76,9 @@ distinctive-site/
 │   │       ├── hero-slider.js          # Home carousel: reduced motion, pause on focus, pause button
 │   │       ├── read-more.js            # long bios cut behind Read more
 │   │       ├── http.js                 # fetch wrapper: CSRF, JSON envelope, timeout
-│   │       ├── contact-form.js
-│   │       └── cookie-consent.js       # Phase 2 adds search-dropdown.js, highlight.js
+│   │       ├── contact-form.js         # [data-contact-form]: fetch(), field errors, thank-you
+│   │       └── cookie-consent.js       # banner, stored choice, GA4 and the map after Accept
+│   │                                   # Phase 2 adds search-dropdown.js, highlight.js
 │   ├── vendor/                         # copied from node_modules by `npm run vendor`, committed
 │   │   ├── bootstrap/                  # bootstrap.bundle.min.js (source-map line removed)
 │   │   └── nunito-sans/                # latin woff2, 400/600/700, normal and italic
@@ -90,7 +90,8 @@ distinctive-site/
 │   │   ├── _topbar.html
 │   │   ├── _navbar.html
 │   │   ├── _footer.html
-│   │   ├── _cookie_banner.html
+│   │   ├── _cookie_banner.html         # shown by cookie-consent.js; only when GA or the map is set up
+│   │   ├── _enquiry_form.html          # ContactForm or EnquiryForm, posting to /contact/
 │   │   ├── icons/                      # inline SVG icons, written by `npm run vendor`
 │   │   ├── _hero_slider.html           # Home's slides (pages.HeroSlide)
 │   │   ├── _section.html               # renders one PageSection by type
@@ -145,16 +146,17 @@ apps/contact/
 ├── controllers/
 │   ├── __init__.py
 │   └── contact_controller.py       # ContactController(BaseController)
-├── templates/
-│   └── contact/
-│       ├── contact.html
-│       └── _enquiry_form.html      # included on the Services page
 ├── migrations/
 └── tests/
     ├── test_contact_service.py     # fake repository + fake mailer, no DB: the gate
-    ├── test_contact_repository.py  # a few DB tests
-    └── test_contact_controller.py  # smoke + form behaviour
+    ├── test_contact_db.py          # the model, repository and admin on a real database
+    ├── failing_backend.py          # an email backend that always fails
+    └── test_contact_controller.py  # both forms, JS on and off, honeypot, 429, CSRF
 ```
+
+Contact has no templates of its own: the page is a `Page` built from sections like the others,
+so `ContactController` extends `PageController` and the form is `templates/includes/_enquiry_form.html`,
+which the `contact_form` and `enquiry_form` sections include.
 
 ## 3. `apps/core/` in detail
 
@@ -169,14 +171,15 @@ apps/core/
 │   ├── base.py                # BaseService
 │   ├── markdown_service.py    # Markdown → sanitised HTML
 │   ├── navigation_service.py  # the nav items, with the current page marked
+│   ├── rate_limit_service.py  # RateLimitService: counts in Django's cache (the enquiry limit)
 │   ├── seed_service.py        # SeedService: adds the old site's content that's missing
 │   ├── site_details.py        # SiteDetails value + DEFAULTS (the old site's details)
 │   └── site_settings_service.py
 ├── controllers/
-│   └── base.py                # BaseController (View) + error mapping
+│   └── base.py                # BaseController (View), error mapping, client_ip()
 ├── exceptions.py              # ServiceError, NotFoundError, ValidationError, ExternalServiceError
 ├── checks.py                  # core.W001–W003 (email configuration)
-├── context_processors.py      # site_info (SiteDetails), nav_items, current_year
+├── context_processors.py      # site_info (SiteDetails), nav_items, current_year, consent_needed
 ├── middleware.py              # RedirectMiddleware (old WordPress URLs → 301)
 ├── seo.py                     # SeoMixin, SeoData, sitemaps
 ├── templatetags/
@@ -191,19 +194,24 @@ apps/core/
     ├── test_markdown_service.py
     ├── test_checks.py
     ├── test_seed.py           # SeedService with fakes; the command twice on a real database
+    ├── test_rate_limit_service.py  # the limit, its window; client_ip behind Caddy
+    ├── test_consent.py        # no Google address in any page before consent
     └── test_security.py       # check --deploy with prod settings
 ```
 
-`apps/pages/` as built by Day 6: `models.py` (`Page`, `PageSection`, `Partner`, `HeroSlide`),
+`apps/pages/` as built by Day 8: `models.py` (`Page`, `PageSection`, `Partner`, `HeroSlide`),
 `admin.py` (each page with its slides and sections inline; partners and clients),
 `repositories/` (`page_repository.py`, `partner_repository.py`), `services/`
 (`page_service.py` with `PageService` and `PageContent`, `partner_service.py`,
 `page_blocks_service.py`), `controllers/page_controller.py` (`PageController`, `HomeController`,
 `AboutController`, `ServicesController`), `urls.py`, `templates/pages/` (`page.html`, `home.html`), and migrations
-`0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`, `0004_service_bands`.
+`0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`, `0004_service_bands`,
+`0005_form_and_map_sections`.
 `apps/offerings/` has `Service`, its admin, `ServiceRepository` and `OfferingService`.
 `apps/contact/` (Day 7) has `ContactSubmission`, its admin, `ContactRepository`,
-`ContactService` and tests; its forms, controller and templates (§2) arrive on Day 8. `apps/team/` has `TeamMember`,
+`ContactService` and tests; Day 8 added `forms.py`, `controllers/contact_controller.py` and
+`urls.py` (`/contact/`), and the pages migration `0005_form_and_map_sections`.
+`apps/core/services/rate_limit_service.py` (Day 8) is the shared rate limit. `apps/team/` has `TeamMember`,
 its admin, `TeamRepository` and `TeamService`.
 
 `Redirect` is a model in `apps/pages` (editable in the admin); the middleware in `apps/core`
