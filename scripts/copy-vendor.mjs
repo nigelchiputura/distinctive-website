@@ -2,7 +2,7 @@
 //
 // Copies the few files the site uses from node_modules into the repo, where they are committed:
 //   - Bootstrap's JS bundle               → static/vendor/bootstrap/
-//   - Open Sans (latin, 400/600/700)      → static/vendor/open-sans/
+//   - Nunito Sans (latin, 400/600/700)    → static/vendor/nunito-sans/
 //   - Font Awesome icons, as inline SVGs  → templates/includes/icons/
 // Node never reaches an image or a server; the committed copies do.
 // Re-run after changing a package version, then run the prod collectstatic (deployment.md §2).
@@ -34,14 +34,14 @@ copyWithoutSourceMap(
   join(root, "static", "vendor", "bootstrap", "bootstrap.bundle.min.js"),
 );
 
-// Open Sans: the weights and styles _fonts.scss declares.
+// Nunito Sans (the site's font since 2026-11-04): the weights and styles _fonts.scss declares.
 for (const weight of ["400", "600", "700"]) {
   for (const style of ["normal", "italic"]) {
-    const file = `open-sans-latin-${weight}-${style}.woff2`;
-    copy(nm("@fontsource", "open-sans", "files", file), join(root, "static", "vendor", "open-sans", file));
+    const file = `nunito-sans-latin-${weight}-${style}.woff2`;
+    copy(nm("@fontsource", "nunito-sans", "files", file), join(root, "static", "vendor", "nunito-sans", file));
   }
 }
-copy(nm("@fontsource", "open-sans", "LICENSE"), join(root, "static", "vendor", "open-sans", "LICENSE"));
+copy(nm("@fontsource", "nunito-sans", "LICENSE"), join(root, "static", "vendor", "nunito-sans", "LICENSE"));
 
 // Font Awesome icons as inline SVG partials: no webfont download, and each icon inherits
 // the text colour (fill="currentColor"). Icons are CC BY 4.0 (fontawesome.com/license/free).

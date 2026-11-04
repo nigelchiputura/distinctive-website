@@ -92,8 +92,8 @@ DJANGO_SETTINGS_MODULE=config.settings.prod SECRET_KEY=build-only python manage.
 2. Waits up to 30 seconds for Postgres, using the app's own `DATABASE_URL`.
 3. Runs `migrate --noinput` (this also prints the `core.W00x` checks into the logs) and, from
    Day 8, `createcachetable` (the rate limiter's shared cache).
-4. Runs `seed_site_content` when `SEED_SITE_CONTENT=true` (first deploy only). It adds only
-   what's missing and never changes an editor's work; its images are copied into the media
+4. Runs `seed_site_content` when `SEED_SITE_CONTENT=true` (first deploy only). It adds what's
+   missing and fills in empty fields, and never changes an editor's work; its images are copied into the media
    volume like any upload.
 5. `exec "$@"`: gunicorn in the image, `runserver` under docker-compose.
 
@@ -289,6 +289,11 @@ backend.
   logs almost nothing with `DEBUG` off.
 - `ContactService` logs each failed send with the provider's message and stores it on the
   submission.
+
+**Proving a real send (owner, once Resend is verified).** Locally, with `EMAIL_PROVIDER=resend`,
+`RESEND_API_KEY` and `DEFAULT_FROM_EMAIL` on the verified domain in `.env`:
+`python manage.py sendtestemail you@example.org` (Django's own command, through the same backend),
+then an enquiry through `ContactService` (`commands/Phase_1/day-7.md` step 9).
 
 **Failure handling.** `ContactService.submit` saves first and never raises a send failure to the
 visitor. A failed send leaves `email_sent=False` and `email_error` set; the admin action

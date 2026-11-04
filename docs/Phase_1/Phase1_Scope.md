@@ -38,6 +38,7 @@ with section anchors, the deployment), so Phase 2 adds apps without reworking Ph
 | **D12** | SEO basics (meta, Open Graph, JSON-LD `Organization`, sitemap, robots), a cookie banner, and **GA4 loaded only after consent**. The Google Map is an interactive Maps Embed iframe, also loaded only after consent. | 2026-10-08 |
 | **D13** | Social icons: Facebook, LinkedIn, Instagram, X, each a `SiteSettings` URL shown only when filled in. RSS dropped. | 2026-10-08 |
 | **D14** | Old WordPress URLs get **301 redirects** to their new pages, so links and search rankings survive the cutover. | 2026-11-02 |
+| **D15** | The site's font is **Nunito Sans** (self-hosted), on the site and in the admin, replacing the old site's Open Sans. | 2026-11-04 |
 
 ## 3. Phase 1 deliverables
 

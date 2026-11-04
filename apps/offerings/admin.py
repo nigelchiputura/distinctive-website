@@ -18,7 +18,18 @@ class ServiceAdmin(admin.ModelAdmin):
     readonly_fields = ("preview",)
     fieldsets = (
         (None, {"fields": ("title", "summary", "body")}),
-        ("Image", {"fields": ("image", "preview", "image_alt", "image_decorative")}),
+        (
+            "Image",
+            {
+                "fields": (
+                    "image",
+                    "preview",
+                    "image_alt",
+                    "image_decorative",
+                    "image_on_services_page",
+                )
+            },
+        ),
         ("Where it shows", {"fields": ("show_on_home", "sort_order", "is_published", "anchor")}),
     )
 

@@ -1,9 +1,11 @@
 """Loads the old site's content into an empty or partly filled database
 (`manage.py seed_site_content`, docs/deployment.md §2.1).
 
-Adds only what is missing, judged by each item's key (see apps/core/seed/content.py). It never
-changes or removes what is already there, so it is safe to run again, and an editor's changes
-survive it. An item an editor has deleted does come back on a re-run: run it on the first deploy.
+Adds what is missing, judged by each item's key (see apps/core/seed/content.py). For an item that
+is already there, it fills in only its **empty** text fields and a missing image, so a later day's
+fuller content reaches a database seeded earlier, while anything an editor has filled in, ticked
+or ordered is left alone. It never removes anything. Safe to run again; an item an editor has
+deleted does come back on a re-run, so run it on the first deploy.
 """
 
 from collections.abc import Callable
@@ -26,6 +28,23 @@ SEED_IMAGES = Path(__file__).resolve().parent.parent / "seed" / "images"
 def open_seed_image(name: str) -> File:
     """A seed image as a file Django can save into an ImageField."""
     return File((SEED_IMAGES / name).open("rb"), name=name)
+
+
+# Keys that identify an item, never "filled in".
+KEY_FIELDS = frozenset({"anchor", "heading", "name", "kind"})
+
+
+def blank_fields(obj: Any, item: dict[str, Any]) -> dict[str, Any]:
+    """The item's text and image values whose field on `obj` is still empty. Flags, numbers and
+    keys are never touched (False and 0 are real choices, not blanks)."""
+    blanks: dict[str, Any] = {}
+    for name, value in item.items():
+        if name in KEY_FIELDS or isinstance(value, bool | int):
+            continue
+        current = getattr(obj, name, None)
+        if current is None or current == "":  # an empty FieldFile also equals ""
+            blanks[name] = value
+    return blanks
 
 
 @dataclass
@@ -68,27 +87,46 @@ class SeedService(BaseService):
             content.HOME_SLIDES,
         )
         self._seed_page(report, "about", content.ABOUT_META_DESCRIPTION, content.ABOUT_SECTIONS)
+        self._seed_page(
+            report, "services", content.SERVICES_META_DESCRIPTION, content.SERVICES_SECTIONS
+        )
         return report
 
     # ---- parts -----------------------------------------------------------------------------
 
     def _seed_services(self, report: SeedReport) -> None:
         for item in content.SERVICES:
-            if self.services.by_anchor(item["anchor"]) is None:
-                self.services.create(**self._with_image(item))
-                report.add("services")
+            self._add_or_fill(
+                report,
+                "services",
+                self.services.by_anchor(item["anchor"]),
+                item,
+                self.services.create,
+                self.services.update,
+            )
 
     def _seed_team(self, report: SeedReport) -> None:
         for item in content.TEAM:
-            if self.team.by_name(item["name"]) is None:
-                self.team.create(**self._with_image(item))
-                report.add("team members")
+            self._add_or_fill(
+                report,
+                "team members",
+                self.team.by_name(item["name"]),
+                item,
+                self.team.create,
+                self.team.update,
+            )
 
     def _seed_partners(self, report: SeedReport) -> None:
-        for item in content.PARTNERS:
-            if self.partners.by_name(item["kind"], item["name"]) is None:
-                self.partners.create(**self._with_image(item))
-                report.add("partners")
+        for item in (*content.PARTNERS, *content.CLIENTS):
+            label = "partners" if item["kind"] == "partner" else "clients"
+            self._add_or_fill(
+                report,
+                label,
+                self.partners.by_name(item["kind"], item["name"]),
+                item,
+                self.partners.create,
+                self.partners.update,
+            )
 
     def _seed_page(
         self,
@@ -104,13 +142,39 @@ class SeedService(BaseService):
         if not page.meta_description:
             self.pages.update(page, meta_description=meta_description)
         for item in slides:
-            if not self.pages.has_slide(page, item["heading"]):
-                self.pages.add_slide(page, **self._with_image(item))
-                report.add("hero slides")
+            self._add_or_fill(
+                report,
+                "hero slides",
+                self.pages.slide(page, item["heading"]),
+                item,
+                lambda **data: self.pages.add_slide(page, **data),
+                self.pages.update,
+            )
         for item in sections:
-            if not self.pages.has_section(page, item["anchor"]):
-                self.pages.add_section(page, **self._with_image(item))
-                report.add("sections")
+            self._add_or_fill(
+                report,
+                "sections",
+                self.pages.section(page, item["anchor"]),
+                item,
+                lambda **data: self.pages.add_section(page, **data),
+                self.pages.update,
+            )
+
+    def _add_or_fill(
+        self,
+        report: SeedReport,
+        kind: str,
+        existing: Any,
+        item: dict[str, Any],
+        create: Callable[..., Any],
+        update: Callable[..., Any],
+    ) -> None:
+        if existing is None:
+            create(**self._with_image(item))
+            report.add(kind)
+        elif blanks := blank_fields(existing, item):
+            update(existing, **self._with_image(blanks))
+            report.add("filled in")
 
     def _with_image(self, item: dict[str, Any]) -> dict[str, Any]:
         """The item's fields, with its image file name replaced by the file itself."""

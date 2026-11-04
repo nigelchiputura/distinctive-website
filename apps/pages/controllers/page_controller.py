@@ -1,4 +1,4 @@
-"""A page built from its sections: Home and About (Services and Contact add forms on Days 7–8)."""
+"""A page built from its sections: Home, About and Services (Contact adds its form on Day 8)."""
 
 from typing import ClassVar
 
@@ -26,3 +26,7 @@ class HomeController(PageController):
 
 class AboutController(PageController):
     slug = "about"
+
+
+class ServicesController(PageController):
+    slug = "services"

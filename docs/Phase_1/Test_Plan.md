@@ -39,14 +39,14 @@ Admin Markdown is rendered publicly, so these are as important as any business r
 
 Service (fake repository and fake mailer):
 
-- [ ] The submission is saved **before** the email is attempted.
-- [ ] A successful send sets `email_sent=True`.
-- [ ] A failed send leaves `email_sent=False`, records the provider's message in `email_error`,
+- [x] The submission is saved **before** the email is attempted.
+- [x] A successful send sets `email_sent=True`.
+- [x] A failed send leaves `email_sent=False`, records the provider's message in `email_error`,
   logs a warning, and does **not** raise to the caller.
-- [ ] The recipient comes from `CONTACT_RECIPIENT`; `Reply-To` is the submitter; the subject
+- [x] The recipient comes from `CONTACT_RECIPIENT`; `Reply-To` is the submitter; the subject
   names the source page.
-- [ ] HTML in the message is sent as plain text, never as HTML.
-- [ ] `resend(submission)` (the admin action) sends again and updates the flags.
+- [x] HTML in the message is sent as plain text, never as HTML.
+- [x] `resend(submission)` (the admin action) sends again and updates the flags.
 
 Controller:
 

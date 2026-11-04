@@ -138,7 +138,13 @@ order and "published" right in the list.
 "published" editable in place; partners filter by kind. Typing `linkedin.com/in/…` without
 `https://` is accepted.
 
-Later days add: contact submissions (Day 7), redirects (Day 9), and Phase 2's job admin.
+**Enquiries** (Day 7; first in the menu): read-only, newest first, filtered by "email sent",
+"handled" and "sent from", searchable, with a date bar. Actions: **Mark as handled** and **Resend
+notification email** (which reports how many were sent and how many still failed; the provider's
+message is on each enquiry). Nobody can add an enquiry in the admin; a Content Editor can't delete
+one. A Service has a new tick box, "show the image on the Services page".
+
+Later days add: redirects (Day 9) and Phase 2's job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 

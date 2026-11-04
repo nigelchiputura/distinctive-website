@@ -30,6 +30,7 @@ class PageBlocksService(BaseService):
         # section type → (context name, how to fetch it)
         self.sources: dict[str, tuple[str, Callable[[], Any]]] = {
             T.SERVICE_CARDS: ("service_cards", offerings.home_cards),
+            T.SERVICE_BANDS: ("services", offerings.all),
             T.PARTNERS: ("partners", partners.partners),
             T.CLIENTS: ("clients", partners.clients),
             T.TEAM: ("team", team.leadership),

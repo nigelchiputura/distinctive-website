@@ -28,14 +28,14 @@ class PageRepository(BaseRepository[Page]):
 
     # ---- used by the seed command ----------------------------------------------------------
 
-    def has_section(self, page: Page, anchor: str) -> bool:
-        return PageSection.objects.filter(page=page, anchor=anchor).exists()
+    def section(self, page: Page, anchor: str) -> PageSection | None:
+        return PageSection.objects.filter(page=page, anchor=anchor).first()
 
     def add_section(self, page: Page, **data: Any) -> PageSection:
         return PageSection.objects.create(page=page, **data)
 
-    def has_slide(self, page: Page, heading: str) -> bool:
-        return HeroSlide.objects.filter(page=page, heading=heading).exists()
+    def slide(self, page: Page, heading: str) -> HeroSlide | None:
+        return HeroSlide.objects.filter(page=page, heading=heading).first()
 
     def add_slide(self, page: Page, **data: Any) -> HeroSlide:
         return HeroSlide.objects.create(page=page, **data)
