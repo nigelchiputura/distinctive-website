@@ -134,8 +134,11 @@ it without deleting it.
 **Services** (Day 5): the list shows a thumbnail and lets an editor change "show on Home", the
 order and "published" right in the list.
 
-Later days add: team and partners (Day 6), contact submissions (Day 7), redirects (Day 9), and
-Phase 2's job admin.
+**Team members** and **Partners and clients** (Day 6): lists with a thumbnail and the order and
+"published" editable in place; partners filter by kind. Typing `linkedin.com/in/…` without
+`https://` is accepted.
+
+Later days add: contact submissions (Day 7), redirects (Day 9), and Phase 2's job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 

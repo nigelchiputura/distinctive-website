@@ -1,0 +1,17 @@
+.git
+.github
+node_modules
+package.json
+package-lock.json
+static/scss
+scripts
+docs
+media
+staticfiles
+.env
+.env.*
+!.env.example
+**/__pycache__
+.pytest_cache
+.ruff_cache
+.coverage

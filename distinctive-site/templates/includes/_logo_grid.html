@@ -1,0 +1,11 @@
+{# Partner or client logos (pages.Partner), centred; each links out when it has a website. #}
+<ul class="logo-grid list-unstyled">
+  {% for logo in logos %}
+    <li class="logo-grid__item">
+      {% if logo.url %}<a class="logo-grid__link" href="{{ logo.url }}" rel="noopener" target="_blank">{% endif %}
+      {% if logo.image %}<span class="logo-grid__frame">{% include "includes/_image.html" with obj=logo class="logo-grid__image" %}</span>{% endif %}
+      {% if logo.caption %}<span class="logo-grid__caption">{{ logo.caption }}</span>{% elif not logo.image %}<span class="logo-grid__caption">{{ logo.name }}</span>{% endif %}
+      {% if logo.url %}<span class="visually-hidden">(opens in a new tab)</span></a>{% endif %}
+    </li>
+  {% endfor %}
+</ul>

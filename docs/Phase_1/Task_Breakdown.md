@@ -172,18 +172,23 @@ can't sign up.
 
 **Goal:** About renders from the DB with all eight leadership profiles.
 
-- [ ] **Models.** `team.TeamMember` (photo + alt, name, title, Markdown bio, LinkedIn,
+- [x] **Models.** `team.TeamMember` (photo + alt, name, title, Markdown bio, LinkedIn,
   Facebook, order, published); `pages.Partner` (logo + alt, name, caption, URL,
   `kind` = partner | client, order, published).
   AC: migrations apply.
-- [ ] **Layers.** `TeamRepository`/`TeamService.leadership()`, `PartnerRepository`/
+  *(As built: `TeamMember` also has an `anchor`; `PageSection` gained a "short text" (`intro`),
+  a heading position, and the section types `partners`, `clients` and `team`.)*
+- [x] **Layers.** `TeamRepository`/`TeamService.leadership()`, `PartnerRepository`/
   `PartnerService.partners()` and `.clients()`, `AboutController`.
   AC: service tests with fakes pass.
-- [ ] **About page.** Hero, Our Story (gradient band, two columns), Strategic Partners,
+  *(As built: one `PageController` serves Home and About; `PageBlocksService` fetches the team,
+  logos or service cards only for the sections that show them.)*
+- [x] **About page.** Hero, Our Story (gradient band, two columns), Strategic Partners,
   Capability Analysis, Value Driven and Capacity Building, Our Leadership grid with "Read more"
   collapse for long bios (`frontend.md` §4).
   AC: matches the old structure; bios are left-aligned with a comfortable line length.
-- [ ] **Seed, part 2.** About sections, eight team members, partners.
+  *(As built: Read more on every screen size, so the cards line up; `static/js/modules/read-more.js`.)*
+- [x] **Seed, part 2.** About sections, eight team members, partners.
   AC: idempotent.
 
 **Done when:** About renders from the DB with all eight profiles.

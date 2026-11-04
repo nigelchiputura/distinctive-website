@@ -1,0 +1,6 @@
+{% extends "pages/page.html" %}
+{# Home: the hero slider (whose first heading is the h1), then the sections. #}
+
+{% block page_top %}
+  {% include "includes/_hero_slider.html" with slides=content.slides %}
+{% endblock page_top %}

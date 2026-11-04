@@ -1,0 +1,5 @@
+# The shipped image. Includes base. The build's collectstatic runs with prod settings,
+# so every image variant needs these (dev.txt includes this file).
+-r base.txt
+gunicorn==26.2.0
+whitenoise==6.12.0

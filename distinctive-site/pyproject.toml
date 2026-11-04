@@ -1,0 +1,24 @@
+[project]
+name = "distinctive-site"
+version = "0.1.0"
+description = "Distinctive Consultancy Services website"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/migrations/**", "docs", "staticfiles", "node_modules", "media"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "DJ", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]
+
+[tool.basedpyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+include = ["apps", "config"]
+# Tests are excluded so duck-typed fakes don't need a Protocol (docs/architecture.md §3).
+exclude = ["**/tests/**", "**/migrations/**", "**/__pycache__"]
+reportMissingModuleSource = false

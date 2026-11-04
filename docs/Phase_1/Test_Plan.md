@@ -67,8 +67,8 @@ Controller:
 - [x] `OfferingService.home_cards()`: published services with `show_on_home`, ordered, at most
   six.
 - [x] `OfferingService.all()`: every published service, ordered; each has a unique anchor.
-- [ ] `TeamService.leadership()`: published members, ordered.
-- [ ] `PartnerService.partners()` / `.clients()` split by `kind`, published only.
+- [x] `TeamService.leadership()`: published members, ordered.
+- [x] `PartnerService.partners()` / `.clients()` split by `kind`, published only.
 - [x] `seed_site_content` is idempotent: running it twice leaves the same row counts.
 
 ### 3.5 Users (`users.md` §8)

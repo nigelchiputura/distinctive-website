@@ -3,11 +3,12 @@ The admin uses the ORM directly: a documented exception to the layering."""
 
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
+from django.db import models
 from django.http import HttpRequest
 
 from apps.core.admin_widgets import image_preview
 
-from .models import HeroSlide, Page, PageSection
+from .models import HeroSlide, Page, PageSection, Partner
 
 IMAGE_FIELDS = ("image", "preview", "image_alt", "image_decorative")
 
@@ -18,7 +19,20 @@ class PageSectionInline(admin.StackedInline):
     ordering = ("sort_order", "pk")
     readonly_fields = ("preview",)
     fieldsets = (
-        (None, {"fields": ("section_type", "heading", "body", "sort_order", "is_published")}),
+        (
+            None,
+            {
+                "fields": (
+                    "section_type",
+                    "heading",
+                    "heading_align",
+                    "intro",
+                    "body",
+                    "sort_order",
+                    "is_published",
+                )
+            },
+        ),
         ("Image", {"fields": (*IMAGE_FIELDS, "image_position"), "classes": ("collapse",)}),
         (
             "Button and link name",
@@ -76,3 +90,28 @@ class PageAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request: HttpRequest, obj: Page | None = None) -> bool:
         return False
+
+
+@admin.register(Partner)
+class PartnerAdmin(admin.ModelAdmin):
+    list_display = ("thumbnail", "name", "kind", "sort_order", "is_published")
+    list_display_links = ("thumbnail", "name")
+    list_editable = ("sort_order", "is_published")
+    list_filter = ("kind", "is_published")
+    search_fields = ("name", "caption")
+    ordering = ("kind", "sort_order", "pk")
+    readonly_fields = ("preview",)
+    formfield_overrides = {models.URLField: {"assume_scheme": "https"}}  # noqa: RUF012
+    fieldsets = (
+        (None, {"fields": ("kind", "name", "caption", "url")}),
+        ("Logo", {"fields": ("image", "preview", "image_alt", "image_decorative")}),
+        ("Where it shows", {"fields": ("sort_order", "is_published")}),
+    )
+
+    @admin.display(description="")
+    def thumbnail(self, obj: Partner) -> str:
+        return image_preview(obj, height=40)
+
+    @admin.display(description="current logo")
+    def preview(self, obj: Partner) -> str:
+        return image_preview(obj, height=120)
