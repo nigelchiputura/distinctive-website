@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{# Home: the hero slider, then the page's sections in the order set in the admin. #}
+
+{% block title %}{{ content.title }} | {{ site_info.company_name }}{% endblock %}
+{% block meta_description %}{{ content.meta_description|default:site_info.meta_description }}{% endblock %}
+
+{% block content %}
+  {% include "includes/_hero_slider.html" with slides=content.slides %}
+  {% for section in content.sections %}
+    {% include "includes/_section.html" %}
+  {% endfor %}
+{% endblock %}

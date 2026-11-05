@@ -1,0 +1,65 @@
+// Service cards on Home (templates/includes/_service_card.html).
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: 3rem 2.5rem;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+
+    .service-card__title {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    .service-card__image {
+      transform: scale(1.03);
+    }
+  }
+}
+
+// The framed photo: a dark grey mat around the image, as on the old site, in one fixed shape so
+// a row of cards lines up whatever the uploaded images' sizes. "contain", not "cover": several
+// card images have words in them (Talent Management), which cropping would cut off.
+.service-card__frame {
+  overflow: hidden;
+  padding: 0.75rem;
+  background: $dcs-charcoal-light;
+  aspect-ratio: 3 / 2;
+}
+
+.service-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.service-card__title {
+  margin: 1.25rem 0 0.5rem;
+  color: $dcs-gold;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+.service-card__summary {
+  margin: 0;
+  color: $dcs-white;
+}

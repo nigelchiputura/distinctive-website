@@ -175,6 +175,8 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": ["pages", "offerings", "team", "contact", "core", "users", "auth"],
     "icons": {
         "core.SiteSettings": "fas fa-sliders-h",
+        "pages.Page": "fas fa-file-alt",
+        "offerings.Service": "fas fa-briefcase",
         "users.User": "fas fa-user",
         "auth.Group": "fas fa-users-cog",
         "account.EmailAddress": "fas fa-at",

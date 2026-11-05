@@ -140,24 +140,31 @@ can't sign up.
 
 **Goal:** Home matches the old site's structure, every block editable in the admin.
 
-- [ ] **Models.** `pages.Page` (slug, title, SEO fields), `pages.PageSection` (type, heading,
+- [x] **Models.** `pages.Page` (slug, title, SEO fields), `pages.PageSection` (type, heading,
   Markdown body, image + alt text, layout options, `anchor`, order, published),
   `pages.HeroSlide`; `offerings.Service` (title, `anchor`, summary, Markdown body, image + alt,
   `show_on_home`, order, published).
   AC: migrations apply; `anchor` is unique per page and auto-filled from the heading.
-- [ ] **Layers.** `PageRepository`, `PageService.get_page(slug)` (published sections only,
+  *(As built: images through a shared `ImageMixin` that stores width and height and requires alt
+  text unless "decorative"; a data migration creates the four pages; a `service_cards` section
+  type places Home's cards.)*
+- [x] **Layers.** `PageRepository`, `PageService.get_page(slug)` (published sections only,
   ordered; `NotFoundError` otherwise), `ServiceRepository`/`OfferingService.home_cards()`,
   `HomeController`.
   AC: service tests with fakes pass.
-- [ ] **Templates.** `includes/_section.html` rendering each `section_type`
+- [x] **Templates.** `includes/_section.html` rendering each `section_type`
   (`frontend.md` §3); `pages/home.html`; hero slider (Bootstrap carousel, pause on hover/focus,
   reduced-motion respected).
   AC: hero, six cards, CTA and the two value blocks render from the DB.
-- [ ] **Admin.** Page admin with inline sections and slides, ordering, image thumbnails;
+  *(As built: plus a pause button and `static/js/main.js` + `modules/hero-slider.js`.)*
+- [x] **Admin.** Page admin with inline sections and slides, ordering, image thumbnails;
   Service admin.
   AC: reordering a section in the admin reorders it on the page.
-- [ ] **Seed, part 1.** `seed_site_content` loads Home's real content and the six home services.
+- [x] **Seed, part 1.** `seed_site_content` loads Home's real content and the six home services.
   AC: running it twice changes nothing (idempotent).
+  *(As built: it adds only what's missing and never overwrites an editor's change. Images are cut
+  from the old site's screenshots until the client sends originals; the hero photo is left out,
+  see `frontend.md` §4.)*
 
 **Done when:** Home renders from the DB and every block is editable.
 

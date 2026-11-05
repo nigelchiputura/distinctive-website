@@ -1,0 +1,79 @@
+// Page sections (templates/includes/_section.html): full-width bands of colour.
+
+.band {
+  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+}
+
+.band--white {
+  background: $dcs-white;
+}
+
+.band--black {
+  background: $dcs-black;
+}
+
+.band--charcoal,
+.band--dark {
+  background: $dcs-charcoal;
+}
+
+.band__heading {
+  margin-bottom: 1.25rem;
+  color: inherit;
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.25rem);
+}
+
+.on-dark .band__heading {
+  color: $dcs-gold;
+}
+
+.band__lead {
+  max-width: 46rem;
+  margin: 0 auto 2.5rem;
+}
+
+.band__body {
+  max-width: 48rem;
+}
+
+// Call to action: one line and a button.
+.band--cta {
+  padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
+}
+
+.cta__heading {
+  margin-bottom: 1.5rem;
+  color: $dcs-white;
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+  font-weight: 700;
+}
+
+// Image beside a heading and text ("People Centred", "Proactive"). The image side is set per
+// section; on phones the image always comes first.
+.value-block__heading {
+  margin-bottom: 1rem;
+  color: $dcs-black;
+  font-size: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem);
+  font-weight: 700;
+}
+
+.value-block__body {
+  max-width: 34rem;
+  color: $dcs-grey;
+  font-size: 1.05rem;
+}
+
+.value-block__image {
+  width: 100%;
+}
+
+@include media-breakpoint-up(lg) {
+  .value-block--image-right .value-block__media {
+    order: 2;
+  }
+}
+
+// Consecutive white value blocks read as one section, as on the old site.
+.value-block + .value-block {
+  padding-top: 0;
+}

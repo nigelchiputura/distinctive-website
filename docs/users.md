@@ -126,8 +126,16 @@ Staff users need `is_staff` to reach the admin. Someone with no group sees an em
 
 **Site settings** (Day 3): a single row, no add or delete.
 
-Later days add: the page admin with inline sections and slides (Day 5), team and partners
-(Day 6), services and contact submissions (Day 7), redirects (Day 9), and Phase 2's job admin.
+**Pages** (Day 5): the four fixed pages; no add or delete. Each opens in tabs: General, Search
+engines, then **Hero slides** (Home only) and **Sections**, edited inline with a thumbnail of the
+current image. A section's "order" number sets its place on the page; unticking "published" hides
+it without deleting it.
+
+**Services** (Day 5): the list shows a thumbnail and lets an editor change "show on Home", the
+order and "published" right in the list.
+
+Later days add: team and partners (Day 6), contact submissions (Day 7), redirects (Day 9), and
+Phase 2's job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 

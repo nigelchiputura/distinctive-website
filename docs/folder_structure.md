@@ -1,7 +1,7 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-02** (npm and SCSS at the repo root, as in Consult 360; Phase 2
-apps marked; no R2)
+**Project-wide · revised 2026-11-03** (Day 5: seed content, Home templates, JS; 2026-11-02: npm
+and SCSS at the repo root, as in Consult 360; Phase 2 apps marked; no R2)
 
 ## 1. Repository layout
 
@@ -56,6 +56,7 @@ distinctive-site/
 │   │   │   ├── _forms.scss
 │   │   │   ├── _footer.scss
 │   │   │   ├── _auth.scss              # sign-in and the other allauth pages
+│   │   │   ├── _buttons.scss           # the outlined gold buttons
 │   │   │   └── _cookie-banner.scss
 │   │   └── pages/
 │   │       ├── _home.scss
@@ -68,6 +69,7 @@ distinctive-site/
 │   ├── js/
 │   │   ├── main.js                     # entry (ES module)
 │   │   └── modules/
+│   │       ├── hero-slider.js          # Home carousel: reduced motion, pause on focus, pause button
 │   │       ├── http.js                 # fetch wrapper: CSRF, JSON envelope, timeout
 │   │       ├── contact-form.js
 │   │       └── cookie-consent.js       # Phase 2 adds search-dropdown.js, highlight.js
@@ -84,7 +86,10 @@ distinctive-site/
 │   │   ├── _footer.html
 │   │   ├── _cookie_banner.html
 │   │   ├── icons/                      # inline SVG icons, written by `npm run vendor`
-│   │   └── _section.html               # renders one PageSection by type
+│   │   ├── _hero_slider.html           # Home's slides (pages.HeroSlide)
+│   │   ├── _section.html               # renders one PageSection by type
+│   │   ├── _service_card.html          # one offerings.Service card
+│   │   └── _image.html                 # an admin image with its stored size and alt text
 │   ├── errors/
 │   │   ├── 404.html
 │   │   └── 500.html
@@ -146,7 +151,8 @@ apps/contact/
 
 ```
 apps/core/
-├── models.py                  # BaseModel, PublishableMixin, OrderableMixin, SluggedMixin, SiteSettings
+├── models.py                  # BaseModel, PublishableMixin, OrderableMixin, SluggedMixin, ImageMixin, SiteSettings
+├── admin_widgets.py           # image_preview(): thumbnails in the content admins
 ├── repositories/
 │   ├── base.py                # BaseRepository[T]
 │   └── site_settings_repository.py
@@ -154,25 +160,36 @@ apps/core/
 │   ├── base.py                # BaseService
 │   ├── markdown_service.py    # Markdown → sanitised HTML
 │   ├── navigation_service.py  # the nav items, with the current page marked
+│   ├── seed_service.py        # SeedService: adds the old site's content that's missing
 │   ├── site_details.py        # SiteDetails value + DEFAULTS (the old site's details)
 │   └── site_settings_service.py
 ├── controllers/
 │   └── base.py                # BaseController (View) + error mapping
 ├── exceptions.py              # ServiceError, NotFoundError, ValidationError, ExternalServiceError
 ├── checks.py                  # core.W001–W003 (email configuration)
-├── context_processors.py      # site (SiteDetails), nav_items, current_year
+├── context_processors.py      # site_info (SiteDetails), nav_items, current_year
 ├── middleware.py              # RedirectMiddleware (old WordPress URLs → 301)
 ├── seo.py                     # SeoMixin, SeoData, sitemaps
 ├── templatetags/
 │   └── core_extras.py         # the |markdown filter
+├── seed/
+│   ├── content.py             # the old site's text, keyed (anchors, headings)
+│   └── images/                # 8 JPEGs cut from the old site's screenshots, until the originals come
 ├── management/commands/
-│   └── seed_site_content.py   # loads the old site's real content (idempotent)
+│   └── seed_site_content.py   # loads seed/ through SeedService (idempotent)
 └── tests/
     ├── test_layering.py
     ├── test_markdown_service.py
     ├── test_checks.py
+    ├── test_seed.py           # SeedService with fakes; the command twice on a real database
     └── test_security.py       # check --deploy with prod settings
 ```
+
+`apps/pages/` as built on Day 5: `models.py` (`Page`, `PageSection`, `HeroSlide`), `admin.py`
+(each page with its slides and sections inline), `repositories/page_repository.py`,
+`services/page_service.py` (`PageService`, `PageContent`), `controllers/home_controller.py`,
+`urls.py`, `templates/pages/home.html`, and migrations `0001_initial`, `0002_the_four_pages`.
+`apps/offerings/` has `Service`, its admin, `ServiceRepository` and `OfferingService`.
 
 `Redirect` is a model in `apps/pages` (editable in the admin); the middleware in `apps/core`
 reads it through `RedirectService`.
