@@ -3,7 +3,8 @@
 **Cards:** `Phase_1/Task_Breakdown.md`, Day 9 (added 2026-11-04; SEO moved to Day 10, go-live to
 Day 11)
 **Completed:** 2026-11-04 · **Revised:** 2026-11-04 (the team photo behind Home's hero; the
-gradient on the other heroes and the Contact band)
+gradient on the other heroes and the Contact band; later that evening, the gradient at full
+strength, a shorter phone hero, and no sideways scroll on phones)
 
 Run from the repo root. Commands are bash; on Windows or macOS see
 [`../Terminal_Note.md`](../Terminal_Note.md).
@@ -98,7 +99,10 @@ and Contact, at full width and at phone width (375 px).
   - The "Let's talk" panel with a filled gold button.
   - People Centred and Proactive with framed photos.
 - **About, Services and Contact:** the page hero on the drifting black-and-gold gradient (gold
-  light moving slowly across black), the same on Contact's form band.
+  light moving slowly across black, clearly gold in the top-right corner, not plain black), the
+  same on Contact's form band.
+- **Phone width (375 px), every page:** nothing scrolls sideways. Drag the page left: it doesn't
+  move.
 - **About:**
   - Our Story's long text in a frosted card on the blue band.
   - Partner logos on white tiles.

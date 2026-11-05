@@ -22,7 +22,7 @@
           <div class="service-band__body{% if not service.image or not service.image_on_services_page %} service-band__body--wide{% endif %}">{{ service.body|markdown }}</div>
         </div>
         {% if service.image and service.image_on_services_page %}
-          <div class="col-lg-6" data-reveal data-reveal-delay="1">{% include "includes/_image.html" with obj=service class="img-fluid service-band__image" %}</div>
+          <div class="col-lg-6" data-reveal data-reveal-delay="1">{% include "includes/_image.html" with obj=service class="img-fluid service-band__image" sizes="(min-width: 992px) 46vw, 92vw" %}</div>
         {% endif %}
       </div>
     </div>

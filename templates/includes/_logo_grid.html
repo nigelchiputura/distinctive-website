@@ -3,7 +3,7 @@
   {% for logo in logos %}
     <li class="logo-grid__item" data-reveal data-reveal-delay="{{ forloop.counter0 }}">
       {% if logo.url %}<a class="logo-grid__tile" href="{{ logo.url }}" rel="noopener" target="_blank">{% else %}<span class="logo-grid__tile">{% endif %}
-      {% if logo.image %}<span class="logo-grid__frame">{% include "includes/_image.html" with obj=logo class="logo-grid__image" %}</span>{% endif %}
+      {% if logo.image %}<span class="logo-grid__frame">{% include "includes/_image.html" with obj=logo class="logo-grid__image" sizes="200px" %}</span>{% endif %}
       {% if logo.caption %}<span class="logo-grid__caption">{{ logo.caption }}</span>{% elif not logo.image %}<span class="logo-grid__caption">{{ logo.name }}</span>{% endif %}
       {% if logo.url %}<span class="visually-hidden">(opens in a new tab)</span></a>{% else %}</span>{% endif %}
     </li>

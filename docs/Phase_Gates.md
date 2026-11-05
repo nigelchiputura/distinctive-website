@@ -6,9 +6,9 @@ work on the next phase starts.
 
 ## 1. Phases at a glance
 
-| Phase | Purpose | Status (2026-11-04) | Docs |
+| Phase | Purpose | Status (2026-11-05) | Docs |
 |---|---|---|---|
-| **Phase 1** | Something visual, live: Home, About, Services and Contact, all admin-editable, replacing the WordPress site on `distinctive.co.zw` | **In progress.** Days 1–9 of 11 completed 2026-11-03/04 (Day 9, UI and components polish, added 2026-11-04) | `Phase_1/` |
+| **Phase 1** | Something visual, live: Home, About, Services and Contact, all admin-editable, replacing the WordPress site on `distinctive.co.zw` | **In progress.** Days 1–10 of 11 completed 2026-11-03/05 (Day 9, UI and components polish, added 2026-11-04); the demo goes up on the preview host on Day 10 | `Phase_1/` |
 | **Phase 2** | Jobs (list, detail, Markdown postings) and site-wide Search (dropdown, results, highlighting) | **Draft.** Built at the owner's pace after the Phase 1 gate; no fixed deadline | `Phase_2/` |
 | **Backlog** | Optional improvements, built when the client needs them | Listed only | `Phase_2/Phase2_Scope.md` §6 |
 

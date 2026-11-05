@@ -3,8 +3,8 @@
 #   docker compose -f docker-compose.prod.yml pull web
 #   docker compose -f docker-compose.prod.yml up -d --remove-orphans
 #
-# Locally (Day 9, the prod stack at https://localhost), from the repo root, with an image you
-# built yourself (docs/commands/Phase_1/day-9.md):
+# Locally (Day 10, the prod stack at https://localhost), from the repo root, with an image you
+# built yourself (docs/commands/Phase_1/day-10.md):
 #   docker compose --env-file .env.prod -f docker/docker-compose.prod.yml up -d
 # where .env.prod sets ENV_FILE=../.env.prod (paths here are relative to this file's folder).
 services:

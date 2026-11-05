@@ -1,6 +1,6 @@
 # Frontend
 
-**Project-wide · revised 2026-11-04** (Day 9 as built: light and dark themes, the modernised
+**Project-wide · revised 2026-11-05** (Day 10: the SEO tags, responsive images, Lighthouse; Day 9 as built: light and dark themes, the modernised
 components, motion, back to top; Day 8 as built: Contact, the enquiry forms, cookie consent;
 Day 7 as built: the Services page; the font is Nunito Sans;
 Day 6: About, the team and logo blocks, Read more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
@@ -184,6 +184,16 @@ sign-in and set-password pages (`users.md` §3).
 stores each upload's width and height, so `<img>` always has them and the page doesn't jump while
 images load; alt text is required unless the editor ticks "decorative image" (then `alt=""`).
 Images are `loading="lazy"` except the first hero slide, which gets `fetchpriority="high"`.
+Since Day 10 every image also has a `srcset` of WebP copies (480–2000 px, never wider than the
+upload; `ImageVariantService`, `architecture.md` §4) and a `sizes` hint passed by the include
+(`sizes="100vw"` for heroes, about a third of the window for service cards, 152 px for team
+photos …), so a phone downloads a copy sized for it: Home's team photo is about 90 KB as an
+800 px WebP instead of the 280 KB JPEG.
+
+**Search and sharing tags** (`includes/_seo.html`, Day 10): title, description, canonical,
+`noindex, nofollow` on the preview host, Open Graph and Twitter card (the image is Site
+settings' OG image, else `static/img/og-default.png`, 1200 × 630), and on Home the
+`Organization` JSON-LD. Pages without them (sign-in, errors) get a plain title and `noindex`.
 
 `includes/_section.html` renders a `PageSection` by `section_type`, with `id="{{ section.anchor }}"`:
 
@@ -248,7 +258,8 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
    Consultancy Services", in a gold gradient, "Bringing excellence into your world."). Since
    2026-11-04 the slide shows the **team photo** the owner sent (seeded as `team-photo.jpg`,
    1600 px wide, about 280 KB, loaded first with `fetchpriority="high"`). A slide with a photo
-   (`hero__slide--photo`) is taller (up to 80 vh), puts its text at the top over the darkened
+   (`hero__slide--photo`) is taller (up to 80 vh; on phones 26–32 rem, so the crop of the wide
+   photo keeps more of the team), puts its text at the top over the darkened
    trees, and crops the photo from the top (`object-position: center 12%`), so the team's faces
    stay clear at every width; a soft gold glow sits over the photo. A slide without a photo
    shows the drifting black-and-gold gradient. With no slides at all, a visually hidden `h1`
@@ -362,6 +373,11 @@ JavaScript.
   needs one), no auto-advance with `prefers-reduced-motion`.
 - Fonts with `font-display: swap`; compressed CSS; nothing third-party before consent.
 - Lighthouse targets on every Phase 1 page: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95.
+  **Measured on 2026-11-05** (prod settings under gunicorn, uploads served as Caddy will, mobile
+  emulation): Home 94 / 100 / 100 / 100 (Performance, Accessibility, Best Practices, SEO), About
+  97 / 100 / 100 / 100, Services 97 / 100 / 100 / 100, Contact 98 / 100 / 100 / 100; desktop 100
+  throughout. Home's largest paint is the team photo (3.0 s on Lighthouse's slow 4G); before the
+  WebP copies it was 3.9 s and Performance 87.
 
 ## 7. Cookie banner and analytics
 
@@ -402,7 +418,11 @@ first paint; without JavaScript the system setting still applies and the toggle 
 
 The **drifting gold gradient** (the `dcs-hero-glow` mixin in `_hero.scss`: two gold radial
 glows over black-to-charcoal, moving over 18 s) is the background of every hero without a photo
-and of the Contact form's band.
+and of the Contact form's band. The darkening overlay is only for photos: on a photo-less hero it
+is switched off, so the gradient shows at full strength.
+
+**Grid gutters:** rows use `g-4 g-lg-5`, never a bare `g-5`. Below 992 px, `g-5`'s negative margins
+are wider than the container's padding, which made every page scroll sideways on phones.
 
 What changes with the theme: the page, light bands, cards, text, headings, borders, shadows, the
 navbar's frosted background, form fields on light bands and the logo. What doesn't: the black,

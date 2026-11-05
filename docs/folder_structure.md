@@ -1,6 +1,6 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-04** (Day 9: themes, the polish modules and partials; Day 8: Contact, enquiry forms, rate limit, cookie
+**Project-wide · revised 2026-11-05** (Day 10: SEO, redirects, image copies, error pages; Day 9: themes, the polish modules and partials; Day 8: Contact, enquiry forms, rate limit, cookie
 consent; Day 7: Services page, enquiries, Nunito Sans; Day 6: team,
 partners, page blocks; Day 5: seed content,
 Home templates, JS; 2026-11-02: npm
@@ -109,9 +109,8 @@ distinctive-site/
 │   │   ├── _service_bands.html         # every service as a band, with links
 │   │   ├── _team_card.html             # one team.TeamMember
 │   │   └── _image.html                 # an admin image with its stored size and alt text
-│   ├── errors/
-│   │   ├── 404.html
-│   │   └── 500.html
+│   ├── 404.html                        # branded; the site's header and footer
+│   ├── 500.html                        # standalone: no context processors, no database
 │   ├── allauth/layouts/                # base.html wraps every allauth page in the site's layout
 │   └── account/                        # our sign-in and set-password pages
 ├── media/                              # local uploads in dev (git-ignored); a Docker volume in prod
@@ -190,9 +189,10 @@ apps/core/
 ├── checks.py                  # core.W001–W003 (email configuration)
 ├── context_processors.py      # site_info (SiteDetails), nav_items, current_year, consent_needed
 ├── middleware.py              # RedirectMiddleware (old WordPress URLs → 301)
-├── seo.py                     # SeoMixin, SeoData, sitemaps
+├── services/seo_service.py    # SeoService, SeoData, absolute_url (Day 10)
+├── services/image_variant_service.py  # WebP copies for srcset (Day 10)
 ├── templatetags/
-│   └── core_extras.py         # the |markdown filter
+│   └── core_extras.py         # the |markdown, |jsonld and |srcset filters
 ├── seed/
 │   ├── content.py             # the old site's text, keyed (anchors, headings)
 │   └── images/                # 30 images cut from the old site's screenshots, until the originals come, and team-photo.jpg (Home's hero)
@@ -205,7 +205,9 @@ apps/core/
     ├── test_seed.py           # SeedService with fakes; the command twice on a real database
     ├── test_rate_limit_service.py  # the limit, its window; client_ip behind Caddy
     ├── test_consent.py        # no Google address in any page before consent
-    ├── test_polish.py         # themes, labels, back to top, the reveal hooks (Day 9)
+    ├── test_polish.py         # themes, labels, back to top, the reveal hooks, gutters (Day 9)
+    ├── test_seo.py            # titles, canonicals, noindex, JSON-LD, sitemap, robots, 404, 500
+    ├── test_image_variant_service.py  # the WebP copies
     └── test_security.py       # check --deploy with prod settings
 ```
 
@@ -226,7 +228,12 @@ and (Day 9) `0008_section_label`.
 its admin, `TeamRepository` and `TeamService`.
 
 `Redirect` is a model in `apps/pages` (editable in the admin); the middleware in `apps/core`
-reads it through `RedirectService`.
+reads it through `RedirectService`. Day 10's other files in `apps/pages`: `paths.py`
+(`normalize_path`), `routes.py` (each page's URL name, for canonicals and the sitemap),
+`repositories/redirect_repository.py`, `services/redirect_service.py`,
+`controllers/seo_controller.py` (`SitemapController`, `RobotsController`),
+`templates/pages/sitemap.xml`, `management/commands/check_redirects.py`, migrations
+`0006_redirects` and `0007_search_title_help`, and `tests/test_redirects.py`.
 
 ## 4. Naming conventions
 

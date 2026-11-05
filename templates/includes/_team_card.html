@@ -4,7 +4,7 @@
    whole bio shows on the card. title_tag: h2 when the section has no heading, h3 under one. {% endcomment %}
 <article class="team-card" id="{{ member.anchor }}" data-bio-card data-reveal data-reveal-delay="{{ delay|default:0 }}">
   {% if member.image %}
-    <span class="team-card__photo-wrap">{% include "includes/_image.html" with obj=member class="team-card__photo" %}</span>
+    <span class="team-card__photo-wrap">{% include "includes/_image.html" with obj=member class="team-card__photo" sizes="152px" %}</span>
   {% endif %}
   <{{ title_tag|default:"h3" }} class="team-card__name">{{ member.name }}</{{ title_tag|default:"h3" }}>
   <p class="team-card__title">{{ member.title }}</p>

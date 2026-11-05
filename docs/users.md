@@ -155,7 +155,14 @@ from **Site settings**, so they're edited once for the whole site. Enquiries fro
 heading ("What we do", "The team"). Leave it empty for none. Visitors choose the light or dark
 look themselves (the navbar's toggle); there is nothing to set in the admin for it.
 
-Later days add: redirects (Day 10) and Phase 2's job admin.
+**Redirects** (Day 10): the old site's addresses and where they now go, with "and everything
+under it" for whole sections (WordPress categories), permanent (301) or temporary (302), active
+or not, and how often each is used (**hits**, **last used**), which shows which old links people
+still follow. An address is tidied when saved (lower case, no `https://distinctive.co.zw`), and
+a redirect to its own address is refused. Each page also has a **Search engines** tab: the
+title Google shows (as written, about 60 characters) and the description.
+
+Phase 2 adds the job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 

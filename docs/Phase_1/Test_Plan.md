@@ -87,19 +87,19 @@ Controller:
 Status code, template and one expected string for each:
 
 - [x] `/`, `/about/`, `/services/`, `/contact/` → 200 (`apps/core/tests/test_consent.py`).
-- [ ] `/sitemap.xml` (lists the four pages, not the admin), `/robots.txt` (points to the
+- [x] `/sitemap.xml` (lists the four pages, not the admin), `/robots.txt` (points to the
   sitemap) → 200.
-- [ ] An unknown URL → the branded 404.
-- [ ] A seeded old URL (for example `/about-us/`) → 301 to its new page.
-- [ ] Each page's `<title>`, meta description and canonical are present and unique.
+- [x] An unknown URL → the branded 404.
+- [x] A seeded old URL (for example `/about-us/`) → 301 to its new page.
+- [x] Each page's `<title>`, meta description and canonical are present and unique.
 - [x] No `googletagmanager` or `maps.googleapis`/`google.com/maps/embed` URL appears in the
   initial HTML of any page (both are injected by JavaScript after consent).
 
 ### 3.7 Security settings
 
-- [ ] `check --deploy` with prod settings prints no warnings beyond the two deliberately silenced
+- [x] `check --deploy` with prod settings prints no warnings beyond the two deliberately silenced
   ones, `security.W005` and `W021` (`apps/core/tests/test_security.py`).
-- [ ] Prod settings: `DEBUG=False`, secure cookies, HSTS, `SECURE_SSL_REDIRECT`,
+- [x] Prod settings: `DEBUG=False`, secure cookies, HSTS, `SECURE_SSL_REDIRECT`,
   `X-Frame-Options: DENY`, `nosniff`, referrer policy.
 
 ### 3.8 Look and feel (Day 9, `apps/core/tests/test_polish.py`)
@@ -115,6 +115,15 @@ Status code, template and one expected string for each:
 - [x] `[data-reveal]` is only a hook: no element is hidden in the HTML.
 - [x] The footer has Reach Us and Quick Links; the vacancies line stays on Contact.
 - [x] The seed fills an empty section heading (Home's service cards got "What We Do").
+
+### 3.9 Responsive images (Day 10, `apps/core/tests/test_image_variant_service.py`)
+
+- [x] WebP copies at each width narrower than the original, then the original, in `srcset`
+  order; the copy has the right size and format.
+- [x] Copies are made once and reused.
+- [x] Transparency survives (logos).
+- [x] No `srcset` for small images or none; a missing file is logged and skipped, never an error
+  on the page.
 
 ## 4. Manual QA checklist (Day 10 and Day 11)
 
@@ -166,6 +175,7 @@ Run on the local prod stack (Day 10) and again on the preview host (Day 11).
 - [ ] `http://` redirects to `https://`; `www` and the apex agree on one canonical host.
 - [ ] Every URL from the old sitemap answers 301 to a live page.
 - [ ] Mail to `enquiries@distinctive.co.zw` still arrives after the DNS change.
-- [ ] Lighthouse on the live domain: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95.
+- [ ] Lighthouse on the live domain: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95. *(Locally on
+  2026-11-05, prod settings: mobile 94–98 / 100 / 100 / 100 on all four pages.)*
 - [ ] Keyboard-only: skip link, nav, theme toggle, slider, bio dialog, cookie banner, both forms,
   back to top.

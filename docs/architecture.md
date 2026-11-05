@@ -1,6 +1,6 @@
 # Architecture
 
-**Project-wide · revised 2026-11-04** (Day 9: the section label, the seed fills empty headings; Day 8: the contact controller, rate limit, form and map
+**Project-wide · revised 2026-11-05** (Day 10: SEO, redirects, responsive images as built; Day 9: the section label, the seed fills empty headings; Day 8: the contact controller, rate limit, form and map
 sections; Day 7: Services page, enquiries, the seed fills blanks;
 Day 6: team, partners, the page blocks; Day 5:
 `ImageMixin`, pages and services as built, the seed; 2026-11-02: two phases; Resend; local media; VPS go-live)
@@ -89,12 +89,14 @@ testability, no extra files.
 | `BaseService` | Holds the repository; `get_or_raise` raising `NotFoundError`. |
 | `ServiceError` family | `NotFoundError`, `ValidationError`, `ExternalServiceError`. Services raise these, never `Http404`. |
 | `BaseController` (a `View`) | `render_page`, `json_ok`, `json_error`, `is_ajax`; maps `ServiceError` to responses (404, 400, 503). |
-| `SeoMixin` + `SeoData` | Controllers return title, description, canonical and OG image; `_seo.html` renders them with JSON-LD. |
+| `SeoService` + `SeoData` (Day 10) | `PageController` asks `SeoService.for_page()` for the title (the page's search title as written, or "<title> \| <company>"), description, canonical, Open Graph image and, on Home only, the `Organization` JSON-LD; `includes/_seo.html` renders them. Every address is built from `SITE_URL`, never the request's host, so the preview host and `www` never compete with the live domain. `SEO_NOINDEX=true` (the preview host) adds `noindex, nofollow` everywhere and makes `robots.txt` disallow everything. |
+| `ImageVariantService` + `{{ obj\|srcset }}` (Day 10) | WebP copies of an upload at 480–2000 px (never wider than the original), made the first time a page needs them, kept under `media/variants/<width>/`, and listed in the `<img>`'s `srcset` by `includes/_image.html`. A new upload has a new file name, so its copies are made afresh; a missing or unreadable file is logged and the plain `src` still works. |
 | `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
 | `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template as **`site_info`** (not `site`, which allauth's views use for the Sites record). |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
 | `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name). For an item that's already there it fills in only **empty** text fields and a missing image (`blank_fields`; since Day 9 that includes an empty section heading, since a section is found by its anchor), so a later day's fuller content reaches a database seeded earlier; flags, numbers and anything an editor has filled in are never changed. Day 5 seeded Home and its six services, Day 6 About, its team and partners, Day 7 Services, the full text of all 13 services and ten clients, Day 8 Contact (its form and map sections) and the Services enquiry block, Day 9 every section's label, Home's "What We Do" heading and Contact's page hero. |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
+| `RedirectMiddleware` (Day 10) | Last in `MIDDLEWARE`. For a GET or HEAD that would be a 404, it asks `RedirectService` (in `apps/pages`) for the old address's new home and answers 301 (or 302); anything else passes through untouched, so a redirect can never hide a live page. |
 
 ## 5. Request flow — worked example
 
@@ -222,7 +224,7 @@ erDiagram
     }
 ```
 
-**As built (Days 5–9):**
+**As built (Days 5–10):**
 
 - `Page`: one row per fixed page (`home`, `about`, `services`, `contact`), created by the
   migration `pages.0002_the_four_pages`, so every URL works on a fresh database. Title, published,
@@ -245,6 +247,12 @@ erDiagram
 - `team.TeamMember` (Day 6): name, job title, Markdown bio, photo, LinkedIn and Facebook URLs,
   order, published, and an `anchor` from the name (unique, kept), so a person can be linked to
   (`/about/#rose-nhamo`) and Phase 2 search can point at them.
+- `pages.Redirect` (Day 10): `old_path` (normalised: lower case, no host or query, trailing
+  slash unless it looks like a file), `new_path` (a path here or a full address), `match_prefix`
+  ("and everything under it"; the longest matching prefix wins, an exact match beats any
+  prefix), `is_permanent` (301, else 302), `is_active`, a note, and `hits` / `last_hit_at`,
+  counted on use. A redirect to its own address is refused. Nine are seeded; `manage.py
+  check_redirects <sitemap>` checks an old sitemap against pages and redirects.
 - `contact.ContactSubmission` (Day 7): name, email, optional phone, message, `source_page`
   (`contact` or `services`), `email_sent`, `emailed_at`, `email_error`, `handled`, `handled_at`,
   `ip_hash`, `user_agent`; newest first.
