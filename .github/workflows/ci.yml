@@ -1,5 +1,6 @@
 # CI (docs/deployment.md §5). Node runs only in the css-fresh job, never in the image.
 # Day 9 adds the build-and-push job (image → GHCR).
+# Branch protection on main requires both jobs: test and css-fresh.
 name: CI
 on:
   push: { branches: [main] }
@@ -34,21 +35,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # The npm pipeline arrives on Day 2; until then this job has nothing to check.
-      - name: Is there an npm pipeline yet?
-        id: npm
-        run: |
-          if [ -f package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
-      - if: steps.npm.outputs.present == 'true'
-        uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
-      - if: steps.npm.outputs.present == 'true'
-        run: npm ci
-      - if: steps.npm.outputs.present == 'true'
-        run: npm run build:css
-      - if: steps.npm.outputs.present == 'true'
-        name: Compiled CSS must match the committed file
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build:css
+      - name: Compiled CSS must match the committed file
         run: git diff --exit-code -- static/css/main.css
-      - if: steps.npm.outputs.present == 'true'
-        name: No source-map references may ship
-        run: "! grep -q 'sourceMappingURL' static/css/main.css"
+      - name: No source-map references may ship
+        run: "! grep -q 'sourceMappingURL' static/css/main.css static/vendor/bootstrap/bootstrap.bundle.min.js"

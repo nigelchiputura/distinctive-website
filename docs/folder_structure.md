@@ -37,7 +37,7 @@ distinctive-site/
 │   └── Caddyfile                       # HTTPS, /media/ from the volume, proxy to web
 ├── docs/                               # this doc set (index: docs/README.md)
 ├── scripts/
-│   └── copy-vendor.mjs                 # copies Bootstrap JS, Font Awesome, Open Sans into static/vendor/
+│   └── copy-vendor.mjs                 # Bootstrap JS + Open Sans → static/vendor/; Font Awesome SVGs → templates/includes/icons/
 ├── static/
 │   ├── scss/                           # SOURCE, compiled on the dev machine (not in the image)
 │   │   ├── main.scss                   # entry: tokens → variables → bootstrap → partials
@@ -68,7 +68,9 @@ distinctive-site/
 │   │       ├── contact-form.js
 │   │       └── cookie-consent.js       # Phase 2 adds search-dropdown.js, highlight.js
 │   ├── vendor/                         # copied from node_modules by `npm run vendor`, committed
-│   └── img/                            # logo, default images, favicons
+│   │   ├── bootstrap/                  # bootstrap.bundle.min.js (source-map line removed)
+│   │   └── open-sans/                  # latin woff2, 400/600/700, normal and italic
+│   └── img/                            # logo.png (stand-in until the real logo), later favicons and defaults
 ├── templates/
 │   ├── base.html
 │   ├── includes/
@@ -77,6 +79,7 @@ distinctive-site/
 │   │   ├── _navbar.html
 │   │   ├── _footer.html
 │   │   ├── _cookie_banner.html
+│   │   ├── icons/                      # inline SVG icons, written by `npm run vendor`
 │   │   └── _section.html               # renders one PageSection by type
 │   ├── errors/
 │   │   ├── 404.html

@@ -66,23 +66,24 @@ critical-path cards. A day also isn't done until `commands/Phase_1/day-N.md` is 
 
 **Goal:** an empty page with the final header and footer on desktop and mobile.
 
-- [ ] **npm Sass pipeline.** Root `package.json` with exact versions of `sass`, `bootstrap`,
+- [x] **npm Sass pipeline.** Root `package.json` with exact versions of `sass`, `bootstrap`,
   `@fortawesome/fontawesome-free`, `@fontsource/open-sans`; scripts `build:css`, `watch:css`,
-  `vendor` (`frontend.md` §1); `scripts/copy-vendor.mjs` copies Bootstrap's JS bundle, Font
-  Awesome webfonts and Open Sans `woff2` into `static/vendor/`.
+  `vendor` (`frontend.md` §1); `scripts/copy-vendor.mjs` copies Bootstrap's JS bundle and Open
+  Sans `woff2` into `static/vendor/`, and Font Awesome icons as inline SVGs into
+  `templates/includes/icons/`.
   AC: `npm run build:css` writes a minified `static/css/main.css` with no `sourceMappingURL`.
-- [ ] **Brand tokens.** `static/scss/_tokens.scss` (`$dcs-*` and the `--dcs-*` custom
+- [x] **Brand tokens.** `static/scss/_tokens.scss` (`$dcs-*` and the `--dcs-*` custom
   properties), `_variables.scss` (Bootstrap overrides), `main.scss` import order
   (`frontend.md` §2).
   AC: `$primary` is the brand gold; body text is Open Sans.
-- [ ] **Base templates.** `base.html`, `includes/_topbar.html`, `_navbar.html` (Home, About Us,
+- [x] **Base templates.** `base.html`, `includes/_topbar.html`, `_navbar.html` (Home, About Us,
   Services, Contact Us, from a nav list in the context processor), `_footer.html`; skip link;
   placeholder values until `SiteSettings` exists tomorrow.
   AC: the layout matches the old site's structure at 375, 768 and 1280 px.
-- [ ] **`css-fresh` CI job** completed: `npm ci`, `npm run build:css`, `git diff --exit-code`,
+- [x] **`css-fresh` CI job** completed: `npm ci`, `npm run build:css`, `git diff --exit-code`,
   no source maps.
   AC: a PR with SCSS changed but CSS not rebuilt fails `css-fresh`.
-- [ ] **WhiteNoise check.** Run the prod `collectstatic` locally (`deployment.md` §2).
+- [x] **WhiteNoise check.** Run the prod `collectstatic` locally (`deployment.md` §2).
   AC: no missing-file errors from vendored fonts.
 
 **Done when:** an empty page renders with the final header and footer, and `css-fresh` is green.
