@@ -1,6 +1,6 @@
 # Deployment Plan
 
-**Project-wide · revised 2026-11-02:** Phase 1 goes **live on a VPS** at `distinctive.co.zw` (no
+**Project-wide · revised 2026-11-05** (the demo on the preview host moved to Day 10; GHCR login on the VPS; `SEO_NOINDEX`). **2026-11-02:** Phase 1 goes **live on a VPS** at `distinctive.co.zw` (no
 Render demo); email through **Resend's HTTPS API** (replacing Brevo); uploaded media in a
 **Docker volume** served by Caddy (Cloudflare R2 deferred to the backlog).
 
@@ -15,7 +15,7 @@ deploy to a VPS running Docker Compose with Caddy.
 | Local | Docker Compose on the developer machine (plus Node for SCSS, on the machine only) | Development | Phase 1 Day 1 |
 | CI | GitHub Actions | Lint, type check, tests, CSS freshness, image build | Phase 1 Day 1 |
 | Local prod stack | `docker-compose.prod.yml` on the developer machine | Prove the production files before the VPS | Phase 1 Day 10 |
-| Preview | The VPS at `new.distinctive.co.zw` | Client walkthrough before cutover | Phase 1 Day 11 |
+| Preview | The VPS at `new.distinctive.co.zw` | The stakeholders' demo and walkthroughs before cutover | Phase 1 Day 10 (moved forward for the demo), walkthroughs on Day 11 |
 | Production | The same VPS at `distinctive.co.zw` | The live site | Phase 1 Day 11, after sign-off |
 
 The preview is the production server under a second hostname, not a separate environment. After
@@ -123,6 +123,8 @@ Phase 2 adds `rebuild_search_index` after step 4.
 | `GOOGLE_MAPS_EMBED_KEY` | empty (no map; the address and "Get directions" show), or a key allowing `localhost` | the key restricted by HTTP referrer to the preview and live hosts. Public by design: it ends up in the iframe's address |
 | `CONTACT_RATE_LIMIT` | 5 (default) | 5 (default): enquiries per visitor per hour |
 | `TRUSTED_PROXY_COUNT` | 0 (default; the visitor is `REMOTE_ADDR`) | 1 (the prod default): the visitor is the last `X-Forwarded-For` entry, the one Caddy adds |
+| `SEO_NOINDEX` | — | `true` on the preview host (every page `noindex`, `robots.txt` disallows all); removed at cutover |
+| `ENV_FILE` | — | only for the local prod stack: `../.env.prod` (where the prod compose file finds its env file) |
 | `SEED_SITE_CONTENT` | `true` (optional) | `true` on the first deploy only, then removed |
 | `SECURE_SSL_REDIRECT` | — | `true` (default) |
 
@@ -325,72 +327,30 @@ keys only (password login and root login off); `ufw` allowing 22, 80 and 443; Do
 the Compose plugin; the app folder `/srv/distinctive` holding `docker-compose.prod.yml`,
 `Caddyfile` and `.env`.
 
-```yaml
-# docker/docker-compose.prod.yml
-services:
-  web:
-    image: ghcr.io/${GHCR_IMAGE:?set GHCR_IMAGE}:${IMAGE_TAG:-latest}
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@db:5432/${POSTGRES_DB:?}
-    volumes:
-      - media_data:/app/media
-    depends_on:
-      db: { condition: service_healthy }
-    expose: ["8000"]
-  db:
-    image: postgres:16
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
-      interval: 5s
-      retries: 10
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    environment:
-      SITE_DOMAIN: ${SITE_DOMAIN:?set SITE_DOMAIN}
-    ports: ["80:80", "443:443"]
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - media_data:/srv/media:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on: [web]
-volumes:
-  pg_data:
-  media_data:
-  caddy_data:
-  caddy_config:
+**The files** (in the repo; copy `docker/docker-compose.prod.yml`, `docker/Caddyfile` and a
+filled-in `.env.prod.example` as `.env` to `/srv/distinctive`):
+
+- `docker-compose.prod.yml`: `web` (the GHCR image, `restart: unless-stopped`, the media
+  volume, `DATABASE_URL` built from `POSTGRES_*`, starting once `db` is healthy), `db` (Postgres
+  16 with a health check and the `pg_data` volume) and `caddy` (ports 80 and 443, the
+  `Caddyfile`, the media volume read-only, `caddy_data` for the certificates). `env_file` is
+  `.env`, or `ENV_FILE` for the local prod stack.
+- `Caddyfile`: `{$SITE_DOMAIN}` with compression, no `Server` header, `/media/*` straight from the
+  volume (a week's cache, `nosniff`), everything else to `web:8000`; the cutover's redirect block
+  for `www` and `new.` is in it, commented out.
+
+**Pulling the image (once per server).** The image on GHCR is private (the repository is), so
+the server logs in with a token that can only read packages: on GitHub, Settings → Developer
+settings → Personal access tokens → **Tokens (classic)** → scope `read:packages` only; then, on
+the server as the deploy user:
+
+```bash
+echo "<token>" | docker login ghcr.io -u <github-username> --password-stdin
 ```
 
-```
-# docker/Caddyfile
-{$SITE_DOMAIN} {
-    encode zstd gzip
-    header -Server
-
-    # Admin-uploaded images, straight from the media volume
-    handle_path /media/* {
-        root * /srv/media
-        file_server
-        header Cache-Control "public, max-age=604800"
-    }
-
-    handle {
-        reverse_proxy web:8000
-    }
-}
-
-# Added at cutover (§8): redirect www and the preview host to the live domain
-# www.distinctive.co.zw, new.distinctive.co.zw {
-#     redir https://distinctive.co.zw{uri} permanent
-# }
-```
+Docker keeps the login in `~/.docker/config.json`, so **Deploy VPS** can pull from then on.
+Making the package public would also work, but keeping it private costs nothing and means a
+mistake in the image is never published.
 
 - **Caddy** gets and renews certificates, redirects HTTP to HTTPS and serves `/media/` from the
   volume read-only. Keep `caddy_data`: it holds the certificates. Its `reverse_proxy` sets
@@ -436,12 +396,12 @@ undo. Their two checks (`security.W005`, `W021`) are silenced in `prod.py`, so
   any `mail`/`webmail`/`autodiscover` records**. These stay exactly as they are.
 - Lower the TTL of the apex `A`/`AAAA` and `www` records to 300 seconds at least a day before.
 
-**Preview:**
+**Preview (Day 10: the stakeholders' demo; `commands/Phase_1/day-10.md` step 11):**
 
 1. Add `new.distinctive.co.zw` → the VPS's IP (an `A` record; DNS only, not proxied, if the DNS
    host is Cloudflare, so Caddy can get its certificate).
-2. `.env`: `SITE_DOMAIN=new.distinctive.co.zw`, `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` for
-   it, `SEED_SITE_CONTENT=true`.
+2. `.env`: `SITE_DOMAIN=new.distinctive.co.zw`, `SITE_URL`, `ALLOWED_HOSTS` and
+   `CSRF_TRUSTED_ORIGINS` for it, `SEO_NOINDEX=true`, `SEED_SITE_CONTENT=true`.
 3. Run the **Deploy VPS** workflow. Check the logs for the migrations, the seed and no `core.W00x`
    warnings.
 4. Create the client's users (`onboard_user`), then remove `SEED_SITE_CONTENT` from `.env`.
@@ -451,7 +411,8 @@ undo. Their two checks (`security.W005`, `W021`) are silenced in `prod.py`, so
 **Cutover (after sign-off):**
 
 1. `.env`: `SITE_DOMAIN=distinctive.co.zw`; add `distinctive.co.zw`, `www.distinctive.co.zw` to
-   `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`; `SITE_URL=https://distinctive.co.zw`.
+   `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`; `SITE_URL=https://distinctive.co.zw`; remove
+   `SEO_NOINDEX`.
 2. Uncomment the redirect block in the `Caddyfile`.
 3. Change the apex `A`/`AAAA` and the `www` record to the VPS. **Change nothing else.**
 4. `docker compose -f docker-compose.prod.yml up -d`; watch `docker compose logs caddy` for

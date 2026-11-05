@@ -4,7 +4,7 @@
 <article class="service-card" data-reveal data-reveal-delay="{{ delay|default:0 }}">
   {% if service.image %}
     <div class="service-card__frame">
-      {% include "includes/_image.html" with obj=service class="service-card__image" %}
+      {% include "includes/_image.html" with obj=service class="service-card__image" sizes="(min-width: 1200px) 330px, (min-width: 768px) 45vw, 88vw" %}
     </div>
   {% endif %}
   <div class="service-card__body">

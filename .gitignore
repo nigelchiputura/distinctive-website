@@ -23,3 +23,5 @@ node_modules/
 .vscode/
 .idea/
 .DS_Store
+
+wp-sitemap.xml

@@ -313,6 +313,14 @@ says. The old site is a reference for content and structure, not a design to cop
   Contact, and the Contact form's band, use the drifting black-and-gold gradient (it had been
   hidden behind plain black by a CSS ordering slip, now fixed).
   AC: on Home the heading and tagline never cover a face at 375, 768, 1280 or 1920 px.
+  *(Revised 2026-11-04 evening: the photo's darkening overlay no longer sits over the photo-less
+  heroes, so their gradient shows at full strength; Home's photo hero is shorter on phones, so
+  the crop keeps more of the team and less lawn.)*
+- [x] **No sideways scroll on phones** (found 2026-11-04 while taking the stakeholder screenshots):
+  rows with Bootstrap's `g-5` gutter were 12 px wider than a phone screen, so every page scrolled
+  sideways. They now use `g-4` below 992 px (`g-4 g-lg-5`).
+  AC: at 390 px nothing on any page is wider than the screen (checked in the browser on all
+  four pages).
 
 **Done when:** all four pages are polished in both themes, the checks pass, and nothing that
 worked on Day 8 (forms, consent, the slider) has changed behaviour.
@@ -322,37 +330,76 @@ worked on Day 8 (forms, consent, the slider) has changed behaviour.
 **Goal:** production-ready: SEO valid, old links redirected, Lighthouse targets met, prod stack
 runs locally.
 
-*(Started on 2026-11-04 before the polish day was added: the SEO service and `_seo.html`, the
-redirects, the 404 and 500 pages and the production files are in the code with their tests, so
-they ship in the Day 9 zip. They are checked, finished and documented, with their commands file,
-on this day.)*
+*(Started on 2026-11-04 before the polish day was added; the code shipped in the Day 9 zip, and
+was checked, finished and documented on 2026-11-05. The owner also moved the **demo** forward to
+this day, the stakeholder email of 2026-11-04 having promised one on Thursday 5 November: the
+preview host goes up today, and Day 11 keeps the walkthroughs and the cutover.)*
 
-- [ ] **SEO.** `SeoMixin` + `includes/_seo.html` (title, description, canonical, Open Graph,
+- [x] **SEO.** `SeoMixin` + `includes/_seo.html` (title, description, canonical, Open Graph,
   Twitter card, JSON-LD `Organization` with address and phone); per-page fields on `Page`.
   AC: each page has a unique title and description.
-- [ ] **Sitemap and robots.** `sitemap.xml` (the four pages), `robots.txt` pointing to it and
+  *(As built: `SeoService` (`apps/core/services/seo_service.py`) rather than a mixin, called by
+  `PageController`; canonical and Open Graph addresses come from `SITE_URL`, never the request's
+  host; the `Organization` JSON-LD is on Home only; `SEO_NOINDEX=true` (the preview host) adds
+  `noindex, nofollow` everywhere. Sign-in and error pages get a plain title and `noindex`.)*
+- [x] **Sitemap and robots.** `sitemap.xml` (the four pages), `robots.txt` pointing to it and
   disallowing the admin path.
   AC: both validate; the admin path isn't in the sitemap.
-- [ ] **Old-URL redirects.** `pages.Redirect` (old path → new path, 301) with an admin and a
+  *(As built: `robots.txt` does not name the admin, since that would publish its unguessable
+  address; it disallows `/accounts/`, and on the preview host everything.)*
+- [x] **Old-URL redirects.** `pages.Redirect` (old path → new path, 301) with an admin and a
   middleware, seeded from the old site's sitemap (for example `/about-us/` → `/about/`, job post
   URLs → `/contact/` until Phase 2).
   AC: every URL in the old sitemap answers 301 to a live page.
-- [ ] **Error pages.** Branded `404.html` and `500.html`.
+  *(As built: nine seeded redirects from the addresses the screenshots and WordPress's defaults
+  show, with "and everything under it" prefixes for categories and jobs; job addresses are 302
+  to Contact, so they can change when Phase 2 adds Jobs. Only requests that would be a 404 are
+  redirected, so a redirect never hides a live page; hits are counted in the admin.
+  `manage.py check_redirects <sitemap>` checks the old sitemap once the owner exports it.)*
+- [ ] **Old sitemap (owner).** Export the old site's `wp-sitemap.xml` (and the sitemaps it lists)
+  and run `check_redirects` on them (`commands/Phase_1/day-10.md` step 8).
+  AC: every address prints OK; anything MISSING gets a redirect in the admin.
+- [x] **Error pages.** Branded `404.html` and `500.html`.
   AC: an unknown URL shows the branded 404 with status 404.
-- [ ] **Responsive and accessibility pass.** Every page at 375 / 768 / 1280 px; focus states;
+  *(As built: `500.html` uses no context processor or database, so it shows even when those
+  are what failed.)*
+- [x] **Responsive and accessibility pass.** Every page at 375 / 768 / 1280 px; focus states;
   contrast (darker gold for text on light bands); `alt` texts; `loading="lazy"` except the
   hero; explicit image sizes.
   AC: Lighthouse on Home, About, Services, Contact: Performance ≥ 90, Accessibility ≥ 90,
   SEO ≥ 95.
-- [ ] **Seed, part 3.** Services, clients and Contact content *(all three seeded by Day 8)*;
+  *(Measured 2026-11-05 on prod settings under gunicorn, with uploads served as Caddy will:
+  mobile Performance 94–98, Accessibility 100, Best Practices 100, SEO 100 on all four pages;
+  desktop 100 throughout. Home first measured 87 on mobile once the team photo actually loaded,
+  hence the next card.)*
+- [x] **Responsive images** (promoted from the stretch pool on 2026-11-05). `ImageVariantService`
+  makes WebP copies of each upload at 480, 800, 1200, 1600 and 2000 px (never wider than the
+  original) the first time a page needs them, under `media/variants/`; `_image.html` gives every
+  image a `srcset`, and a `sizes` hint where the layout is known.
+  AC: a phone fetches the team photo as a WebP of about 90 KB instead of the 280 KB JPEG; Home's
+  mobile Performance is 90 or more (94, with LCP 3.0 s instead of 3.9 s).
+- [x] **Seed, part 3.** Services, clients and Contact content *(all three seeded by Day 8)*;
   `SiteSettings` values.
   AC: a fresh database plus `seed_site_content` gives the complete site.
+  *(`SiteSettings` gets the old site's details from its data migration; the seed adds the
+  redirects.)*
 - [ ] **Production files.** `docker/docker-compose.prod.yml` (web from GHCR, db with health
   check, caddy; volumes `pg_data`, `media_data`, `caddy_data`), `docker/Caddyfile` (serves
   `/media/*` from the volume, proxies the rest), `.env.prod.example`,
   `.github/workflows/deploy-vps.yml`, `build-and-push` job in CI (`deployment.md` §7).
   AC: the prod stack runs locally at `https://localhost` with `config.settings.prod`; an image
   uploaded in the admin is served by Caddy; `check --deploy` prints no warnings.
+  *(Files done and reviewed 2026-11-05. Checked here without Docker, since Docker Hub isn't
+  reachable from the build workspace: `collectstatic` with the manifest storage, `check --deploy`
+  clean, gunicorn with prod settings serving all four pages, robots, the sitemap, a 301 and the
+  404, with the security headers. The owner confirms the whole stack with
+  `commands/Phase_1/day-10.md` step 10 or, directly, on the VPS in step 11.)*
+- [ ] **Demo on the preview host (owner, moved here from Day 11 on 2026-11-05).** The VPS set up
+  (`deployment.md` §7), `new.distinctive.co.zw` pointed at it, GitHub's `production` secrets,
+  the first **Deploy VPS** run with `SEED_SITE_CONTENT=true` and `SEO_NOINDEX=true`
+  (`commands/Phase_1/day-10.md` step 11).
+  AC: `https://new.distinctive.co.zw` shows the site with a valid certificate, and is
+  `noindex`; an enquiry is saved (and emailed once Resend is verified).
 - [ ] **Old site backup (owner).** Full WordPress backup (files and database) stored safely.
   AC: the backup file exists off the old host.
 
@@ -367,9 +414,9 @@ locally.
   only, firewall (22, 80, 443), Docker, the two compose files and `.env` in `/srv/distinctive`
   (`deployment.md` §7).
   AC: `docker compose -f docker-compose.prod.yml config` resolves.
-- [ ] **Preview host.** A DNS record such as `new.distinctive.co.zw` → the VPS;
-  `SITE_DOMAIN=new.distinctive.co.zw`; first deploy with the `Deploy VPS` workflow; seed the
-  content; create the client's users.
+- [ ] **Preview host.** *(Set up on Day 10 for the demo; today, finish it.)* A DNS record such as
+  `new.distinctive.co.zw` → the VPS; `SITE_DOMAIN=new.distinctive.co.zw`; first deploy with the
+  `Deploy VPS` workflow; seed the content; create the client's users.
   AC: `https://new.distinctive.co.zw` serves the site with a valid certificate; an enquiry
   reaches the mailbox and shows **Email sent: Yes**.
 - [ ] **Client walkthrough.** Editing a section, reordering a slide, adding a team member,
@@ -407,6 +454,6 @@ affirmed.
 
 ## Stretch pool (only if a day finishes early)
 
-- Responsive image sizes (`srcset`) generated on upload.
+- ~~Responsive image sizes (`srcset`) generated on upload.~~ Done on Day 10, made on first use.
 - An uptime monitor (UptimeRobot free) on the live domain.
 - A pre-commit hook running `npm run build:css` when SCSS is staged.

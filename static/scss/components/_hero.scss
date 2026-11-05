@@ -75,6 +75,13 @@
   }
 }
 
+// Phones: a shorter hero, so the crop of the (wide) photo keeps more of the team and less lawn.
+@include media-breakpoint-down(md) {
+  .hero__slide--photo {
+    min-height: clamp(26rem, 62vh, 32rem);
+  }
+}
+
 // Faint gold lines over the plain background, so it has some texture.
 .hero__slide--plain::before,
 .page-hero--plain::before {
@@ -237,4 +244,11 @@
   p:last-child {
     margin-bottom: 0;
   }
+}
+
+// No photo, nothing to darken: the gold gradient shows at full strength (Home's slide without a
+// photo, and the About, Services and Contact heroes).
+.hero__slide--plain .hero__overlay,
+.page-hero--plain .page-hero__overlay {
+  background: none;
 }

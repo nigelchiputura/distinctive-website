@@ -1,3 +1,6 @@
-{% comment %} One content image with its stored size, so the page doesn't jump while it loads.
-   Usage: {% include "includes/_image.html" with obj=section class="…" eager=False %} {% endcomment %}
-<img src="{{ obj.image.url }}" alt="{{ obj.alt_text }}"{% if obj.image_width %} width="{{ obj.image_width }}" height="{{ obj.image_height }}"{% endif %}{% if class %} class="{{ class }}"{% endif %}{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async">
+{% load core_extras %}{% comment %} One content image with its stored size, so the page doesn't jump while it loads, and smaller
+   WebP copies (srcset) so phones fetch only what they need (ImageVariantService).
+   Usage: {% include "includes/_image.html" with obj=section class="…" sizes="…" eager=False %}
+   sizes: how wide the image shows, as in the HTML attribute; without it, the browser assumes
+   the full window width. {% endcomment %}
+{% with variants=obj|srcset %}<img src="{{ obj.image.url }}"{% if variants %} srcset="{{ variants }}" sizes="{{ sizes|default:'100vw' }}"{% endif %} alt="{{ obj.alt_text }}"{% if obj.image_width %} width="{{ obj.image_width }}" height="{{ obj.image_height }}"{% endif %}{% if class %} class="{{ class }}"{% endif %}{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async">{% endwith %}

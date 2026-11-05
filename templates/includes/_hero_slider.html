@@ -9,7 +9,7 @@
         {% for slide in slides %}
           <div class="carousel-item hero__slide{% if forloop.first %} active{% endif %}{% if slide.image %} hero__slide--photo{% else %} hero__slide--plain{% endif %}"{% if slides|length > 1 %} role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ slides|length }}"{% endif %}>
             {% if slide.image %}
-              {% include "includes/_image.html" with obj=slide class="hero__image" eager=forloop.first %}
+              {% include "includes/_image.html" with obj=slide class="hero__image" sizes="100vw" eager=forloop.first %}
             {% endif %}
             <div class="hero__overlay">
               <div class="container hero__text">

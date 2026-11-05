@@ -133,11 +133,11 @@
 {% elif s.section_type == "value_block" %}
   <section id="{{ s.anchor }}" class="band band--light value-block value-block--image-{{ s.image_position }}">
     <div class="container">
-      <div class="row g-5 align-items-center">
+      <div class="row g-4 g-lg-5 align-items-center">
         {% if s.image %}
           <div class="col-lg-6 value-block__media" data-reveal>
             <div class="framed-image{% if s.image_position == 'left' %} framed-image--left{% endif %}">
-              {% include "includes/_image.html" with obj=s class="value-block__image" %}
+              {% include "includes/_image.html" with obj=s class="value-block__image" sizes="(min-width: 1400px) 600px, (min-width: 992px) 45vw, 92vw" %}
             </div>
           </div>
         {% endif %}
@@ -160,7 +160,7 @@
           {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
           {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
           {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
-          {% if s.image %}<div class="framed-image mt-4">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>{% endif %}
+          {% if s.image %}<div class="framed-image mt-4">{% include "includes/_image.html" with obj=s class="img-fluid" sizes="(min-width: 992px) 30vw, 92vw" %}</div>{% endif %}
         </div>
         <div class="col-lg-8" data-reveal data-reveal-delay="1">
           <div class="glass-card band__body band__body--wide">{{ s.body|markdown }}</div>
@@ -171,7 +171,7 @@
 
 {% elif s.section_type == "hero_text" %}
   <section id="{{ s.anchor }}" class="page-hero{% if not s.image %} page-hero--plain{% endif %}">
-    {% if s.image %}{% include "includes/_image.html" with obj=s class="page-hero__image" eager=True %}{% endif %}
+    {% if s.image %}{% include "includes/_image.html" with obj=s class="page-hero__image" sizes="100vw" eager=True %}{% endif %}
     <div class="page-hero__overlay">
       <div class="container">
         <div class="page-hero__inner">
@@ -187,7 +187,7 @@
   {# intro_dark, band_dark, band_light: a heading and text, with an optional image beside it. #}
   <section id="{{ s.anchor }}" class="band {% if s.section_type == 'band_light' %}band--light{% elif s.section_type == 'intro_dark' %}band--black on-dark{% else %}band--charcoal on-dark{% endif %}">
     <div class="container">
-      <div class="row g-5 align-items-center">
+      <div class="row g-4 g-lg-5 align-items-center">
         <div class="{% if s.image %}col-lg-7{% else %}col-12{% endif %}{% if s.image and s.image_position == 'left' %} order-lg-2{% endif %}" data-reveal>
           {% include "includes/_section_head.html" %}
           <div class="band__body{% if not s.image %} band__body--wide{% endif %}{% if s.heading_align == 'right' %} ms-lg-auto{% endif %}">{{ s.body|markdown }}</div>
@@ -195,7 +195,7 @@
         </div>
         {% if s.image %}
           <div class="col-lg-5" data-reveal data-reveal-delay="1">
-            <div class="framed-image">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>
+            <div class="framed-image">{% include "includes/_image.html" with obj=s class="img-fluid" sizes="(min-width: 992px) 38vw, 92vw" %}</div>
           </div>
         {% endif %}
       </div>

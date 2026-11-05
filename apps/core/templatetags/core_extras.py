@@ -6,6 +6,7 @@ import json
 from django import template
 from django.utils.safestring import SafeString, mark_safe
 
+from apps.core.services.image_variant_service import ImageVariantService
 from apps.core.services.markdown_service import MarkdownService
 
 register = template.Library()
@@ -29,3 +30,10 @@ def jsonld_filter(data: dict | None) -> SafeString:
         return mark_safe("")
     text = json.dumps(data, ensure_ascii=False, separators=(",", ":")).translate(_JSON_ESCAPES)
     return mark_safe(f'<script type="application/ld+json">{text}</script>')  # noqa: S308
+
+
+@register.filter(name="srcset")
+def srcset_filter(obj: object) -> str:
+    """`{{ obj|srcset }}`: smaller WebP copies of an ImageMixin object's image (made on
+    first use)."""
+    return ImageVariantService().srcset(obj)

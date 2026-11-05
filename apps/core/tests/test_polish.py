@@ -84,3 +84,14 @@ def test_footer_has_the_details_and_quick_links(client):
     assert "Reach Us" in footer and "Quick Links" in footer
     assert 'aria-label="Footer"' in footer and 'href="/services/"' in footer
     assert "62 Mutare Road" in footer and "recruitment@" not in footer  # vacancies: Contact only
+
+
+def test_no_bare_g5_gutters():
+    """`row g-5` is wider than a phone screen; use `g-4 g-lg-5` (errors-and-exceptions/
+    row-g5-gutter-made-phones-scroll-sideways__2026-11-04_1950)."""
+    offenders = [
+        str(path.relative_to(settings.BASE_DIR))
+        for path in (settings.BASE_DIR / "templates").rglob("*.html")
+        if re.search(r'class="row g-5\b', path.read_text())
+    ]
+    assert offenders == []
