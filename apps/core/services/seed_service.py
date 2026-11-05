@@ -17,6 +17,8 @@ from apps.core.seed import content
 from apps.core.services.base import BaseService
 from apps.offerings.repositories.service_repository import ServiceRepository
 from apps.pages.repositories.page_repository import PageRepository
+from apps.pages.repositories.partner_repository import PartnerRepository
+from apps.team.repositories.team_repository import TeamRepository
 
 SEED_IMAGES = Path(__file__).resolve().parent.parent / "seed" / "images"
 
@@ -43,16 +45,29 @@ class SeedService(BaseService):
         self,
         pages: PageRepository | None = None,
         services: ServiceRepository | None = None,
+        team: TeamRepository | None = None,
+        partners: PartnerRepository | None = None,
         open_image: Callable[[str], Any] = open_seed_image,
     ):
         self.pages = pages or PageRepository()
         self.services = services or ServiceRepository()
+        self.team = team or TeamRepository()
+        self.partners = partners or PartnerRepository()
         self.open_image = open_image
 
     def seed(self) -> SeedReport:
         report = SeedReport()
         self._seed_services(report)
-        self._seed_home(report)
+        self._seed_team(report)
+        self._seed_partners(report)
+        self._seed_page(
+            report,
+            "home",
+            content.HOME_META_DESCRIPTION,
+            content.HOME_SECTIONS,
+            content.HOME_SLIDES,
+        )
+        self._seed_page(report, "about", content.ABOUT_META_DESCRIPTION, content.ABOUT_SECTIONS)
         return report
 
     # ---- parts -----------------------------------------------------------------------------
@@ -63,17 +78,36 @@ class SeedService(BaseService):
                 self.services.create(**self._with_image(item))
                 report.add("services")
 
-    def _seed_home(self, report: SeedReport) -> None:
+    def _seed_team(self, report: SeedReport) -> None:
+        for item in content.TEAM:
+            if self.team.by_name(item["name"]) is None:
+                self.team.create(**self._with_image(item))
+                report.add("team members")
+
+    def _seed_partners(self, report: SeedReport) -> None:
+        for item in content.PARTNERS:
+            if self.partners.by_name(item["kind"], item["name"]) is None:
+                self.partners.create(**self._with_image(item))
+                report.add("partners")
+
+    def _seed_page(
+        self,
+        report: SeedReport,
+        slug: str,
+        meta_description: str,
+        sections: tuple[dict[str, Any], ...],
+        slides: tuple[dict[str, Any], ...] = (),
+    ) -> None:
         page = self.get_or_raise(
-            self.pages.by_slug("home"), "The home page is missing: run `manage.py migrate` first."
+            self.pages.by_slug(slug), f"The {slug} page is missing: run `manage.py migrate` first."
         )
         if not page.meta_description:
-            self.pages.update(page, meta_description=content.HOME_META_DESCRIPTION)
-        for item in content.HOME_SLIDES:
+            self.pages.update(page, meta_description=meta_description)
+        for item in slides:
             if not self.pages.has_slide(page, item["heading"]):
                 self.pages.add_slide(page, **self._with_image(item))
                 report.add("hero slides")
-        for item in content.HOME_SECTIONS:
+        for item in sections:
             if not self.pages.has_section(page, item["anchor"]):
                 self.pages.add_section(page, **self._with_image(item))
                 report.add("sections")

@@ -1,7 +1,7 @@
 # Architecture
 
-**Project-wide · revised 2026-11-03** (Day 5: `ImageMixin`, pages and services as built, the
-seed; 2026-11-02: two phases; Resend; local media; VPS go-live)
+**Project-wide · revised 2026-11-04** (Day 6: team, partners, the page blocks; Day 5:
+`ImageMixin`, pages and services as built, the seed; 2026-11-02: two phases; Resend; local media; VPS go-live)
 
 The Distinctive Consultancy Services website: Django SSR, Postgres, Docker. It replaces the
 existing WordPress (Divi) site. Phase 1 builds Home, About, Services and Contact and goes live;
@@ -44,7 +44,7 @@ either happens.
 - **The Django admin** reads and writes models directly. It is Django's own machinery, not our UI.
 - **Data migrations and management commands** are operator tooling outside the layering. They
   may use the ORM, but prefer services: `seed_site_content` calls `SeedService`, which works
-  through the pages and offerings repositories.
+  through the pages, offerings and team repositories.
 - **Signals** call a service, never the ORM: the users app's `post_migrate` handler calls
   `UserService.sync_content_editor_group`; Phase 2's search signals call `SearchIndexService`.
 
@@ -82,7 +82,7 @@ testability, no extra files.
 | `PublishableMixin` | `is_published`, `published_at`. |
 | `OrderableMixin` | `sort_order`, with default ordering. |
 | `SluggedMixin` | `slug` generated from a title field; unique. |
-| `ImageMixin` | An optional `image` with `image_alt`, `image_decorative`, and the stored `image_width`/`image_height`. `clean()` requires a description unless the image is decorative; `alt_text` gives the attribute. Each model sets `image_upload_to` (`pages/sections`, `pages/slides`, `services`). |
+| `ImageMixin` | An optional `image` with `image_alt`, `image_decorative`, and the stored `image_width`/`image_height`. `clean()` requires a description unless the image is decorative; `alt_text` gives the attribute. Each model sets `image_upload_to` (`pages/sections`, `pages/slides`, `services`, `partners`, `team`). |
 | `BaseRepository[T]` | `get` (raises `NotFoundError`, so ORM exceptions never reach services), `get_or_none`, `list`, `create`, `update`, `delete`, `exists`, `count`; `published()` for publishable models. Subclasses set `model`. |
 | `BaseService` | Holds the repository; `get_or_raise` raising `NotFoundError`. |
 | `ServiceError` family | `NotFoundError`, `ValidationError`, `ExternalServiceError`. Services raise these, never `Http404`. |
@@ -91,7 +91,7 @@ testability, no extra files.
 | `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
 | `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template as **`site_info`** (not `site`, which allauth's views use for the Sites record). |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
-| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds only what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor), and never changes what's there, so an editor's changes survive a re-run. Day 5 seeds Home and its six services; Days 6 and 9 add the rest. |
+| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds only what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name), and never changes what's there, so an editor's changes survive a re-run. Day 5 seeded Home and its six services, Day 6 About, its eight team members and two partners; Days 7 and 9 add the rest. |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
 
 ## 5. Request flow — worked example
@@ -119,13 +119,19 @@ The submission is **saved before** the email is attempted. A provider failure ne
 enquiry: it stays in the admin with `email_sent=False` and the provider's message, and an admin
 action resends it.
 
-**A visitor opens `/`.** `HomeController` → `PageService.get_page("home")` (the published page,
-its published sections and slides, in order; `NotFoundError` → 404 if the page is unpublished) +
-`OfferingService.home_cards()` (published services ticked "show on Home", at most six) →
-`pages/home.html`.
+**A visitor opens `/about/`.** `AboutController` (a `PageController` with `slug = "about"`) →
+`PageService.get_page("about")` (the published page, its published sections and slides, in order;
+`NotFoundError` → 404 if the page is unpublished) → `PageBlocksService.for_sections(sections)`,
+which calls `TeamService.leadership()` because a section is a `team` block and
+`PartnerService.partners()` because one is a `partners` block, and nothing else →
+`pages/page.html`.
 
-**A visitor opens `/about/`.** `AboutController` → `PageService.get_page("about")` (published
-sections, ordered) + `TeamService.leadership()` + `PartnerService.partners()` → `pages/about.html`.
+**A visitor opens `/`.** `HomeController` does the same with `slug = "home"` and
+`pages/home.html`; its `service_cards` section brings in `OfferingService.home_cards()`
+(published services ticked "show on Home", at most six).
+
+Because the blocks are chosen by the sections, an editor can put the team, the logos or the
+service cards on any page, and a page only queries for what it shows.
 
 ## 6. SSR with targeted AJAX
 
@@ -168,20 +174,26 @@ erDiagram
     }
 ```
 
-**As built (Day 5):**
+**As built (Days 5–6):**
 
 - `Page`: one row per fixed page (`home`, `about`, `services`, `contact`), created by the
   migration `pages.0002_the_four_pages`, so every URL works on a fresh database. Title, published,
   and the search-engine title and description. The admin can't add or delete pages.
 - `PageSection`: `section_type` (`hero_text`, `intro_dark`, `band_light`, `band_dark`,
-  `two_column`, `value_block`, `service_cards`, `cta`), heading, Markdown body, optional image
-  (`ImageMixin`) and its position, an optional button, order, published, and an `anchor`. The
+  `two_column`, `value_block`, `service_cards`, `partners`, `clients`, `team`, `cta`), heading
+  and its position, a short text (`intro`, the left column of `two_column`), Markdown body,
+  optional image (`ImageMixin`) and its position, an optional button, order, published, and an `anchor`. The
   anchor is made from the heading when empty, unique within its page (`our-story`, `our-story-2`),
   and then kept, so links keep working when the heading changes. Editors restructure a page
   without a developer, and Phase 2 search can link straight to a section.
 - `HeroSlide`: heading, subheading, optional image and button, order, published. Home only.
 - `offerings.Service`: title, `anchor` (unique site-wide, same rules), summary (the Home card),
   Markdown body (the Services page, Day 7), image, `show_on_home`, order, published.
+- `pages.Partner` (Day 6): `kind` (strategic partner or corporate client), name, caption,
+  website, logo (`ImageMixin`), order, published.
+- `team.TeamMember` (Day 6): name, job title, Markdown bio, photo, LinkedIn and Facebook URLs,
+  order, published, and an `anchor` from the name (unique, kept), so a person can be linked to
+  (`/about/#rose-nhamo`) and Phase 2 search can point at them.
 
 **Phase 2 additions** (`Phase_2/Phase2_Scope.md`): `JobPosting`, and `SearchEntry` with one row per
 searchable section, service, team member and open job.

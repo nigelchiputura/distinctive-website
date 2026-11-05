@@ -61,10 +61,18 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         TWO_COLUMN = "two_column", "Two columns (short text left, long text right)"
         VALUE_BLOCK = "value_block", "Image beside heading and text"
         SERVICE_CARDS = "service_cards", "Service cards (the services ticked “show on Home”)"
+        PARTNERS = "partners", "Strategic partners (logos)"
+        CLIENTS = "clients", "Corporate clients (logos)"
+        TEAM = "team", "Leadership team"
         CTA = "cta", "Call to action (a line and a button)"
 
     class ImagePosition(models.TextChoices):
         LEFT = "left", "Left"
+        RIGHT = "right", "Right"
+
+    class Align(models.TextChoices):
+        LEFT = "left", "Left"
+        CENTER = "center", "Centre"
         RIGHT = "right", "Right"
 
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="sections")
@@ -73,6 +81,14 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         get_section_type_display: Callable[[], str]
     section_type = models.CharField("look", max_length=20, choices=SectionType.choices)
     heading = models.CharField(max_length=200, blank=True)
+    heading_align = models.CharField(
+        "heading position", max_length=6, choices=Align.choices, default=Align.LEFT
+    )
+    intro = models.TextField(
+        "short text",
+        blank=True,
+        help_text="Two columns only: the short text under the heading on the left. Markdown.",
+    )
     body = models.TextField(
         blank=True,
         help_text="Markdown: **bold**, *italic*, [link text](https://…), "
@@ -118,6 +134,30 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         while siblings.filter(anchor=candidate).exists():
             candidate, n = f"{base}-{n}", n + 1
         return candidate
+
+
+class Partner(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
+    """A logo in a logo grid: a strategic partner (About) or a corporate client (Services)."""
+
+    image_upload_to = "partners"
+
+    class Kind(models.TextChoices):
+        PARTNER = "partner", "Strategic partner"
+        CLIENT = "client", "Corporate client"
+
+    kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.PARTNER)
+    name = models.CharField(max_length=120)
+    caption = models.CharField(
+        max_length=160, blank=True, help_text="Shown under the logo. Leave empty for none."
+    )
+    url = models.URLField("website", blank=True, help_text="The logo links here if filled in.")
+
+    class Meta(OrderableMixin.Meta):  # pyright: ignore[reportIncompatibleVariableOverride]  # Meta of several abstract parents
+        verbose_name = "partner or client"
+        verbose_name_plural = "partners and clients"
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class HeroSlide(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):

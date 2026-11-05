@@ -1,0 +1,115 @@
+{% load core_extras %}
+{% comment %} One PageSection, drawn by its section_type (docs/frontend.md §3). Markdown bodies go through
+   |markdown, the only place admin text becomes HTML. {% endcomment %}
+{% with s=section %}
+{% if s.section_type == "service_cards" %}
+  <section id="{{ s.anchor }}" class="band band--charcoal on-dark">
+    <div class="container">
+      {% if s.heading %}<h2 class="band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
+      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      <div class="service-grid">
+        {% for service in service_cards %}
+          {% include "includes/_service_card.html" with title_tag=s.heading|yesno:"h3,h2" %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "service_bands" %}
+  {% include "includes/_service_bands.html" %}
+
+{% elif s.section_type == "partners" or s.section_type == "clients" %}
+  <section id="{{ s.anchor }}" class="band band--white logo-band">
+    <div class="container">
+      {% if s.heading %}<h2 class="band__heading band__heading--on-light align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
+      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      {% if s.section_type == "partners" %}{% include "includes/_logo_grid.html" with logos=partners %}{% else %}{% include "includes/_logo_grid.html" with logos=clients %}{% endif %}
+    </div>
+  </section>
+
+{% elif s.section_type == "team" %}
+  <section id="{{ s.anchor }}" class="band band--white team-band">
+    <div class="container">
+      {% if s.heading %}<h2 class="band__heading band__heading--on-light team-band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
+      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      <div class="team-grid">
+        {% for member in team %}
+          {% include "includes/_team_card.html" with title_tag=s.heading|yesno:"h3,h2" %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "cta" %}
+  <section id="{{ s.anchor }}" class="band band--charcoal band--cta on-dark text-center">
+    <div class="container">
+      {% if s.heading %}<h2 class="cta__heading">{{ s.heading }}</h2>{% endif %}
+      {% if s.body %}<div class="cta__body">{{ s.body|markdown }}</div>{% endif %}
+      {% if s.button_label and s.button_url %}
+        <a class="btn btn-outline-gold btn-lg" href="{{ s.button_url }}">{{ s.button_label }}</a>
+      {% endif %}
+    </div>
+  </section>
+
+{% elif s.section_type == "value_block" %}
+  <section id="{{ s.anchor }}" class="band band--white value-block value-block--image-{{ s.image_position }}">
+    <div class="container">
+      <div class="row g-4 g-lg-5 align-items-center">
+        {% if s.image %}
+          <div class="col-lg-6 value-block__media">
+            {% include "includes/_image.html" with obj=s class="img-fluid value-block__image" %}
+          </div>
+        {% endif %}
+        <div class="{% if s.image %}col-lg-6{% else %}col-lg-8{% endif %} value-block__text">
+          {% if s.heading %}<h2 class="value-block__heading">{{ s.heading }}</h2>{% endif %}
+          <div class="value-block__body">{{ s.body|markdown }}</div>
+          {% if s.button_label and s.button_url %}<a class="btn btn-outline-gold-dark" href="{{ s.button_url }}">{{ s.button_label }}</a>{% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "two_column" %}
+  {# "Our Story": a navy-to-blue band; heading and short text left, the long text right. #}
+  <section id="{{ s.anchor }}" class="band band--gradient on-dark">
+    <div class="container">
+      <div class="row g-4 g-lg-5">
+        <div class="col-lg-4">
+          {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
+          {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
+          {% if s.image %}{% include "includes/_image.html" with obj=s class="img-fluid mt-3" %}{% endif %}
+        </div>
+        <div class="col-lg-8 band__body band__body--wide">{{ s.body|markdown }}</div>
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "hero_text" %}
+  <section id="{{ s.anchor }}" class="page-hero{% if not s.image %} page-hero--plain{% endif %}">
+    {% if s.image %}{% include "includes/_image.html" with obj=s class="page-hero__image" eager=True %}{% endif %}
+    <div class="page-hero__overlay">
+      <div class="container">
+        {% if s.heading %}{% if forloop.first %}<h1 class="page-hero__heading">{{ s.heading }}</h1>{% else %}<h2 class="page-hero__heading">{{ s.heading }}</h2>{% endif %}{% endif %}
+        {% if s.body %}<div class="page-hero__body">{{ s.body|markdown }}</div>{% endif %}
+      </div>
+    </div>
+  </section>
+
+{% else %}
+  {# intro_dark, band_dark, band_light: a heading and text, with an optional image beside it. #}
+  <section id="{{ s.anchor }}" class="band {% if s.section_type == 'band_light' %}band--white{% elif s.section_type == 'intro_dark' %}band--black on-dark{% else %}band--charcoal on-dark{% endif %}">
+    <div class="container">
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="{% if s.image %}col-lg-7{% else %}col-12{% endif %}{% if s.image and s.image_position == 'left' %} order-lg-2{% endif %}">
+          {% if s.heading %}<h2 class="band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
+          <div class="band__body{% if not s.image %} band__body--wide{% endif %}">{{ s.body|markdown }}</div>
+          {% if s.button_label and s.button_url %}<a class="btn {% if s.section_type == 'band_light' %}btn-outline-gold-dark{% else %}btn-outline-gold{% endif %}" href="{{ s.button_url }}">{{ s.button_label }}</a>{% endif %}
+        </div>
+        {% if s.image %}
+          <div class="col-lg-5">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+{% endwith %}

@@ -100,10 +100,11 @@ without migrations beyond the search app's own.
 | Q2 | Which VPS? (Consult 360's comparison recommends Vultr Johannesburg, 1 vCPU / 2 GB, about $12/month.) Could it share a server with Consult 360 or CVision? | Day 9 | A dedicated Vultr Johannesburg 2 GB server |
 | Q3 | Who controls `distinctive.co.zw` DNS? The CVision notes say Cloudflare; confirm and get access. | Day 7 (Resend), Day 10 (cutover) | Cloudflare |
 | Q4 | Where is the `enquiries@` mailbox hosted (Google Workspace, the WordPress host's cPanel mail, other)? This matters only to keep its MX records intact at cutover. | Day 10 | Leave every mail record as is |
-| Q5 | Exact brand colours and the logo in SVG or high-resolution PNG; the original photos for Home (the hero team photo without text over it, the six service-card images, the two value-block images) | Day 2 (logo), Day 9 (photos) | A4; Home uses images cut from the old site's screenshots and a hero without a photo |
+| Q5 | Exact brand colours and the logo in SVG or high-resolution PNG; the original photos (Home's hero team photo and About's compass photo without text over them, the service-card and value-block images, the capability image, the team portraits, the partner logos) | Day 2 (logo), Day 9 (photos) | A4; images cut from the old site's screenshots, and the two heroes without a photo |
 | Q6 | Who at Distinctive edits content, and do they want Google sign-in? | Day 4 | One superuser plus one Content Editor |
 | Q7 | Keep the "Designed by" footer credit? | Day 2 | Removed |
 | Q8 | Is the WordPress host contract ending, and is a full backup of the old site (files + database) taken before cutover? | Day 10 | The owner takes a backup on Day 9 |
+| Q9 | About: is the board member **Norbet** or **Nobert** Muyaka (the old page uses both)? And the Facebook and LinkedIn links the old page showed for Farai Pilime and Rebecca Matongo | Day 9 | Kept as found ("Norbet" heading, "Nobert" in the bio); no social links |
 
 ## 7. Prerequisites (owner, outside the code)
 

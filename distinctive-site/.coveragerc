@@ -1,0 +1,12 @@
+# The coverage gate measures services only (docs/Testing_Strategy.md §5).
+# Note: [run] include is ignored when a source is set (a Consult 360 lesson), so the
+# filter lives in [report].
+[run]
+source = apps
+branch = true
+
+[report]
+include = */services/*
+omit = */tests/*
+show_missing = true
+skip_empty = true

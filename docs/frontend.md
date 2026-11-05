@@ -1,8 +1,8 @@
 # Frontend
 
-**Project-wide · revised 2026-11-03** (Day 5 as built: Home, the section partial, the hero
-slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at the repo root as in Consult 360, Phase 1 pages, Jobs and
-Search designs moved to `Phase_2/Phase2_Scope.md`)
+**Project-wide · revised 2026-11-04** (Day 6 as built: About, the team and logo blocks, Read
+more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
+the repo root as in Consult 360, Phase 1 pages, Jobs and Search designs moved to `Phase_2/Phase2_Scope.md`)
 
 Django templates (SSR) + Bootstrap 5 (customised) + vanilla JS ES modules + CSS compiled from
 Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the search dropdown
@@ -75,6 +75,8 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "components/hero";                   // Day 5: the slider and the hero_text band
 @import "components/section";                // Day 5: bands, CTA, value blocks
 @import "components/cards";                  // Day 5: service cards
+@import "components/logos";                  // Day 6: partner and client logos
+@import "components/team";                   // Day 6: Our Leadership, Read more
 // Day 8: components/forms, components/cookie-banner.
 // pages/about, pages/services, pages/contact only if a page needs rules of its own.
 ```
@@ -103,7 +105,7 @@ outside `_tokens.scss`.
 | `$dcs-gold-dark` | `#86691a` | Gold **text** on light backgrounds (links, active nav) | 5.2:1 on white |
 | `$dcs-gold-deeper` | `#6b5415` | Hover on `$dcs-gold-dark` links | — |
 | `$dcs-white` | `#fff` | Light bands, navbar | — |
-| `$dcs-navy`, `$dcs-blue` | placeholders | About "Our Story" gradient; sampled on Day 6 | — |
+| `$dcs-navy` → `$dcs-blue` | `#02070b` → `#1f5fa8` | About "Our Story" gradient (sampled on Day 6). The old band ran on to `#2a85d6`; it stops darker here | white text 6.4:1 or better throughout (the old end was 3.9:1) |
 | Body font | Open Sans 400/600/700 | All text | — |
 
 **The logo** is the file the client sent on 2026-11-03: `static/img/logo.png`, a transparent PNG
@@ -127,9 +129,13 @@ base.html
  ├─ includes/_cookie_banner.html  (Day 8)
  └─ Bootstrap's bundle (defer), then js/main.js (type="module")
 
-pages/home.html                   includes/_hero_slider.html, then includes/_section.html per section
+pages/page.html                   any page: a visually hidden h1 unless the first section is a hero_text band,
+                                  then includes/_section.html per section
+pages/home.html                   extends page.html; its top is includes/_hero_slider.html
 includes/_section.html            one PageSection, by section_type (table below)
 includes/_service_card.html       one offerings.Service on Home
+includes/_logo_grid.html          partner or client logos (pages.Partner)
+includes/_team_card.html          one team.TeamMember
 includes/_image.html              an admin image with its stored width/height and alt text
 ```
 
@@ -150,16 +156,21 @@ Images are `loading="lazy"` except the first hero slide, which gets `fetchpriori
 
 | `section_type` | Look (from the old site) |
 |---|---|
-| `hero_text` | Full-width image band with a large heading |
+| `hero_text` | Full-width image band with a large heading; the page's `h1` when it's the first section |
 | `intro_dark` | Black band, gold heading, white text ("What We Do") |
 | `band_light` / `band_dark` | Alternating bands used on Services; heading left- or right-aligned |
-| `two_column` | "Our Story" style: heading and short text left, long text right |
+| `two_column` | "Our Story": a navy-to-blue band; heading and the section's **short text** (`intro`) left, the body right |
 | `value_block` | Image one side (the section's "image position"), heading and paragraph the other; image first on phones. Consecutive value blocks share one white band |
 | `service_cards` | Charcoal band with the services ticked "show on Home" (at most six), as framed cards linking to `/services/#<anchor>`. Card titles are `h2` when the section has no heading, `h3` under one |
+| `partners` / `clients` | White band with the published logos of that kind, centred, each scaled into the same 8 rem box without cropping, caption below, linked when it has a website |
+| `team` | White band, uppercase dark-gold heading, the published team: four across on wide screens, two on tablets, one on phones; round photos, name, job title in grey, bio, LinkedIn and Facebook icons when filled in |
 | `cta` | A centred line and an outlined gold button ("Get In Touch") |
 
-The editor picks the look per section and orders sections freely, so Home's order (cards, CTA,
-value blocks) is data, not template code.
+The editor picks the look per section and orders sections freely, so each page's order is data,
+not template code. Every section also has a **heading position** (left, centre, right; right
+falls back to left below 992 px). The blocks that show other content (`service_cards`,
+`partners`, `clients`, `team`) can go on any page: `PageBlocksService` fetches each one only
+when a section uses it (`architecture.md` §5).
 
 Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). Nothing else turns admin text into HTML.
 
@@ -199,17 +210,21 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
 
 ### About
 
-1. Hero image with "Bringing Excellence Into Your World!".
-2. **Our Story:** navy-to-blue gradient band, short intro left, long text right (bold key
-   phrases).
-3. **Strategic Partners:** centred logos with captions (Emergence Growth, Bindura University of
-   Science Education) (`Partner`, kind = partner).
-4. **Capability Analysis** (charcoal band, with image); **Value Driven and Capacity Building**
-   (right-aligned heading).
-5. **Our Leadership:** four-column grid (two on tablet, one on mobile), circular portraits, name,
-   title in grey, bio. Eight people; long bios collapse behind "Read more" on mobile. Social
-   icons per person where provided. The old bios were justified and cramped: use left-aligned
-   text at a comfortable line length.
+As built on Day 6, all from sections in the admin:
+
+1. `hero_text`: "Bringing Excellence Into Your World!" (the page's `h1`). The old compass photo had
+   the heading printed over it, so it shows on the plain black-and-gold background until the
+   original is uploaded.
+2. `two_column` **Our Story**: the gradient band, short text left, long text right with bold key
+   phrases.
+3. `partners` **Strategic Partners**: Emergence Growth and Bindura University of Science
+   Education.
+4. `band_dark` **Capability Analysis**: the old run-on dashes are now a list, with the image
+   beside the text; `band_dark` **Value Driven and Capacity Building** with its heading on the
+   right.
+5. `team` **Our Leadership**: eight people. Bios are left-aligned (the old ones were justified,
+   with gaps). A bio longer than about nine lines is cut behind **Read more** on every screen size,
+   so the cards line up; without JavaScript every bio shows in full.
 
 ### Services
 
@@ -235,8 +250,9 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
   "can't load Google Maps correctly" (a key or billing problem), so test the key on the preview
   host.
 
-**Seed images.** Until the client sends the originals, the card and value-block images are cut
-from the old site's screenshots (`apps/core/seed/images/`, 8 files, 164 KB). They look right at
+**Seed images.** Until the client sends the originals, every seeded image (cards, value blocks,
+the capability image, team portraits, partner logos) is cut from the old site's screenshots
+(`apps/core/seed/images/`, 19 files, 356 KB). They look right at
 their displayed size but are small; replacing them is an upload in the admin (Phase 1 Q5).
 
 ### Phase 2 pages
@@ -250,6 +266,7 @@ Jobs (list and detail) and Search (dropdown, results page, highlighting) are des
 |---|---|---|
 | `main.js` | The entry point (`<script type="module">` after Bootstrap's bundle); initialises each module | 5 |
 | `modules/hero-slider.js` | Starts the Home carousel (6 s per slide) unless the visitor prefers reduced motion; pauses on hover and while keyboard focus is inside; shows a **Pause slides / Play slides** button (`aria-pressed`) that stops it until pressed again. Without JavaScript, or with reduced motion, the slides change only by the arrows and dots | 5 |
+| `modules/read-more.js` | Cuts each `[data-read-more]` element to about nine lines and adds a **Read more / Show less** button (`aria-expanded`, `aria-controls`), only when the text is actually longer | 6 |
 | `modules/http.js` | `fetch` wrapper: CSRF header from the cookie, JSON parsing, the `{ok, data, errors}` envelope, a timeout | 8 |
 | `modules/contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js`, shows field errors and the success state; the form still works by normal POST if JS fails | 8 |
 | `modules/cookie-consent.js` | The banner, the stored choice (`localStorage`, wrapped in `try/catch`), a `consent:granted` event, the "Cookie settings" link; injects the GA4 tag and the map iframe only after consent | 8 |

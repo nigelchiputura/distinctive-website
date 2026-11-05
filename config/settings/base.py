@@ -177,6 +177,8 @@ JAZZMIN_SETTINGS = {
         "core.SiteSettings": "fas fa-sliders-h",
         "pages.Page": "fas fa-file-alt",
         "offerings.Service": "fas fa-briefcase",
+        "pages.Partner": "fas fa-handshake",
+        "team.TeamMember": "fas fa-user-tie",
         "users.User": "fas fa-user",
         "auth.Group": "fas fa-users-cog",
         "account.EmailAddress": "fas fa-at",

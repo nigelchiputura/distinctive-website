@@ -1,0 +1,29 @@
+// The site's outlined gold buttons ("Get In Touch").
+
+// On dark bands and over the hero image: gold outline and text, filled gold on hover.
+.btn-outline-gold {
+  --bs-btn-color: #{$dcs-gold};
+  --bs-btn-border-color: #{$dcs-gold};
+  --bs-btn-border-width: 2px;
+  --bs-btn-hover-color: #{$dcs-black};
+  --bs-btn-hover-bg: #{$dcs-gold};
+  --bs-btn-hover-border-color: #{$dcs-gold};
+  --bs-btn-active-color: #{$dcs-black};
+  --bs-btn-active-bg: #{$dcs-gold};
+  --bs-btn-active-border-color: #{$dcs-gold};
+  --bs-btn-font-weight: 400;
+  --bs-btn-padding-x: 1.25rem;
+}
+
+// On white bands, where plain gold text is too faint (2.1:1): the darker gold.
+.btn-outline-gold-dark {
+  --bs-btn-color: #{$dcs-gold-dark};
+  --bs-btn-border-color: #{$dcs-gold-dark};
+  --bs-btn-border-width: 2px;
+  --bs-btn-hover-color: #{$dcs-white};
+  --bs-btn-hover-bg: #{$dcs-gold-dark};
+  --bs-btn-hover-border-color: #{$dcs-gold-dark};
+  --bs-btn-active-color: #{$dcs-white};
+  --bs-btn-active-bg: #{$dcs-gold-deeper};
+  --bs-btn-active-border-color: #{$dcs-gold-deeper};
+}

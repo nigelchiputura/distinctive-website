@@ -1,0 +1,59 @@
+// The Services page: the row of links to each service, and the alternating service bands
+// (templates/includes/_service_bands.html).
+
+.service-nav {
+  padding-block: 2.5rem;
+  border-bottom: 1px solid $dcs-grey-light;
+}
+
+.service-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.service-nav__link {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid $dcs-gold-dark;
+  color: $dcs-gold-dark;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    background: $dcs-gold-dark;
+    color: $dcs-white;
+    text-decoration: none;
+  }
+}
+
+// As on the old site, the dark bands put their heading on the right (on wide screens).
+@include media-breakpoint-up(lg) {
+  .service-band__heading--right {
+    text-align: right;
+  }
+}
+
+.service-band--light .band__body ul,
+.service-band--dark .band__body ul {
+  columns: 1;
+}
+
+// Long lists (the training products) take two columns on wide screens.
+@include media-breakpoint-up(md) {
+  .service-band .band__body--wide ul:has(> li:nth-child(10)) {
+    columns: 2;
+    column-gap: 3rem;
+  }
+
+  .service-band .band__body--wide li {
+    break-inside: avoid;
+  }
+}
+
+.service-band__image {
+  width: 100%;
+}

@@ -1,0 +1,22 @@
+{# Black strip above the navbar. Values from SiteSettings (Day 3); defaults until then. #}
+<div class="topbar">
+  <div class="container topbar__inner">
+    <a href="tel:{{ site_info.phone_href }}">
+      {% include "includes/icons/phone.svg" %}
+      <span class="topbar__label">{{ site_info.phone_display }}</span>
+      <span class="visually-hidden">(call us)</span>
+    </a>
+    <a href="mailto:{{ site_info.enquiries_email }}">
+      {% include "includes/icons/envelope.svg" %}
+      <span class="topbar__label">{{ site_info.enquiries_email }}</span>
+      <span class="visually-hidden">(email us)</span>
+    </a>
+    {% if site_info.visible_social_links %}
+      <ul class="topbar__social list-unstyled mb-0" aria-label="Social media">
+        {% for link in site_info.visible_social_links %}
+          <li><a href="{{ link.url }}" rel="noopener" target="_blank" aria-label="{{ link.label }} (opens in a new tab)">{% include "includes/icons/"|add:link.name|add:".svg" %}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>

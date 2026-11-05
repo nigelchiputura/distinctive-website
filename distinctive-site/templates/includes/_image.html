@@ -1,0 +1,3 @@
+{% comment %} One content image with its stored size, so the page doesn't jump while it loads.
+   Usage: {% include "includes/_image.html" with obj=section class="…" eager=False %} {% endcomment %}
+<img src="{{ obj.image.url }}" alt="{{ obj.alt_text }}"{% if obj.image_width %} width="{{ obj.image_width }}" height="{{ obj.image_height }}"{% endif %}{% if class %} class="{{ class }}"{% endif %}{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async">

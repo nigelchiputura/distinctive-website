@@ -1,6 +1,7 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-03** (Day 5: seed content, Home templates, JS; 2026-11-02: npm
+**Project-wide · revised 2026-11-04** (Day 6: team, partners, page blocks; Day 5: seed content,
+Home templates, JS; 2026-11-02: npm
 and SCSS at the repo root, as in Consult 360; Phase 2 apps marked; no R2)
 
 ## 1. Repository layout
@@ -57,6 +58,8 @@ distinctive-site/
 │   │   │   ├── _footer.scss
 │   │   │   ├── _auth.scss              # sign-in and the other allauth pages
 │   │   │   ├── _buttons.scss           # the outlined gold buttons
+│   │   │   ├── _logos.scss             # partner and client logo grids
+│   │   │   ├── _team.scss              # Our Leadership, Read more
 │   │   │   └── _cookie-banner.scss
 │   │   └── pages/
 │   │       ├── _home.scss
@@ -70,6 +73,7 @@ distinctive-site/
 │   │   ├── main.js                     # entry (ES module)
 │   │   └── modules/
 │   │       ├── hero-slider.js          # Home carousel: reduced motion, pause on focus, pause button
+│   │       ├── read-more.js            # long bios cut behind Read more
 │   │       ├── http.js                 # fetch wrapper: CSRF, JSON envelope, timeout
 │   │       ├── contact-form.js
 │   │       └── cookie-consent.js       # Phase 2 adds search-dropdown.js, highlight.js
@@ -89,6 +93,8 @@ distinctive-site/
 │   │   ├── _hero_slider.html           # Home's slides (pages.HeroSlide)
 │   │   ├── _section.html               # renders one PageSection by type
 │   │   ├── _service_card.html          # one offerings.Service card
+│   │   ├── _logo_grid.html             # pages.Partner logos
+│   │   ├── _team_card.html             # one team.TeamMember
 │   │   └── _image.html                 # an admin image with its stored size and alt text
 │   ├── errors/
 │   │   ├── 404.html
@@ -174,7 +180,7 @@ apps/core/
 │   └── core_extras.py         # the |markdown filter
 ├── seed/
 │   ├── content.py             # the old site's text, keyed (anchors, headings)
-│   └── images/                # 8 JPEGs cut from the old site's screenshots, until the originals come
+│   └── images/                # 19 images cut from the old site's screenshots, until the originals come
 ├── management/commands/
 │   └── seed_site_content.py   # loads seed/ through SeedService (idempotent)
 └── tests/
@@ -185,11 +191,15 @@ apps/core/
     └── test_security.py       # check --deploy with prod settings
 ```
 
-`apps/pages/` as built on Day 5: `models.py` (`Page`, `PageSection`, `HeroSlide`), `admin.py`
-(each page with its slides and sections inline), `repositories/page_repository.py`,
-`services/page_service.py` (`PageService`, `PageContent`), `controllers/home_controller.py`,
-`urls.py`, `templates/pages/home.html`, and migrations `0001_initial`, `0002_the_four_pages`.
-`apps/offerings/` has `Service`, its admin, `ServiceRepository` and `OfferingService`.
+`apps/pages/` as built by Day 6: `models.py` (`Page`, `PageSection`, `Partner`, `HeroSlide`),
+`admin.py` (each page with its slides and sections inline; partners and clients),
+`repositories/` (`page_repository.py`, `partner_repository.py`), `services/`
+(`page_service.py` with `PageService` and `PageContent`, `partner_service.py`,
+`page_blocks_service.py`), `controllers/page_controller.py` (`PageController`, `HomeController`,
+`AboutController`), `urls.py`, `templates/pages/` (`page.html`, `home.html`), and migrations
+`0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`. `apps/offerings/` has
+`Service`, its admin, `ServiceRepository` and `OfferingService`. `apps/team/` has `TeamMember`,
+its admin, `TeamRepository` and `TeamService`.
 
 `Redirect` is a model in `apps/pages` (editable in the admin); the middleware in `apps/core`
 reads it through `RedirectService`.

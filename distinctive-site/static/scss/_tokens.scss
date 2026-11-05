@@ -1,0 +1,38 @@
+// Brand tokens. The ONLY place raw colour values live (docs/frontend.md §2).
+//
+// Sampled from the old site's screenshots on 2026-11-03. The gold matches the old theme
+// exactly (#d4af37). Confirm against the logo file when it arrives (Phase 1 Q5).
+
+// Core palette
+$dcs-black: #000;
+$dcs-black-soft: #0d0d0d; // footer navigation strip
+$dcs-charcoal: #242424; // home services band, capability band
+$dcs-charcoal-light: #333; // the frame around service-card images (sampled from the old Home)
+$dcs-grey: #666; // navbar links, muted text (5.7:1 on white)
+$dcs-grey-light: #f5f5f5;
+$dcs-grey-on-dark: #a6a6a6; // muted text on black (8.6:1); the old #666 was too faint (3.7:1)
+$dcs-text: #222; // body text on white
+$dcs-white: #fff;
+
+$dcs-gold: #d4af37; // on dark backgrounds: headings, labels, links, active nav (10:1 on black)
+$dcs-gold-dark: #86691a; // gold TEXT on light backgrounds (5.2:1 on white; plain gold is 2.1:1)
+$dcs-gold-deeper: #6b5415; // hover state of gold-dark links
+
+// About "Our Story" gradient, sampled on Day 6. The old band ran on to #2a85d6, where white text
+// is only 3.9:1; it stops at $dcs-blue here, which keeps it at 6.4:1 or better all the way down.
+$dcs-navy: #02070b;
+$dcs-blue: #1f5fa8;
+
+// Typography
+$dcs-font-sans: "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+  sans-serif;
+
+// The same tokens as CSS custom properties, for the few places JS or inline styles need them.
+:root {
+  --dcs-black: #{$dcs-black};
+  --dcs-charcoal: #{$dcs-charcoal};
+  --dcs-grey: #{$dcs-grey};
+  --dcs-white: #{$dcs-white};
+  --dcs-gold: #{$dcs-gold};
+  --dcs-gold-dark: #{$dcs-gold-dark};
+}

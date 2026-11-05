@@ -17,6 +17,10 @@
   background: $dcs-charcoal;
 }
 
+.band--gradient {
+  background: linear-gradient(180deg, $dcs-navy 0%, $dcs-blue 100%);
+}
+
 .band__heading {
   margin-bottom: 1.25rem;
   color: inherit;
@@ -27,13 +31,61 @@
   color: $dcs-gold;
 }
 
+// Gold headings on white use the darker gold (plain gold is 2.1:1 on white).
+.band__heading--on-light {
+  color: $dcs-gold-dark;
+  font-weight: 700;
+}
+
+// The editor's "heading position".
+.align-left {
+  text-align: left;
+}
+
+.align-center {
+  text-align: center;
+}
+
+// Right-aligned headings only where there's width for it; on phones they read better left.
+.align-right {
+  text-align: left;
+
+  @include media-breakpoint-up(lg) {
+    text-align: right;
+  }
+}
+
+.band__intro {
+  font-size: 1.05rem;
+}
+
+.on-dark .band__intro strong,
+.on-dark .band__body strong {
+  color: $dcs-white;
+}
+
 .band__lead {
   max-width: 46rem;
   margin: 0 auto 2.5rem;
+  text-align: center;
 }
 
 .band__body {
   max-width: 48rem;
+}
+
+// A band with no image beside its text uses the container's width, with lines still short
+// enough to read comfortably.
+.band__body--wide {
+  max-width: 62rem;
+}
+
+.band__body ul {
+  padding-left: 1.25rem;
+}
+
+.band__body li + li {
+  margin-top: 0.4rem;
 }
 
 // Call to action: one line and a button.

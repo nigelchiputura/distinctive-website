@@ -1,0 +1,53 @@
+// The black strip above the navbar: phone, email, social icons (from SiteSettings).
+
+.topbar {
+  background: $dcs-black;
+  color: $dcs-white;
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  &__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.25rem;
+    min-height: 2.5rem;
+    padding-block: 0.25rem;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: $dcs-white;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: $dcs-gold;
+    }
+  }
+
+  .icon {
+    color: $dcs-gold;
+  }
+
+  &__social {
+    display: flex;
+    gap: 0.9rem;
+    margin-left: auto;
+
+    .icon {
+      color: inherit;
+      width: 1.05em;
+      height: 1.05em;
+    }
+  }
+}
+
+// On phones the email is long; keep the bar to one tidy line by hiding the labels.
+@include media-breakpoint-down(sm) {
+  .topbar__label {
+    @include visually-hidden;
+  }
+}
