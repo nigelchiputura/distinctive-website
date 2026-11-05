@@ -1,30 +1,53 @@
-// The enquiry forms (templates/includes/_enquiry_form.html): on black (Contact) and on gold
-// (Services). Error text is never shown by colour alone: it is a sentence under the field.
+// The enquiry forms (templates/includes/_enquiry_form.html): on the black Contact band (inside a
+// glass card) and on Services (inside a surface card that follows the theme). Error text is never
+// shown by colour alone: it is a sentence under the field.
 
 .enquiry-form {
   .form-label {
-    margin-bottom: 0.35rem;
-    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--dcs-heading);
+    font-size: 0.92rem;
+    font-weight: 700;
   }
 
   .form-control {
-    border-radius: 0;
-    border: 1px solid $dcs-grey;
-    padding: 0.65rem 0.8rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--dcs-border-strong);
+    background: var(--dcs-surface-soft);
+    color: var(--dcs-text);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.25s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba($dcs-gold, 0.6);
+    }
 
     &:focus {
       border-color: $dcs-gold;
-      box-shadow: 0 0 0 0.2rem rgba($dcs-gold, 0.45);
+      background: var(--dcs-surface);
+      box-shadow: 0 0 0 0.25rem rgba($dcs-gold, 0.25);
     }
 
     &[aria-invalid="true"] {
       border-width: 2px;
+      border-color: var(--dcs-error);
     }
+  }
+
+  textarea.form-control {
+    min-height: 9rem;
+    resize: vertical;
+  }
+
+  .form-error {
+    color: var(--dcs-error);
   }
 
   &__submit {
     margin-top: 1.5rem;
-    min-width: 10rem;
+    min-width: 11rem;
 
     &[aria-busy="true"] {
       cursor: progress;
@@ -35,11 +58,12 @@
 
 .form-note {
   margin-bottom: 1rem;
+  color: var(--dcs-text-muted);
   font-size: 0.9rem;
 }
 
 .form-error {
-  margin: 0.35rem 0 0;
+  margin: 0.4rem 0 0;
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -47,12 +71,24 @@
 .form-alert,
 .form-success {
   margin-bottom: 1.25rem;
-  padding: 0.85rem 1rem;
+  padding: 1rem 1.15rem;
   border-left: 4px solid currentcolor;
+  border-radius: $dcs-radius-sm;
+}
+
+.form-alert {
+  color: var(--dcs-error);
+  background: rgba($dcs-error, 0.08);
 }
 
 .form-success {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  color: var(--dcs-heading);
+  background: rgba($dcs-gold, 0.14);
   font-weight: 600;
+  animation: dcs-fade-up 0.5s $dcs-ease both;
 
   &:focus {
     outline: none;
@@ -73,18 +109,33 @@
   overflow: hidden;
 }
 
-// On black: gold labels, white fields, errors in a light red that reads on black (9.2:1).
+// On the black band: light text, translucent fields.
 .on-dark .enquiry-form {
   .form-label {
-    color: $dcs-gold;
+    color: $dcs-white;
+  }
+
+  .form-control {
+    border-color: rgba($dcs-white, 0.2);
+    background: rgba($dcs-white, 0.06);
+    color: $dcs-white;
+
+    &::placeholder {
+      color: rgba($dcs-white, 0.5);
+    }
+
+    &:focus {
+      border-color: $dcs-gold;
+      background: rgba($dcs-white, 0.1);
+    }
+
+    &[aria-invalid="true"] {
+      border-color: $dcs-error-on-dark;
+    }
   }
 
   .form-error {
     color: $dcs-error-on-dark;
-  }
-
-  .form-control[aria-invalid="true"] {
-    border-color: $dcs-error-on-dark;
   }
 }
 
@@ -100,38 +151,4 @@
 
 .on-dark .form-note {
   color: $dcs-grey-on-dark;
-}
-
-// On gold: black text throughout (10:1); errors in a dark red that reads on gold (6.0:1).
-.band--gold .enquiry-form {
-  .form-label {
-    color: $dcs-black;
-  }
-
-  .form-control {
-    border-color: $dcs-black;
-  }
-
-  .form-error {
-    color: $dcs-error-on-gold;
-  }
-
-  .form-control[aria-invalid="true"] {
-    border-color: $dcs-error-on-gold;
-  }
-
-  .form-control:focus {
-    border-color: $dcs-black;
-    box-shadow: 0 0 0 0.2rem rgba($dcs-black, 0.35);
-  }
-}
-
-.band--gold .form-alert {
-  color: $dcs-error-on-gold;
-  background: rgba($dcs-white, 0.45);
-}
-
-.band--gold .form-success {
-  color: $dcs-black;
-  background: rgba($dcs-white, 0.45);
 }

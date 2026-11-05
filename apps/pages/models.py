@@ -8,10 +8,12 @@ slides at the top.
 from collections.abc import Callable
 from typing import TYPE_CHECKING, ClassVar
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 
 from apps.core.models import BaseModel, ImageMixin, OrderableMixin, PublishableMixin
+from apps.pages.paths import normalize_path
 
 if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
@@ -28,7 +30,8 @@ class Page(BaseModel, PublishableMixin):
         "title in search results",
         max_length=70,
         blank=True,
-        help_text="Leave empty to use the page title.",
+        help_text="Shown as written (up to about 60 characters show in Google). Leave empty "
+        "for “<page title> | Distinctive Consultancy Services”.",
     )
     meta_description = models.CharField(
         "description in search results",
@@ -84,6 +87,12 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         page_id: int
         get_section_type_display: Callable[[], str]
     section_type = models.CharField("look", max_length=20, choices=SectionType.choices)
+    eyebrow = models.CharField(
+        "label",
+        max_length=60,
+        blank=True,
+        help_text="A short label shown above the heading, such as “What we do”. Optional.",
+    )
     heading = models.CharField(max_length=200, blank=True)
     heading_align = models.CharField(
         "heading position", max_length=6, choices=Align.choices, default=Align.LEFT
@@ -180,3 +189,62 @@ class HeroSlide(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
 
     def __str__(self) -> str:
         return self.heading
+
+
+class Redirect(BaseModel):
+    """An old site address that now lives somewhere else (docs/architecture.md §7).
+
+    RedirectMiddleware answers with it only when nothing else does (the request would be a 404),
+    so a redirect can never hide a live page.
+    """
+
+    old_path = models.CharField(
+        "old address",
+        max_length=300,
+        unique=True,
+        help_text="The old site's address from the first slash, e.g. /about-us/. A full address "
+        "(https://distinctive.co.zw/about-us/) is shortened to that when saved.",
+    )
+    new_path = models.CharField(
+        "now at",
+        max_length=300,
+        help_text="A page on this site (/about/, /services/#hr-audits) or a full address.",
+    )
+    match_prefix = models.BooleanField(
+        "and everything under it",
+        default=False,
+        help_text="Tick to also send every address that starts with the old one "
+        "(/category/jobs/… as well as /category/jobs/).",
+    )
+    is_permanent = models.BooleanField(
+        "permanent (301)",
+        default=True,
+        help_text="Untick for a temporary redirect (302), e.g. while a page is being rebuilt.",
+    )
+    is_active = models.BooleanField("active", default=True)
+    note = models.CharField(max_length=200, blank=True)
+    hits = models.PositiveIntegerField(default=0, editable=False)
+    last_hit_at = models.DateTimeField("last used", null=True, blank=True, editable=False)
+
+    class Meta(BaseModel.Meta):  # pyright: ignore[reportIncompatibleVariableOverride]  # Meta of an abstract parent
+        ordering: ClassVar = ["old_path"]
+        verbose_name = "redirect"
+
+    def __str__(self) -> str:
+        return f"{self.old_path} → {self.new_path}"
+
+    def clean(self) -> None:
+        super().clean()
+        self.old_path = normalize_path(self.old_path)
+        target = (self.new_path or "").strip()
+        if not (target.startswith("/") or target.startswith(("http://", "https://"))):
+            raise ValidationError(
+                {"new_path": "Start with / for a page on this site, or https:// for another site."}
+            )
+        if target.startswith("/") and normalize_path(target.split("#")[0]) == self.old_path:
+            raise ValidationError({"new_path": "This would send the address to itself."})
+        self.new_path = target
+
+    def save(self, *args, **kwargs):
+        self.old_path = normalize_path(self.old_path)
+        super().save(*args, **kwargs)

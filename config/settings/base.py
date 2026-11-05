@@ -25,6 +25,8 @@ DEBUG = False
 ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS", default=[])
 CSRF_TRUSTED_ORIGINS: list[str] = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 SITE_URL: str = env("SITE_URL", default="http://localhost:8000")
+# The preview host (new.distinctive.co.zw) must not be indexed: true there, false on the live site.
+SEO_NOINDEX: bool = env.bool("SEO_NOINDEX", default=False)
 
 # Where the admin lives. Not guessable in production (docs/users.md §5).
 ADMIN_URL_PATH: str = env("ADMIN_URL_PATH", default="admin/")
@@ -61,6 +63,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    # Last, so it sees a 404 before CommonMiddleware turns it into an added slash.
+    "apps.core.middleware.RedirectMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -178,6 +182,7 @@ JAZZMIN_SETTINGS = {
         "pages.Page": "fas fa-file-alt",
         "offerings.Service": "fas fa-briefcase",
         "pages.Partner": "fas fa-handshake",
+        "pages.Redirect": "fas fa-directions",
         "team.TeamMember": "fas fa-user-tie",
         "contact.ContactSubmission": "fas fa-inbox",
         "users.User": "fas fa-user",

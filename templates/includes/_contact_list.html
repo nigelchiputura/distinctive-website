@@ -1,0 +1,11 @@
+{% comment %} The company's details as icon rows (Contact's Reach Us card and the footer), all from
+   SiteSettings. vacancies: also show the recruitment address. {% endcomment %}
+<ul class="contact-list">
+  <li><span class="contact-list__icon">{% include "includes/icons/location-dot.svg" %}</span><span><span class="contact-list__label">Address</span><span class="contact-list__value">{{ site_info.address }}</span></span></li>
+  <li><span class="contact-list__icon">{% include "includes/icons/phone.svg" %}</span><span><span class="contact-list__label">Phone</span><a class="contact-list__value" href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a></span></li>
+  <li><span class="contact-list__icon">{% include "includes/icons/envelope.svg" %}</span><span><span class="contact-list__label">Email</span><a class="contact-list__value" href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a></span></li>
+  <li><span class="contact-list__icon">{% include "includes/icons/clock.svg" %}</span><span><span class="contact-list__label">Business Hours</span><span class="contact-list__value">{{ site_info.hours }}</span></span></li>
+  {% if vacancies and site_info.recruitment_email %}
+    <li><span class="contact-list__icon">{% include "includes/icons/briefcase.svg" %}</span><span><span class="contact-list__label">Vacancies</span><span class="contact-list__value">Send your CV to <a href="mailto:{{ site_info.recruitment_email }}">{{ site_info.recruitment_email }}</a></span></span></li>
+  {% endif %}
+</ul>

@@ -14,9 +14,9 @@ deploy to a VPS running Docker Compose with Caddy.
 |---|---|---|---|
 | Local | Docker Compose on the developer machine (plus Node for SCSS, on the machine only) | Development | Phase 1 Day 1 |
 | CI | GitHub Actions | Lint, type check, tests, CSS freshness, image build | Phase 1 Day 1 |
-| Local prod stack | `docker-compose.prod.yml` on the developer machine | Prove the production files before the VPS | Phase 1 Day 9 |
-| Preview | The VPS at `new.distinctive.co.zw` | Client walkthrough before cutover | Phase 1 Day 10 |
-| Production | The same VPS at `distinctive.co.zw` | The live site | Phase 1 Day 10, after sign-off |
+| Local prod stack | `docker-compose.prod.yml` on the developer machine | Prove the production files before the VPS | Phase 1 Day 10 |
+| Preview | The VPS at `new.distinctive.co.zw` | Client walkthrough before cutover | Phase 1 Day 11 |
+| Production | The same VPS at `distinctive.co.zw` | The live site | Phase 1 Day 11, after sign-off |
 
 The preview is the production server under a second hostname, not a separate environment. After
 cutover, `new.` redirects to the live domain (or is removed).
@@ -413,7 +413,7 @@ earlier commit SHA.
 the `media_data` volume (`tar` through a throwaway container) into `/srv/backups`, keeps 14 days,
 and copies them off the server (Backblaze B2's free 10 GB, as recommended for Consult 360, or the
 VPS provider's own backups). **Both** are needed: the database holds the content, the volume
-holds the images. Test a restore once on Day 10.
+holds the images. Test a restore once on Day 11.
 
 **Security settings.** `config/settings/prod.py`: `DEBUG = False`, secure and HttpOnly session
 cookies, a secure CSRF cookie (readable by `http.js`, so not HttpOnly), the HTTPS redirect,
@@ -425,7 +425,7 @@ undo. Their two checks (`security.W005`, `W021`) are silenced in `prod.py`, so
 `python manage.py check --deploy` must print no issues apart from those two silenced ones;
 `apps/core/tests/test_security.py` runs it in CI.
 
-## 8. Go-live: preview and cutover (Phase 1 Day 10)
+## 8. Go-live: preview and cutover (Phase 1 Day 11)
 
 **Before the day:**
 

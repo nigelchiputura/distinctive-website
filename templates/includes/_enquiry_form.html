@@ -5,7 +5,7 @@
   {% csrf_token %}
   <input type="hidden" name="form" value="{{ kind }}">
   {% for message in messages %}{% if kind in message.tags %}
-    <div class="form-success" role="status" tabindex="-1" data-form-success>{{ message }}</div>
+    <div class="form-success" role="status" tabindex="-1" data-form-success>{% include "includes/icons/check.svg" %}<span>{{ message }}</span></div>
   {% endif %}{% endfor %}
   <div class="form-alert" role="alert" data-form-errors{% if not form.non_field_errors %} hidden{% endif %}>{% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}</div>
   <p class="form-note">All fields are required.</p>
@@ -23,5 +23,5 @@
     <label for="{{ kind }}-website">Leave this field empty</label>
     <input type="text" id="{{ kind }}-website" name="website" tabindex="-1" autocomplete="off">
   </div>
-  <button type="submit" class="btn {{ button_class }} enquiry-form__submit">{{ button }}</button>
+  <button type="submit" class="btn {{ button_class }} enquiry-form__submit">{{ button }} {% include "includes/icons/arrow-right.svg" %}</button>
 </form>

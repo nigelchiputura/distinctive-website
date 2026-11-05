@@ -81,7 +81,8 @@ def test_service_cards_link_to_their_band_on_services(client, home):
     page = html(client)
     assert 'href="/services/#hr-audits"' in page and "Compliance audits." in page
     assert "Team Building" not in page
-    assert '<h2 class="service-card__title">HR Audits</h2>' in page  # no section heading above
+    # No section heading above, so the card titles are h2; the title's link covers the card.
+    assert '<h2 class="service-card__title"><a class="service-card__link stretched-link" ' in page
 
 
 def test_cta_and_markdown_body(client, home):
@@ -94,7 +95,7 @@ def test_cta_and_markdown_body(client, home):
         button_url="/contact/",
     )
     page = html(client)
-    assert '<a class="btn btn-outline-gold btn-lg" href="/contact/">Get In Touch</a>' in page
+    assert '<a class="btn btn-gold btn-lg" href="/contact/">Get In Touch <svg' in page
     assert "<strong>today</strong>" in page and "<script>alert" not in page
 
 
@@ -108,7 +109,7 @@ def test_page_title_and_description(client, home):
     home.meta_title, home.meta_description = "HR consultancy in Harare", "We help organisations."
     home.save()
     page = html(client)
-    assert "<title>HR consultancy in Harare | Distinctive Consultancy Services</title>" in page
+    assert "<title>HR consultancy in Harare</title>" in page  # a search title is used as written
     assert '<meta name="description" content="We help organisations.">' in page
 
 

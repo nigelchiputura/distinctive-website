@@ -1,27 +1,28 @@
 {% load core_extras %}
-{% comment %} Every published service (offerings.Service) as its own band, alternating white and black,
-   each with id="<anchor>" so /services/#hr-audits (Home's cards) scrolls to it. A row of links to
-   each band comes first. Inside _section.html, so "s" is the section. {% endcomment %}
-<nav id="{{ s.anchor }}" class="band band--white service-nav" aria-label="{{ s.heading|default:'Our services' }}">
+{% comment %} Every published service (offerings.Service) as its own band, alternating dark and light, each
+   numbered and with id="<anchor>" so /services/#hr-audits (Home's cards) scrolls to it. Chips
+   linking to each band come first. Inside _section.html, so "s" is the section. {% endcomment %}
+<nav id="{{ s.anchor }}" class="band band--light service-nav" aria-label="{{ s.heading|default:'Our services' }}">
   <div class="container">
-    {% if s.heading %}<h2 class="band__heading band__heading--on-light align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-    <ul class="service-nav__list list-unstyled">
+    {% include "includes/_section_head.html" %}
+    <ul class="service-nav__list list-unstyled" data-reveal>
       {% for service in services %}
-        <li><a class="service-nav__link" href="#{{ service.anchor }}">{{ service.title }}</a></li>
+        <li><a class="service-nav__link" href="#{{ service.anchor }}"><span class="service-nav__number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>{{ service.title }}</a></li>
       {% endfor %}
     </ul>
   </div>
 </nav>
 {% for service in services %}
-  <section id="{{ service.anchor }}" class="band service-band {% cycle 'band--black on-dark service-band--dark' 'band--white service-band--light' %}">
+  <section id="{{ service.anchor }}" class="band service-band {% cycle 'band--black on-dark service-band--dark' 'band--light service-band--light' %}">
     <div class="container">
       <div class="row g-4 g-lg-5 align-items-center">
-        <div class="{% if service.image and service.image_on_services_page %}col-lg-6{% else %}col-12{% endif %}">
-          <h2 class="band__heading{% if forloop.counter|divisibleby:2 %} band__heading--on-light{% elif not service.image_on_services_page or not service.image %} service-band__heading--right{% endif %}">{{ service.title }}</h2>
-          <div class="band__body{% if not service.image or not service.image_on_services_page %} band__body--wide{% endif %}">{{ service.body|markdown }}</div>
+        <div class="{% if service.image and service.image_on_services_page %}col-lg-6{% else %}col-12{% endif %}" data-reveal>
+          <span class="service-band__number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+          <h2 class="band__heading">{{ service.title }}</h2>
+          <div class="service-band__body{% if not service.image or not service.image_on_services_page %} service-band__body--wide{% endif %}">{{ service.body|markdown }}</div>
         </div>
         {% if service.image and service.image_on_services_page %}
-          <div class="col-lg-6">{% include "includes/_image.html" with obj=service class="img-fluid service-band__image" %}</div>
+          <div class="col-lg-6" data-reveal data-reveal-delay="1">{% include "includes/_image.html" with obj=service class="img-fluid service-band__image" %}</div>
         {% endif %}
       </div>
     </div>

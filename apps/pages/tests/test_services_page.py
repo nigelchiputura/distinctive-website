@@ -38,7 +38,9 @@ def test_every_published_service_gets_a_band_and_a_link(client, services_page):
     assert page.index('id="team-building"') < page.index('id="hr-audits"')
     assert 'href="#hr-audits"' in page and 'href="#team-building"' in page
     assert "Retired" not in page and "<strong>matter</strong>" in page
-    assert "band--black" in page and "band--white service-band--light" in page  # alternating
+    assert "band--black on-dark service-band--dark" in page  # alternating dark and light
+    assert "band--light service-band--light" in page
+    assert '<span class="service-band__number" aria-hidden="true">01</span>' in page
 
 
 def test_a_service_image_shows_on_the_page_only_when_ticked(client, services_page):

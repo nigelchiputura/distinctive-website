@@ -26,6 +26,10 @@ class PageService(BaseService):
     def __init__(self, repo: PageRepository | None = None):
         self.repo = repo or PageRepository()
 
+    def published_pages(self) -> list[Page]:
+        """Every published page, in the site's order (for the sitemap)."""
+        return self.repo.published_pages()
+
     def get_page(self, slug: str) -> PageContent:
         """The published page with its published sections and slides; NotFoundError otherwise."""
         page = self.get_or_raise(self.repo.published_page(slug), f"No published page '{slug}'.")

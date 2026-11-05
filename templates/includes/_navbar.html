@@ -1,14 +1,21 @@
 {% load static %}
-{# White navbar. Items from NavigationService (apps/core/services/navigation_service.py). #}
-<nav class="navbar navbar-expand-lg navbar-light site-navbar sticky-top" aria-label="Main">
+{% comment %} The sticky navbar. Items from NavigationService (apps/core/services/navigation_service.py).
+   Two copies of the logo: dark text for the light theme, light text for the dark one (CSS shows
+   one). The theme toggle is shown by static/js/modules/theme.js; without JavaScript the theme
+   follows the system setting. {% endcomment %}
+<nav class="navbar navbar-expand-lg site-navbar sticky-top" aria-label="Main" data-navbar>
   <div class="container">
     <a class="navbar-brand" href="/">
-      <img src="{% static 'img/logo.png' %}" alt="{{ site_info.company_name }} home" width="172" height="100">
+      <img class="brand-logo--light" src="{% static 'img/logo.png' %}" alt="{{ site_info.company_name }} home" width="172" height="100">
+      <img class="brand-logo--dark" src="{% static 'img/logo-dark.png' %}" alt="{{ site_info.company_name }} home" width="172" height="100">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav"
-            aria-controls="main-nav" aria-expanded="false" aria-label="Show the menu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="site-navbar__tools order-lg-last">
+      {% include "includes/_theme_toggle.html" %}
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav"
+              aria-controls="main-nav" aria-expanded="false" aria-label="Show the menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
     <div class="collapse navbar-collapse" id="main-nav">
       <ul class="navbar-nav ms-auto">
         {% for item in nav_items %}

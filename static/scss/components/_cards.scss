@@ -1,65 +1,104 @@
-// Service cards on Home (templates/includes/_service_card.html).
+// Service cards on Home (templates/includes/_service_card.html): frosted cards on the charcoal
+// band that lift on hover; the whole card is the link (Bootstrap's stretched-link).
 
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-  gap: 3rem 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1.75rem;
 }
 
 .service-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-}
-
-.service-card__link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
+  border: 1px solid rgba($dcs-white, 0.08);
+  border-radius: $dcs-radius-lg;
+  background: linear-gradient(160deg, rgba($dcs-white, 0.07), rgba($dcs-white, 0.02));
+  overflow: hidden;
+  transition:
+    transform 0.4s $dcs-ease,
+    border-color 0.3s ease,
+    box-shadow 0.4s ease;
 
   &:hover,
-  &:focus-visible {
-    text-decoration: none;
-
-    .service-card__title {
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
-    }
+  &:focus-within {
+    border-color: rgba($dcs-gold, 0.55);
+    box-shadow: 0 1.5rem 3rem rgba($dcs-black, 0.45);
+    transform: translateY(-6px);
 
     .service-card__image {
-      transform: scale(1.03);
+      transform: scale(1.05);
+    }
+
+    .service-card__more .icon {
+      transform: translateX(4px);
     }
   }
 }
 
-// The framed photo: a dark grey mat around the image, as on the old site, in one fixed shape so
-// a row of cards lines up whatever the uploaded images' sizes. "contain", not "cover": several
-// card images have words in them (Talent Management), which cropping would cut off.
+// One fixed shape, so a row of cards lines up whatever the uploaded images' sizes. "contain",
+// not "cover": several card images have words in them, which cropping would cut off.
 .service-card__frame {
-  overflow: hidden;
+  margin: 0.75rem 0.75rem 0;
   padding: 0.75rem;
+  border-radius: $dcs-radius;
   background: $dcs-charcoal-light;
   aspect-ratio: 3 / 2;
+  overflow: hidden;
 }
 
 .service-card__image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s $dcs-ease;
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-  }
+.service-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.25rem 1.5rem 1.5rem;
 }
 
 .service-card__title {
-  margin: 1.25rem 0 0.5rem;
+  margin: 0 0 0.5rem;
   color: $dcs-gold;
   font-size: 1.3rem;
-  font-weight: 400;
+  font-weight: 700;
+}
+
+.on-dark .service-card__link {
+  color: $dcs-gold;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: none; // the card shows focus instead
+  }
+}
+
+.service-card:has(.service-card__link:focus-visible) {
+  outline: 3px solid $dcs-gold;
+  outline-offset: 3px;
 }
 
 .service-card__summary {
-  margin: 0;
-  color: $dcs-white;
+  margin: 0 0 1.25rem;
+  color: rgba($dcs-white, 0.85);
+}
+
+.service-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  color: $dcs-gold;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  .icon {
+    transition: transform $dcs-duration $dcs-ease;
+  }
 }

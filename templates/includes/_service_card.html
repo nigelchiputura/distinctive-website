@@ -1,13 +1,15 @@
-{% comment %} One consulting service on Home (offerings.Service). Links to its band on the Services page.
-   title_tag: h2 when the section has no heading of its own, h3 under one. {% endcomment %}
-<article class="service-card">
-  <a class="service-card__link" href="/services/#{{ service.anchor }}">
-    {% if service.image %}
-      <div class="service-card__frame">
-        {% include "includes/_image.html" with obj=service class="service-card__image" %}
-      </div>
-    {% endif %}
-    <{{ title_tag|default:"h3" }} class="service-card__title">{{ service.title }}</{{ title_tag|default:"h3" }}>
-  </a>
-  {% if service.summary %}<p class="service-card__summary">{{ service.summary }}</p>{% endif %}
+{% comment %} One consulting service on Home (offerings.Service), linking to its band on the Services page.
+   The title's link stretches over the whole card. title_tag: h2 when the section has no heading
+   of its own, h3 under one. delay: its place in the row, for the staggered fade-in. {% endcomment %}
+<article class="service-card" data-reveal data-reveal-delay="{{ delay|default:0 }}">
+  {% if service.image %}
+    <div class="service-card__frame">
+      {% include "includes/_image.html" with obj=service class="service-card__image" %}
+    </div>
+  {% endif %}
+  <div class="service-card__body">
+    <{{ title_tag|default:"h3" }} class="service-card__title"><a class="service-card__link stretched-link" href="/services/#{{ service.anchor }}">{{ service.title }}</a></{{ title_tag|default:"h3" }}>
+    {% if service.summary %}<p class="service-card__summary">{{ service.summary }}</p>{% endif %}
+    <span class="service-card__more" aria-hidden="true">Learn more {% include "includes/icons/arrow-right.svg" %}</span>
+  </div>
 </article>

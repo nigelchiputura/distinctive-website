@@ -151,7 +151,11 @@ reorder or unpublish them. The address, phone, email, hours and vacancies addres
 from **Site settings**, so they're edited once for the whole site. Enquiries from Services show
 "sent from: Services page".
 
-Later days add: redirects (Day 9) and Phase 2's job admin.
+**Section labels** (Day 9): each section has an optional **label**, the small gold tag above its
+heading ("What we do", "The team"). Leave it empty for none. Visitors choose the light or dark
+look themselves (the navbar's toggle); there is nothing to set in the admin for it.
+
+Later days add: redirects (Day 10) and Phase 2's job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).
 

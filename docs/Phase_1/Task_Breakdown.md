@@ -1,4 +1,8 @@
-# Phase 1 — Task Breakdown (10 working days)
+# Phase 1 — Task Breakdown (11 working days)
+
+*Revised 2026-11-04: Day 9, **UI and components polish**, was added after Day 8 at the owner's
+request (`Phase_1/Phase1_Scope.md` D16, D17). SEO, redirects and production files moved to Day 10,
+and the VPS and go-live to Day 11.*
 
 Day-by-day cards, ready to paste into GitHub issues (`Backlog` → `In Progress` → `In Review` →
 `Done`). Each card is **Title** — what to do — **AC** (acceptance criteria). Scope and decisions:
@@ -244,7 +248,8 @@ consent.
 - [x] **Contact page.** Black band with the form left and "Reach Us" right (including the
   vacancies line, assumption A3), map band below (`frontend.md` §4).
   AC: the form works with JavaScript off (full-page POST and redirect with a message).
-  *(As built: `contact_form` and `map` section types, seeded today rather than on Day 9.)*
+  *(As built: `contact_form` and `map` section types, seeded today rather than in the SEO day's
+  seed, part 3.)*
 - [x] **`contact-form.js` and `http.js`.** AJAX submit, field errors, success state, CSRF
   header (`frontend.md` §5).
   AC: errors show next to their fields without a reload.
@@ -269,10 +274,58 @@ consent.
 **Done when:** an enquiry from either form lands in the admin and the mailbox, and GA and the
 map load only after consent.
 
-## Day 9 — SEO, redirects, polish and production files
+## Day 9 — UI and components polish
+
+**Goal:** the site looks and feels modern and works in light and dark, without changing what it
+says. The old site is a reference for content and structure, not a design to copy
+(`Phase_1/Phase1_Scope.md` D17).
+
+- [x] **Light and dark themes.** Theme colours as CSS custom properties (`static/scss/_theme.scss`);
+  the system setting (`prefers-color-scheme`) by default; a navbar toggle with **System**,
+  **Light** and **Dark**, remembered in `localStorage` and applied before the first paint
+  (`static/js/theme-init.js`); a light version of the logo for dark backgrounds
+  (`frontend.md` §8).
+  AC: with no choice the site follows the system; a chosen theme survives a reload without a
+  flash; without JavaScript the system setting still applies and the toggle is hidden.
+- [x] **Modern components.** Gradients with soft gold light instead of flat bands; frosted
+  service cards that lift on hover; framed images; logo tiles; team cards with gold photo rings;
+  rounded buttons and fields; a glass Contact form beside an icon list; the Services enquiry form
+  in a card on gold; numbered service bands with chips linking to them; a floating cookie card;
+  a three-column footer.
+  AC: every page at 375 and 1280 px in both themes reads clearly, with contrast checked (AA).
+- [x] **Section labels.** An optional **label** above each section's heading (`PageSection.eyebrow`,
+  migration `pages.0008_section_label`), seeded for every section; Contact gains a page hero.
+  AC: a label set in the admin shows above its heading.
+- [x] **Team bio dialog.** A long bio is cut to a few lines with **Read full bio**, which opens it in a
+  native `<dialog>` (`static/js/modules/bio-dialog.js`, replacing `read-more.js`).
+  AC: Escape closes it and focus returns to the button; without JavaScript the whole bio shows.
+- [x] **Motion.** Sections and cards fade up as they scroll into view (`reveal.js`); hover lifts and
+  arrow nudges; the hero's gold light drifts; the navbar gains a shadow on scroll (`navbar.js`).
+  All of it is off with reduced motion, and nothing is hidden unless the script has started.
+  AC: with reduced motion every card is visible at once; without JavaScript nothing is hidden.
+- [x] **Back to top.** A round gold button bottom right (`back-to-top.js`): a plain link to `#top`
+  without JavaScript; with it, it appears after scrolling, scrolls up smoothly and moves focus to
+  the logo.
+  AC: it appears after scrolling, returns to the top and works by keyboard.
+- [x] **Hero backgrounds** (added 2026-11-04, the owner's choice): Home's hero shows the team
+  photo the owner sent (`seed/images/team-photo.jpg`, 1600 px, about 280 KB), with the text over
+  the trees and the team's faces clear at every width; the page heroes on About, Services and
+  Contact, and the Contact form's band, use the drifting black-and-gold gradient (it had been
+  hidden behind plain black by a CSS ordering slip, now fixed).
+  AC: on Home the heading and tagline never cover a face at 375, 768, 1280 or 1920 px.
+
+**Done when:** all four pages are polished in both themes, the checks pass, and nothing that
+worked on Day 8 (forms, consent, the slider) has changed behaviour.
+
+## Day 10 — SEO, redirects, polish and production files
 
 **Goal:** production-ready: SEO valid, old links redirected, Lighthouse targets met, prod stack
 runs locally.
+
+*(Started on 2026-11-04 before the polish day was added: the SEO service and `_seo.html`, the
+redirects, the 404 and 500 pages and the production files are in the code with their tests, so
+they ship in the Day 9 zip. They are checked, finished and documented, with their commands file,
+on this day.)*
 
 - [ ] **SEO.** `SeoMixin` + `includes/_seo.html` (title, description, canonical, Open Graph,
   Twitter card, JSON-LD `Organization` with address and phone); per-page fields on `Page`.
@@ -306,7 +359,7 @@ runs locally.
 **Done when:** Lighthouse targets are met, every old URL redirects, and the prod stack runs
 locally.
 
-## Day 10 — VPS, client walkthrough and go-live
+## Day 11 — VPS, client walkthrough and go-live
 
 **Goal:** the new site is live on `distinctive.co.zw`, signed off by the client.
 
@@ -347,10 +400,10 @@ affirmed.
 |---|---|
 | Content arrives late | `seed_site_content` loads what the old site already shows; the client edits the rest in the admin after launch |
 | DNS access or Resend verification delayed | Console email locally; submissions are always saved (`email_sent=False` visible in the admin); the preview host can run before Resend is verified, the cutover can't |
-| The VPS isn't ordered by Day 9 | Production files are proven locally on Day 9; Day 10 only needs SSH and DNS |
+| The VPS isn't ordered by Day 10 | Production files are proven locally on Day 10; Day 11 only needs SSH and DNS |
 | Client feedback on the walkthrough is larger than a day | Cutover waits for sign-off; feedback that isn't a blocker goes to the Phase 2 board |
 | Lost mail at cutover | Only web records change; check MX before and after (assumption A1) |
-| Day 8 or 9 overruns | Lighthouse tuning and the redirect seed can finish on Day 10 morning before the walkthrough |
+| Day 9 or 10 overruns | Lighthouse tuning and the redirect seed can finish on Day 11 morning before the walkthrough |
 
 ## Stretch pool (only if a day finishes early)
 

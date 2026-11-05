@@ -1,0 +1,102 @@
+// Light and dark themes (Day 9 polish; docs/frontend.md §8).
+//
+// Colours that change with the theme are CSS custom properties, set here and nowhere else.
+// The theme follows the visitor's system setting (prefers-color-scheme) unless they choose
+// Light or Dark in the navbar's toggle, which sets data-theme on <html> (static/js/theme-init.js
+// before the first paint, static/js/modules/theme.js afterwards). Black and gold bands
+// (.on-dark, .band--gold) look the same in both themes.
+
+@mixin dcs-light-theme {
+  color-scheme: light;
+  --dcs-page: #{$dcs-white};
+  --dcs-page-soft: #{$dcs-paper};
+  --dcs-surface: #{$dcs-white};
+  --dcs-surface-soft: #{$dcs-paper};
+  --dcs-text: #{$dcs-text};
+  --dcs-text-muted: #{$dcs-grey};
+  --dcs-heading: #{$dcs-black-soft};
+  --dcs-accent: #{$dcs-gold-dark};
+  --dcs-accent-hover: #{$dcs-gold-deeper};
+  --dcs-border: #{rgba($dcs-black, 0.08)};
+  --dcs-border-strong: #{rgba($dcs-black, 0.22)};
+  --dcs-shadow: 0 0.75rem 2rem #{rgba($dcs-black, 0.07)};
+  --dcs-shadow-lift: 0 1.25rem 3rem #{rgba($dcs-black, 0.14)};
+  --dcs-band-light: linear-gradient(180deg, #{$dcs-white} 0%, #{$dcs-paper} 100%);
+  --dcs-band-light-glow: #{rgba($dcs-gold, 0.1)};
+  --dcs-nav-bg: #{rgba($dcs-white, 0.85)};
+  --dcs-chip-bg: #{rgba($dcs-gold, 0.12)};
+  --dcs-error: #{$dcs-error};
+  --dcs-logo-light: block;
+  --dcs-logo-dark: none;
+
+  --bs-body-bg: var(--dcs-page);
+  --bs-body-color: var(--dcs-text);
+  --bs-emphasis-color: var(--dcs-heading);
+  --bs-border-color: var(--dcs-border-strong);
+  --bs-link-color-rgb: #{to-rgb($dcs-gold-dark)};
+  --bs-link-hover-color-rgb: #{to-rgb($dcs-gold-deeper)};
+}
+
+@mixin dcs-dark-theme {
+  color-scheme: dark;
+  --dcs-page: #{$dcs-ink};
+  --dcs-page-soft: #{$dcs-ink-soft};
+  --dcs-surface: #{$dcs-ink-raised};
+  --dcs-surface-soft: #{$dcs-ink-soft};
+  --dcs-text: #{$dcs-text-on-ink};
+  --dcs-text-muted: #{$dcs-muted-on-ink};
+  --dcs-heading: #{$dcs-white};
+  --dcs-accent: #{$dcs-gold};
+  --dcs-accent-hover: #{$dcs-gold-light};
+  --dcs-border: #{rgba($dcs-white, 0.08)};
+  --dcs-border-strong: #{rgba($dcs-white, 0.2)};
+  --dcs-shadow: 0 0.75rem 2rem #{rgba($dcs-black, 0.4)};
+  --dcs-shadow-lift: 0 1.25rem 3rem #{rgba($dcs-black, 0.55)};
+  --dcs-band-light: linear-gradient(180deg, #{$dcs-ink-soft} 0%, #{$dcs-ink} 100%);
+  --dcs-band-light-glow: #{rgba($dcs-gold, 0.07)};
+  --dcs-nav-bg: #{rgba($dcs-ink, 0.85)};
+  --dcs-chip-bg: #{rgba($dcs-gold, 0.14)};
+  --dcs-error: #{$dcs-error-on-dark};
+  --dcs-logo-light: none;
+  --dcs-logo-dark: block;
+
+  --bs-body-bg: var(--dcs-page);
+  --bs-body-color: var(--dcs-text);
+  --bs-emphasis-color: var(--dcs-heading);
+  --bs-border-color: var(--dcs-border-strong);
+  --bs-link-color-rgb: #{to-rgb($dcs-gold)};
+  --bs-link-hover-color-rgb: #{to-rgb($dcs-gold-light)};
+}
+
+:root {
+  @include dcs-light-theme;
+}
+
+:root[data-theme="dark"] {
+  @include dcs-dark-theme;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dcs-dark-theme;
+  }
+}
+
+body {
+  background: var(--dcs-page);
+  color: var(--dcs-text);
+  transition:
+    background-color $dcs-duration ease,
+    color $dcs-duration ease;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--dcs-heading);
+}
+
+::selection {
+  background: rgba($dcs-gold, 0.35);
+}

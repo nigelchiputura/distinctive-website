@@ -1,40 +1,42 @@
-{# Footer: "Reach Us", navigation strip, copyright. Values from SiteSettings (Day 3). #}
+{% load static %}
+{# Footer: the logo and blurb, Reach Us, quick links, copyright. Values from SiteSettings. #}
 <footer class="site-footer">
   <div class="site-footer__main">
     <div class="container">
-      <h2 class="site-footer__heading">Reach Us</h2>
-      <p class="site-footer__blurb mb-0">{{ site_info.footer_blurb }}</p>
-      <dl class="site-footer__details">
-        <div><dt>Address:</dt><dd>{{ site_info.address }}</dd></div>
-        <div><dt>Phone:</dt><dd><a href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a></dd></div>
-        <div><dt>Business Hours:</dt><dd>{{ site_info.hours }}</dd></div>
-        <div><dt>Email:</dt><dd><a href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a></dd></div>
-      </dl>
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <img class="site-footer__logo" src="{% static 'img/logo-dark.png' %}" alt="" width="172" height="100" loading="lazy">
+          <p class="site-footer__tagline">{{ site_info.tagline }}</p>
+          <p class="site-footer__blurb mb-0">{{ site_info.footer_blurb }}</p>
+          {% if site_info.visible_social_links %}
+            <ul class="site-footer__social" aria-label="Social media">
+              {% for link in site_info.visible_social_links %}
+                <li><a class="social-circle" href="{{ link.url }}" rel="noopener" target="_blank" aria-label="{{ link.label }} (opens in a new tab)">{% include "includes/icons/"|add:link.name|add:".svg" %}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        <div class="col-md-7 col-lg-5">
+          <h2 class="site-footer__heading">Reach Us</h2>
+          {% include "includes/_contact_list.html" %}
+        </div>
+        <nav class="col-md-5 col-lg-3" aria-label="Footer">
+          <h2 class="site-footer__heading">Quick Links</h2>
+          <ul class="site-footer__links">
+            {% for item in nav_items %}
+              <li><a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{% include "includes/icons/arrow-right.svg" %}{{ item.label }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
-
-  <nav class="site-footer__nav" aria-label="Footer">
-    <div class="container">
-      <ul>
-        {% for item in nav_items %}
-          <li><a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-  </nav>
 
   <div class="site-footer__bottom">
     <div class="container">
       <p class="mb-0">&copy; {{ current_year }} {{ site_info.company_name }}. All rights reserved.</p>
       {# Shown by cookie-consent.js, which is what it needs to work. #}
       <button type="button" class="site-footer__cookies link-button" data-cookie-settings hidden>Cookie settings</button>
-      {% if site_info.visible_social_links %}
-        <ul class="site-footer__social list-unstyled mb-0" aria-label="Social media">
-          {% for link in site_info.visible_social_links %}
-            <li><a href="{{ link.url }}" rel="noopener" target="_blank" aria-label="{{ link.label }} (opens in a new tab)">{% include "includes/icons/"|add:link.name|add:".svg" %}</a></li>
-          {% endfor %}
-        </ul>
-      {% endif %}
     </div>
   </div>
 </footer>

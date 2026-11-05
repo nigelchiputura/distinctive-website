@@ -2,14 +2,10 @@
    without JavaScript nothing asks, and nothing from Google loads either. The GA4 id is a
    data attribute; the script's address is only built in JavaScript after "Accept". {% endcomment %}
 <div class="cookie-banner" role="region" aria-labelledby="cookie-banner-title" data-cookie-banner data-ga-id="{{ site_info.ga_measurement_id }}" hidden>
-  <div class="container cookie-banner__inner">
-    <div class="cookie-banner__text">
-      <h2 id="cookie-banner-title" class="cookie-banner__title">Cookies on this site</h2>
-      <p class="mb-0">We use the cookies the site needs to work. With your permission we'd also use Google Analytics to see how the site is used, and show a Google map on the Contact page. Both set cookies from Google.</p>
-    </div>
-    <div class="cookie-banner__actions">
-      <button type="button" class="btn btn-gold" data-consent="accept">Accept</button>
-      <button type="button" class="btn btn-outline-light" data-consent="decline">Decline</button>
-    </div>
+  <h2 id="cookie-banner-title" class="cookie-banner__title">Cookies on this site</h2>
+  <p class="cookie-banner__text mb-0">We use the cookies the site needs to work. With your permission we'd also use Google Analytics to see how the site is used, and show a Google map on the Contact page. Both set cookies from Google.</p>
+  <div class="cookie-banner__actions">
+    <button type="button" class="btn btn-gold" data-consent="accept">Accept</button>
+    <button type="button" class="btn btn-outline-light" data-consent="decline">Decline</button>
   </div>
 </div>

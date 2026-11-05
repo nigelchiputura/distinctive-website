@@ -1,0 +1,38 @@
+// The 404 and 500 pages (templates/404.html, 500.html).
+
+.error-page {
+  display: flex;
+  align-items: center;
+  min-height: 60vh;
+
+  &__code {
+    margin-bottom: 0.25rem;
+    color: $dcs-grey-on-dark;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+  }
+
+  &__lead {
+    max-width: 40rem;
+    font-size: 1.1rem;
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.75rem 0 2rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  a:not(.btn) {
+    color: $dcs-gold;
+  }
+}
+
+// The 500 page's header: just the logo, on white.
+.site-navbar-plain {
+  background: var(--dcs-nav-bg);
+}

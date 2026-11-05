@@ -16,6 +16,11 @@ Day 6 About, Day 7 Services; Day 9 adds Contact.
 
 from typing import Any
 
+# Titles in search results. Pages not listed get "<page title> | Distinctive Consultancy Services".
+META_TITLES: dict[str, str] = {
+    "home": "Distinctive Consultancy Services | HR Consultancy, Harare",
+}
+
 HOME_META_DESCRIPTION = (
     "Distinctive Consultancy Services, Harare: industrial and employee relations, HR audits, "
     "talent acquisition, people strategy, research surveys and organisational design."
@@ -25,6 +30,10 @@ HOME_SLIDES: tuple[dict[str, Any], ...] = (
     {
         "heading": "Distinctive Consultancy Services",
         "subheading": "Bringing excellence into your world.",
+        # The team photo the owner sent on 2026-11-04 (1600 px wide, about 280 KB).
+        "image": "team-photo.jpg",
+        "image_alt": "The Distinctive Consultancy Services team in branded black hoodies, "
+        "seated and standing on a lawn beneath a large tree",
         "sort_order": 10,
     },
 )
@@ -33,11 +42,14 @@ HOME_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "services",
         "section_type": "service_cards",
+        "eyebrow": "Our services",
+        "heading": "What We Do",
         "sort_order": 10,
     },
     {
         "anchor": "get-in-touch",
         "section_type": "cta",
+        "eyebrow": "Let's talk",
         "heading": "Get the best specialised business consultancy services in Africa.",
         "button_label": "Get In Touch",
         "button_url": "/contact/",
@@ -46,6 +58,7 @@ HOME_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "people-centred",
         "section_type": "value_block",
+        "eyebrow": "Our values",
         "heading": "People Centred",
         "body": "We recognise and cherish the human dimension of our business and thrive on its "
         "quest for never-ending growth and prosperity.",
@@ -57,6 +70,7 @@ HOME_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "proactive",
         "section_type": "value_block",
+        "eyebrow": "Our values",
         "heading": "Proactive",
         "body": "We move ahead of events and strive to change faster than the rate of change in "
         "our domain of practice.",
@@ -330,12 +344,14 @@ ABOUT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "welcome",
         "section_type": "hero_text",
+        "eyebrow": "About us",
         "heading": "Bringing Excellence Into Your World!",
         "sort_order": 10,
     },
     {
         "anchor": "our-story",
         "section_type": "two_column",
+        "eyebrow": "Who we are",
         "heading": "Our Story",
         "intro": "Distinctive Consultancy Services is a Zimbabwean Business Consultancy Firm "
         "that specialises in Human Resources Consultancy Services. Established in July 2006, it "
@@ -362,6 +378,7 @@ ABOUT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "strategic-partners",
         "section_type": "partners",
+        "eyebrow": "Working together",
         "heading": "Strategic Partners",
         "heading_align": "center",
         "sort_order": 30,
@@ -369,6 +386,7 @@ ABOUT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "capability-analysis",
         "section_type": "band_dark",
+        "eyebrow": "What we bring",
         "heading": "Capability Analysis",
         "body": "Distinctive Consultancy Services has the capability to:\n\n"
         "- Leverage the collective competencies of a highly qualified and experienced team of "
@@ -389,6 +407,7 @@ ABOUT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "value-driven",
         "section_type": "band_dark",
+        "eyebrow": "How we work",
         "heading": "Value Driven and Capacity Building",
         "heading_align": "right",
         "body": "Distinctive Consultancy creates and delivers value to its clients by offering "
@@ -403,6 +422,7 @@ ABOUT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "our-leadership",
         "section_type": "team",
+        "eyebrow": "The team",
         "heading": "Our Leadership",
         "heading_align": "center",
         "sort_order": 60,
@@ -580,6 +600,7 @@ SERVICES_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "what-we-do",
         "section_type": "hero_text",
+        "eyebrow": "What we do",
         "heading": "Our Services",
         "body": "At Distinctive Consultancy Services, we specialise in Human Resources "
         "Consultancy Services. Our core business is offering a wide range of strategic "
@@ -590,12 +611,14 @@ SERVICES_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "services-list",
         "section_type": "service_bands",
+        "eyebrow": "Our expertise",
         "heading": "What We Do",
         "sort_order": 20,
     },
     {
         "anchor": "corporate-clients",
         "section_type": "clients",
+        "eyebrow": "Trusted by",
         "heading": "Some of Our Corporate Clients",
         "heading_align": "center",
         "sort_order": 30,
@@ -603,6 +626,7 @@ SERVICES_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "get-in-touch",
         "section_type": "enquiry_form",
+        "eyebrow": "Enquiries",
         "heading": "Get In Touch With Us",
         "heading_align": "center",
         "body": "Tell us what you need and we'll get back to you.",
@@ -642,8 +666,18 @@ CONTACT_META_DESCRIPTION = (
 # edited in one place; the sections hold only the headings and the button.
 CONTACT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
+        "anchor": "contact-us",
+        "section_type": "hero_text",
+        "eyebrow": "Contact",
+        "heading": "Contact Us",
+        "body": "Questions about our services, or ready to start? Send us a message, call us or "
+        "visit our offices in Msasa, Harare.",
+        "sort_order": 5,
+    },
+    {
         "anchor": "get-in-touch",
         "section_type": "contact_form",
+        "eyebrow": "Send a message",
         "heading": "Get In Touch!",
         "button_label": "Submit",
         "sort_order": 10,
@@ -651,7 +685,49 @@ CONTACT_SECTIONS: tuple[dict[str, Any], ...] = (
     {
         "anchor": "find-us",
         "section_type": "map",
+        "eyebrow": "Visit us",
         "heading": "Find Us",
         "sort_order": 20,
     },
+)
+
+
+# ---- Old site addresses (Day 9) -----------------------------------------------------------
+
+# The old WordPress site's addresses as far as the screenshots and WordPress's defaults show
+# them. Its sitemap (Phase 1 Scope, owner input) may list more, such as each job post; check it
+# with `manage.py check_redirects <sitemap file>` and add what is missing in the admin.
+# Jobs go to Contact until Phase 2 builds the jobs pages.
+REDIRECTS: tuple[dict[str, Any], ...] = (
+    {"old_path": "/home/", "new_path": "/", "note": "WordPress front page"},
+    {"old_path": "/about-us/", "new_path": "/about/", "note": "old About Us page"},
+    {"old_path": "/contact-us/", "new_path": "/contact/", "note": "old Contact Us page"},
+    {"old_path": "/our-services/", "new_path": "/services/", "note": "possible old Services page"},
+    {
+        "old_path": "/jobs/",
+        "new_path": "/contact/",
+        "match_prefix": True,
+        "is_permanent": False,
+        "note": "old Jobs page: Contact until Phase 2 (temporary, so it can change then)",
+    },
+    {
+        "old_path": "/category/jobs/",
+        "new_path": "/contact/",
+        "match_prefix": True,
+        "is_permanent": False,
+        "note": "WordPress job category: Contact until Phase 2",
+    },
+    {
+        "old_path": "/category/",
+        "new_path": "/",
+        "match_prefix": True,
+        "note": "other WordPress categories",
+    },
+    {
+        "old_path": "/author/",
+        "new_path": "/about/",
+        "match_prefix": True,
+        "note": "WordPress author pages",
+    },
+    {"old_path": "/feed/", "new_path": "/", "match_prefix": True, "note": "WordPress RSS feed"},
 )

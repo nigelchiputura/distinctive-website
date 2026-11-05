@@ -1,0 +1,28 @@
+# docs/deployment.md §7. Caddy gets and renews the certificate for SITE_DOMAIN (with
+# SITE_DOMAIN=localhost it uses its own local certificate authority), redirects HTTP to HTTPS,
+# serves uploads from the media volume and passes everything else to Django.
+#
+# reverse_proxy sets X-Forwarded-For to the visitor's address and ignores one the visitor sent
+# (no trusted_proxies here), which the enquiry rate limit relies on (TRUSTED_PROXY_COUNT=1).
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+	header -Server
+
+	# Admin-uploaded images, straight from the media volume
+	handle_path /media/* {
+		root * /srv/media
+		file_server
+		header Cache-Control "public, max-age=604800"
+		header X-Content-Type-Options nosniff
+	}
+
+	handle {
+		reverse_proxy web:8000
+	}
+}
+
+# Added at cutover (§8): send www and the preview host to the live domain.
+# www.distinctive.co.zw, new.distinctive.co.zw {
+# 	redir https://distinctive.co.zw{uri} permanent
+# }

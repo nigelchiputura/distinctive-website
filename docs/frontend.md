@@ -1,6 +1,7 @@
 # Frontend
 
-**Project-wide · revised 2026-11-04** (Day 8 as built: Contact, the enquiry forms, cookie consent;
+**Project-wide · revised 2026-11-04** (Day 9 as built: light and dark themes, the modernised
+components, motion, back to top; Day 8 as built: Contact, the enquiry forms, cookie consent;
 Day 7 as built: the Services page; the font is Nunito Sans;
 Day 6: About, the team and logo blocks, Read more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
 the repo root as in Consult 360, Phase 1 pages, Jobs and Search designs moved to `Phase_2/Phase2_Scope.md`)
@@ -56,7 +57,7 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
   a vendored bundle's `sourceMappingURL` line (`copy-vendor.mjs` strips it; see
   `errors-and-exceptions/bootstrap-js-sourcemap-breaks-whitenoise-collectstatic__2026-11-03_1105/`).
 - The full Bootstrap build is about 237 KB minified, 33 KB gzipped. If Lighthouse asks for less on
-  Day 9, import only the Bootstrap partials in use.
+  Day 10, import only the Bootstrap partials in use.
 
 ## 2. SCSS architecture
 
@@ -66,7 +67,8 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "tokens";                            // 1. $dcs-* brand tokens
 @import "variables";                         // 2. Bootstrap variable overrides (use the tokens)
 @import "bootstrap/scss/bootstrap";          // 3. Bootstrap, themed by 1–2
-@import "fonts";                             // 4. our rules
+@import "theme";                             // 4. light and dark custom properties (Day 9, §8)
+@import "fonts";                             // 5. our rules
 @import "base";
 @import "components/topbar";
 @import "components/navbar";
@@ -77,11 +79,12 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "components/section";                // Day 5: bands, CTA, value blocks
 @import "components/cards";                  // Day 5: service cards
 @import "components/logos";                  // Day 6: partner and client logos
-@import "components/team";                   // Day 6: Our Leadership, Read more
+@import "components/team";                   // Day 6: Our Leadership; Day 9: the bio dialog
 @import "components/services";               // Day 7: the Services page
 @import "components/forms";                  // Day 8: the enquiry forms, on black and on gold
 @import "components/contact";                // Day 8: Reach Us, the gold band, the map band
 @import "components/cookie-banner";          // Day 8
+@import "components/error-page";             // Day 10: the 404 and 500 pages
 // pages/* only if a page ever needs rules of its own (none has so far).
 ```
 
@@ -92,7 +95,10 @@ it cleanly. Partials are added to `main.scss` on the day their component arrives
 
 **Colours only through tokens.** SCSS uses `$dcs-*`; `_tokens.scss` also emits them as `--dcs-*`
 custom properties on `:root` for the few places JS or inline styles need them. No raw hex values
-outside `_tokens.scss`.
+outside `_tokens.scss`. **Colours that change with the theme** are the semantic custom properties
+in `_theme.scss` (`--dcs-page`, `--dcs-surface`, `--dcs-text`, `--dcs-text-muted`,
+`--dcs-heading`, `--dcs-accent`, `--dcs-border`, `--dcs-shadow` …), set once for light and once
+for dark (§8); components on light bands use those, never a fixed white or black.
 
 ### Brand tokens (sampled from the old site's screenshots on 2026-11-03; confirm against the logo file, Phase 1 Q5)
 
@@ -109,8 +115,14 @@ outside `_tokens.scss`.
 | `$dcs-gold-dark` | `#86691a` | Gold **text** on light backgrounds (links, active nav) | 5.2:1 on white |
 | `$dcs-gold-deeper` | `#6b5415` | Hover on `$dcs-gold-dark` links | — |
 | `$dcs-white` | `#fff` | Light bands, navbar | — |
-| `$dcs-error-on-dark` | `#ff8a80` | Form errors on black (Contact) | 9.2:1 on black |
-| `$dcs-error-on-gold` | `#6e0000` | Form errors on gold (Services enquiry) | 6.0:1 on gold |
+| `$dcs-gold-light` | `#e8c766` | The light end of gold gradients (buttons, the enquiry band, headings in the hero) | black text 12.8:1 |
+| `$dcs-paper` | `#faf8f3` | Warm off-white: light bands' gradient, form fields, value blocks | `$dcs-grey` 5.4:1, `$dcs-gold-dark` 4.9:1 |
+| `$dcs-ink` / `$dcs-ink-soft` / `$dcs-ink-raised` | `#0e0f11` / `#1a1d21` / `#23272c` | Dark theme: page, light bands, cards | — |
+| `$dcs-text-on-ink` / `$dcs-muted-on-ink` | `#e9e7e2` / `#a9adb3` | Dark theme: body and muted text | 15.5:1 on the page; muted 6.6:1 on cards |
+| `$dcs-error` | `#b42318` | Form errors, light theme | 6.6:1 on white, 6.2:1 on paper |
+| `$dcs-error-on-dark` | `#ff8a80` | Form errors on black and in the dark theme | 9.2:1 on black, 6.6:1 on dark cards |
+| `$dcs-radius-sm` … `$dcs-radius-pill` | 0.5 / 1 / 1.5 rem, pill | Corners: fields 0.75 rem, cards 1.5 rem, buttons and chips pill | — |
+| `$dcs-ease`, `$dcs-duration` | `cubic-bezier(.2,.7,.2,1)`, 0.3 s | Every transition | — |
 | `$dcs-navy` → `$dcs-blue` | `#02070b` → `#1f5fa8` | About "Our Story" gradient (sampled on Day 6). The old band ran on to `#2a85d6`; it stops darker here | white text 6.4:1 or better throughout (the old end was 3.9:1) |
 | `$dcs-font-sans` | Nunito Sans 400/600/700, then system fonts | All text, site and admin (`admin.scss` imports `_fonts.scss` too) | — |
 
@@ -120,19 +132,30 @@ screens it is slightly soft; an SVG (or a PNG at least 2× the size) would make 
 is a gradient around `#d2a22f`, close to the site's `#d4af37`, which stays as the old theme's.
 
 Bootstrap overrides: `$primary: $dcs-gold`, `$body-color`, `$font-family-sans-serif`,
-`$link-color: $dcs-gold-dark`, `$navbar-light-*`, `$btn-border-radius`, `$headings-color`.
+`$link-color: $dcs-gold-dark`, `$navbar-light-*`, `$headings-color`, and (Day 9) rounded corners:
+`$border-radius*`, pill `$btn-border-radius*` with more padding and a transition, 0.75 rem
+`$input-border-radius`, 1 rem `$dropdown-border-radius`. At runtime `_theme.scss` points
+Bootstrap's `--bs-body-bg`, `--bs-body-color`, `--bs-border-color` and `--bs-link-color-rgb` at
+the theme's colours.
+
+**The logo** has a second copy for dark backgrounds, `static/img/logo-dark.png` (Day 9): the
+black lettering and ring made light, the gold untouched. The navbar shows the one that fits the
+theme; the footer always uses the light one.
 
 ## 3. Templates
 
 ```
 base.html
- ├─ includes/_seo.html            <title>, meta description, canonical, OG/Twitter, JSON-LD (Day 9)
+ ├─ js/theme-init.js              applies a chosen Light or Dark theme before the first paint (Day 9)
+ ├─ includes/_seo.html            <title>, meta description, canonical, OG/Twitter, JSON-LD (Day 10)
  ├─ includes/_topbar.html         phones, email, social icons (site_info)
- ├─ includes/_navbar.html         logo + nav items from the context processor
+ ├─ includes/_navbar.html         both logos, nav items, includes/_theme_toggle.html
  ├─ <main id="main"> {% block main %}{% block content %}   pages fill "content";
  │                                 a layout can wrap it by overriding "main"
- ├─ includes/_footer.html         "Reach Us", footer nav, copyright, "Cookie settings" link
+ ├─ includes/_footer.html         logo and blurb, Reach Us (_contact_list.html), Quick Links, copyright, "Cookie settings"
  ├─ includes/_cookie_banner.html  only when GA4 or the map is set up (consent_needed); hidden until JS shows it
+ ├─ <template data-icon>s         icons the scripts copy into what they build (the dialog's ×, arrows, ticks)
+ ├─ the back-to-top link          href="#top" (<body id="top">)
  └─ Bootstrap's bundle (defer), then js/main.js (type="module")
 
 pages/page.html                   any page: a visually hidden h1 unless the first section is a hero_text band,
@@ -144,6 +167,9 @@ includes/_logo_grid.html          partner or client logos (pages.Partner)
 includes/_team_card.html          one team.TeamMember
 includes/_image.html              an admin image with its stored width/height and alt text
 includes/_enquiry_form.html       ContactForm or EnquiryForm: labels, an error slot per field, the honeypot
+includes/_section_head.html       a section's label and heading, with the gold bar under it (Day 9)
+includes/_contact_list.html       address, phone, email, hours (and on Contact the vacancies line) as icon rows (Day 9)
+includes/_theme_toggle.html       the System / Light / Dark menu (Day 9)
 ```
 
 The site's details are `site_info` in every template (not `site`: allauth's views use that name).
@@ -161,27 +187,32 @@ Images are `loading="lazy"` except the first hero slide, which gets `fetchpriori
 
 `includes/_section.html` renders a `PageSection` by `section_type`, with `id="{{ section.anchor }}"`:
 
-| `section_type` | Look (from the old site) |
+| `section_type` | Look (as built on Day 9; the old site's structure, modernised) |
 |---|---|
-| `hero_text` | Full-width image band with a large heading; the page's `h1` when it's the first section |
-| `intro_dark` | Black band, gold heading, white text ("What We Do") |
-| `band_light` / `band_dark` | Alternating bands used on Services; heading left- or right-aligned |
-| `two_column` | "Our Story": a navy-to-blue band; heading and the section's **short text** (`intro`) left, the body right |
-| `value_block` | Image one side (the section's "image position"), heading and paragraph the other; image first on phones. Consecutive value blocks share one white band |
-| `service_bands` | The Services page: a row of links to every service, then each published service in its own band, alternating black (heading on the right on wide screens) and white, with `id="<anchor>"`. A service's image shows beside its text only when "show the image on the Services page" is ticked (the NGO diagram); the Home card images don't. Long lists go into two columns on wide screens |
-| `service_cards` | Charcoal band with the services ticked "show on Home" (at most six), as framed cards linking to `/services/#<anchor>`. Card titles are `h2` when the section has no heading, `h3` under one |
-| `partners` / `clients` | White band with the published logos of that kind, centred, each scaled into the same 8 rem box without cropping, caption below, linked when it has a website |
-| `team` | White band, uppercase dark-gold heading, the published team: four across on wide screens, two on tablets, one on phones; round photos, name, job title in grey, bio, LinkedIn and Facebook icons when filled in |
-| `cta` | A centred line and an outlined gold button ("Get In Touch") |
-| `contact_form` | Contact: black band, the heading ("Get In Touch!") and the form on the left; on the right a gold-framed **Reach Us** box with the address, phone, email, hours and the vacancies line, all from `SiteSettings` (the section's body, if any, goes under them). Button label from the section, default "Submit" |
-| `enquiry_form` | Services: gold band, black heading ("Get In Touch With Us") and text, the enquiry form centred; button label default "Send enquiry" |
-| `map` | Light grey band: heading ("Find Us"), the address and a **Get directions** link; below, when `GOOGLE_MAPS_EMBED_KEY` is set, the map once the visitor accepts cookies (a note and "Cookie settings" until then) |
+| `hero_text` | Full-width band, the page's `h1` when it's the first section: a photo behind a dark overlay, or without one (About, Services and Contact today) the same drifting black-and-gold gradient as Home's slider without a photo, with faint diagonal lines; label, heading and text fade up on load |
+| `intro_dark` / `band_dark` | Black or charcoal band with a soft gold glow in one corner; label, white heading with a gold bar, text; an optional framed image beside it |
+| `band_light` | Light band (white to warm paper; dark grey in the dark theme), the same layout |
+| `two_column` | "Our Story": the navy-to-blue band with a gold glow; label, heading and the **short text** (`intro`) left, the body in a frosted card right |
+| `value_block` | Image in a rounded frame with a gold offset outline (which shifts on hover), label, heading and text beside it; consecutive value blocks share one flat paper background |
+| `service_bands` | The Services page: numbered chips (`01`–`13`) linking to every service, then each service in its own band, alternating black and light, with a large gold number above its title and `id="<anchor>"`; list items get gold ticks, long lists two columns. A service's image shows beside its text only when "show the image on the Services page" is ticked (the NGO diagram) |
+| `service_cards` | Charcoal band with the services ticked "show on Home" (at most six): frosted cards with the image in a rounded frame, gold title, summary and "Learn more →"; the whole card is the link, and it lifts with a gold edge on hover. Card titles are `h2` when the section has no heading, `h3` under one |
+| `partners` / `clients` | Light band; each logo on a white tile (white in both themes, since the logos are made for it), scaled into the same box without cropping, caption below; linked tiles lift on hover. Rows are centred, so ten clients sit five and five |
+| `team` | Light band; a card per person: photo in a gold ring, name, job title in gold, the bio cut to five lines with **Read full bio** (the dialog, §5), LinkedIn and Facebook as round buttons |
+| `cta` | A rounded panel with a gold glow on black: label, line, a filled gold button with an arrow |
+| `contact_form` | Contact: the drifting black-and-gold gradient band; the label, heading ("Get In Touch!") and form in a frosted card on the left; on the right a gold-edged **Reach Us** card with icon rows for the address, phone, email, hours and the vacancies line, all from `SiteSettings` (the section's body, if any, goes under them). Button label from the section, default "Submit" |
+| `enquiry_form` | Services: gold gradient band; label, black heading ("Get In Touch With Us") and text on the left, the enquiry form in a card (following the theme) on the right; button label default "Send enquiry" |
+| `map` | Light band: a card with the label, heading ("Find Us"), the address and **Get directions**; beside it, when `GOOGLE_MAPS_EMBED_KEY` is set, a rounded frame that holds the map once the visitor accepts cookies (until then a map icon, a note and "Cookie settings") |
+
+Every section has an optional **label** (`PageSection.eyebrow`, Day 9): a small uppercase gold
+pill above the heading ("What we do", "The team"), seeded for every section.
 
 **Forms.** Labels above fields, "All fields are required." above them, and each field's error as
 a sentence under it (`aria-invalid` and `aria-describedby` link the two), so errors never rely
 on colour. General errors (the rate limit, a network failure) go in an alert above the fields.
 Name and email (Contact), first and last name (Services) share a row from 768 px. Messages are
-capped at 5,000 characters.
+capped at 5,000 characters. Since Day 9 the fields are rounded (0.75 rem) with a gold focus glow;
+on the black Contact band they are translucent, in the Services card they follow the theme. The
+submit button is filled gold with an arrow, and the thank-you fades in with a tick.
 
 The editor picks the look per section and orders sections freely, so each page's order is data,
 not template code. Every section also has a **heading position** (left, centre, right; right
@@ -199,31 +230,39 @@ Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). N
   icons (Facebook, LinkedIn, Instagram, X), each a `SiteSettings` URL and shown only if filled
   in. RSS dropped. Below 576 px the phone number and email show as icons only (still links,
   with screen-reader labels), so the bar stays one line.
-- **Navbar (white, sticky):** logo left; **Phase 1:** Home, About Us, Services, Contact Us, from
-  `NavigationService`. Phase 2 adds Jobs and the search icon. Dark gold marks hover and the
-  current page, which also gets a gold underline and `aria-current="page"` (colour alone isn't
-  enough). Below 992 px the links collapse behind the toggler.
-- **Footer:** black "Reach Us" block (blurb; 62 Mutare Road, Beverly, Msasa, Harare; phone;
-  hours 8:00am–4:30pm Mon–Fri; email); a strip with the footer nav; a bottom line with copyright,
-  social icons and "Cookie settings". All values from `SiteSettings`.
+- **Navbar (sticky, frosted; white or dark with the theme):** logo left; **Phase 1:** Home, About
+  Us, Services, Contact Us, from `NavigationService`, then the theme toggle. Phase 2 adds Jobs and
+  the search icon. Gold marks hover and the current page, which also gets a gold underline that
+  grows in, and `aria-current="page"` (colour alone isn't enough). Below 992 px the links
+  collapse behind the toggler; the theme toggle stays beside it.
+- **Footer (Day 9):** three columns on a dark gradient with a gold line along the top: the light
+  logo, tagline, blurb and social buttons; **Reach Us** as icon rows (62 Mutare Road, Beverly,
+  Msasa, Harare; phone; email; hours 8:00am–4:30pm Mon–Fri); **Quick Links**. A bottom line with
+  copyright and "Cookie settings". All values from `SiteSettings`.
 - **Not carried over:** the WordPress "Categories" footer widget, the RSS icon, the old sidebar
   search box, and the "Designed by" credit unless the client wants it (Phase 1 Q7).
 
 ### Home
 
 1. Hero slider (`HeroSlide`): the first slide's heading is the page's `h1` ("Distinctive
-   Consultancy Services", "Bringing excellence into your world."). The old site had three slides
-   over a team photo; the seed has one slide and no photo (the old screenshots have the text
-   printed over the photo), so it shows on a black-and-gold background until the original photo
-   is uploaded. With no slides at all, a visually hidden `h1` keeps the page's outline.
-2. Charcoal band with six service cards (a `service_cards` section): Industrial / Employee
+   Consultancy Services", in a gold gradient, "Bringing excellence into your world."). Since
+   2026-11-04 the slide shows the **team photo** the owner sent (seeded as `team-photo.jpg`,
+   1600 px wide, about 280 KB, loaded first with `fetchpriority="high"`). A slide with a photo
+   (`hero__slide--photo`) is taller (up to 80 vh), puts its text at the top over the darkened
+   trees, and crops the photo from the top (`object-position: center 12%`), so the team's faces
+   stay clear at every width; a soft gold glow sits over the photo. A slide without a photo
+   shows the drifting black-and-gold gradient. With no slides at all, a visually hidden `h1`
+   keeps the page's outline.
+2. **Our services · What We Do** (label and heading added on Day 9): six service cards (a
+   `service_cards` section): Industrial / Employee
    Relations, HR Audits, Talent Acquisition, People Strategy, Research Surveys, Organisational
    Design. Framed image, gold title, short blurb; each links to `/services/#<anchor>`. Card images
    are fitted inside a fixed 3:2 frame without cropping (`object-fit: contain`), because several
    have words in them.
-3. CTA: "Get the best specialised business consultancy services in Africa." + outlined gold
-   "Get In Touch" → `/contact/`.
-4. Two value blocks on white: **People Centred** and **Proactive**, image alternating.
+3. CTA, label "Let's talk": "Get the best specialised business consultancy services in
+   Africa." + a filled gold "Get In Touch →" to `/contact/`, in a rounded panel.
+4. Two value blocks, label "Our values": **People Centred** and **Proactive**, framed images
+   alternating sides.
 
 ### About
 
@@ -240,8 +279,8 @@ As built on Day 6, all from sections in the admin:
    beside the text; `band_dark` **Value Driven and Capacity Building** with its heading on the
    right.
 5. `team` **Our Leadership**: eight people. Bios are left-aligned (the old ones were justified,
-   with gaps). A bio longer than about nine lines is cut behind **Read more** on every screen size,
-   so the cards line up; without JavaScript every bio shows in full.
+   with gaps). Since Day 9 a long bio is cut to five lines with **Read full bio**, which opens it in
+   a dialog, so the cards line up; without JavaScript every bio shows in full.
 
 ### Services
 
@@ -262,8 +301,8 @@ As built on Day 7, all from sections in the admin:
 
 ### Contact
 
-As built on Day 8, from two sections (`contact_form`, `map`); the page's `h1` is a visually
-hidden "Contact Us", since its first section isn't a `hero_text` band.
+As built on Day 8, with a page hero added on Day 9: three sections (`hero_text` **Contact Us**,
+which is the page's `h1`, with a line inviting a message, call or visit; `contact_form`; `map`).
 
 - Black band: "Get In Touch!" form (Name, Email Address, Message, Submit) left; "Reach Us" right,
   including the vacancies line until Phase 2 ("Send your CV to recruitment@…", from
@@ -277,7 +316,8 @@ hidden "Contact Us", since its first section isn't a `hero_text` band.
 **Seed images.** Until the client sends the originals, every seeded image (cards, value blocks,
 the capability image, team portraits, partner and client logos, the NGO diagram) is cut from the old site's screenshots
 (`apps/core/seed/images/`, 30 files, about 0.5 MB). They look right at
-their displayed size but are small; replacing them is an upload in the admin (Phase 1 Q5).
+their displayed size but are small; replacing them is an upload in the admin (Phase 1 Q5). The
+31st seed image is the team photo behind Home's hero, sent by the owner on 2026-11-04.
 
 ### Phase 2 pages
 
@@ -290,7 +330,12 @@ Jobs (list and detail) and Search (dropdown, results page, highlighting) are des
 |---|---|---|
 | `main.js` | The entry point (`<script type="module">` after Bootstrap's bundle); initialises each module | 5 |
 | `modules/hero-slider.js` | Starts the Home carousel (6 s per slide) unless the visitor prefers reduced motion; pauses on hover and while keyboard focus is inside; shows a **Pause slides / Play slides** button (`aria-pressed`) that stops it until pressed again. Without JavaScript, or with reduced motion, the slides change only by the arrows and dots | 5 |
-| `modules/read-more.js` | Cuts each `[data-read-more]` element to about nine lines and adds a **Read more / Show less** button (`aria-expanded`, `aria-controls`), only when the text is actually longer | 6 |
+| `theme-init.js` (not a module) | In `<head>`, before the stylesheet: applies a stored Light or Dark choice as `data-theme` on `<html>` and adds the `js` class, so there is no flash of the wrong theme | 9 |
+| `modules/theme.js` | Shows the toggle, marks the current choice (`aria-pressed`, the button's icon and `aria-label`), stores Light or Dark in `localStorage` (`dcs-theme`; System removes it), applies it at once and fires `theme:changed` | 9 |
+| `modules/reveal.js` | Fades `[data-reveal]` elements up as they enter the viewport (`IntersectionObserver`), staggered by `data-reveal-delay`; adds `reveal-ready` to `<html>` first, and only then does CSS hide anything | 9 |
+| `modules/navbar.js` | Adds `is-scrolled` to the navbar (a shadow and a smaller logo) once the page has scrolled | 9 |
+| `modules/bio-dialog.js` | Cuts each long `[data-bio]` to five lines and adds **Read full bio**, which opens the person's photo, name, title and whole bio in one shared `<dialog>`; Escape, the × or a click outside close it, and focus returns to the button. Replaced Day 6's `read-more.js` | 9 |
+| `modules/back-to-top.js` | Shows the back-to-top link after 600 px of scrolling; scrolls up (smoothly unless reduced motion) and moves focus to the logo | 9 |
 | `modules/http.js` | `postForm()`: `fetch` with the CSRF header (from the cookie, else the form's token), `X-Requested-With`, a 15 s timeout; every reply, network failures and Django's HTML 403/500 included, comes back as the `{ok, data, errors}` envelope with a plain-English message | 8 |
 | `modules/contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js` (the button is disabled with `aria-busy` meanwhile), puts each error under its field and moves focus to the first, or shows the alert for general errors; on success the form is replaced by the thank-you (`role="status"`, focused). The form still works by normal POST if JS fails | 8 |
 | `modules/cookie-consent.js` | The banner, the stored choice (`localStorage`, wrapped in `try/catch`), a `consent:granted` event, the "Cookie settings" link; injects the GA4 tag and the map iframe only after consent | 8 |
@@ -302,6 +347,12 @@ browsers at their next cache refresh, not instantly. If that matters later, swit
 storage's `support_js_module_import_aggregation`.
 
 ## 6. Accessibility and performance
+
+Day 9 additions: the theme toggle is a labelled button with a menu whose options say which is
+pressed; the bio dialog is a native modal `<dialog>` labelled by the person's name; the back-to-top
+link has a label and moves focus; every colour pair in both themes is AA or better (the token
+table lists the ratios); motion respects `prefers-reduced-motion`; nothing is hidden without
+JavaScript.
 
 - Semantic landmarks (`header`, `nav`, `main`, `footer`), one `h1` per page, a skip link.
 - Contrast: gold on black passes; gold text on white uses `$dcs-gold-dark`.
@@ -325,8 +376,8 @@ reopens the choice; withdrawing consent stops loading GA4 on the next page.
   is `data-map-key` and `data-map-query` on its frame; the script and iframe addresses are built in
   JavaScript after **Accept** (a test checks all four pages, `apps/core/tests/test_consent.py`).
   "Get directions" is a plain link to Google Maps, which loads nothing until clicked.
-- The banner is a black bar fixed to the bottom with a gold top edge, **Accept** (filled gold)
-  and **Decline** (outlined). It is `hidden` in the HTML and shown by the script, so without
+- The banner is a card floating bottom left (since Day 9; on phones it spans the width), black
+  with a gold edge, **Accept** (filled gold) and **Decline** (outlined). It is `hidden` in the HTML and shown by the script, so without
   JavaScript nothing asks and nothing loads. It isn't rendered at all when neither GA4 nor the
   map is set up (`consent_needed`), since there would be nothing to ask about.
 - The choice is `{"version": 1, "analytics": true|false, "at": …}` in `localStorage` under
@@ -338,3 +389,36 @@ reopens the choice; withdrawing consent stops loading GA4 on the next page.
   choosing returns focus to the link, and Escape closes it once a choice exists. Declining after
   accepting sets GA's own `ga-disable-<id>` switch, deletes the `_ga` cookies and fires
   `consent:declined`; the map stays until the next page.
+
+## 8. Themes, components and motion (Day 9)
+
+**Themes.** Three choices: **System** (the default: CSS follows `prefers-color-scheme`),
+**Light** and **Dark**. `_theme.scss` defines the semantic custom properties twice, in a light
+mixin on `:root` and a dark mixin applied by `:root[data-theme="dark"]` or, with no choice made,
+by `@media (prefers-color-scheme: dark)` on `:root:not([data-theme="light"])`. The choice is stored
+in `localStorage` (`dcs-theme`), not a cookie; it is a display setting the visitor makes
+themselves, so it doesn't need cookie consent. `theme-init.js` applies it in `<head>` before the
+first paint; without JavaScript the system setting still applies and the toggle stays hidden.
+
+The **drifting gold gradient** (the `dcs-hero-glow` mixin in `_hero.scss`: two gold radial
+glows over black-to-charcoal, moving over 18 s) is the background of every hero without a photo
+and of the Contact form's band.
+
+What changes with the theme: the page, light bands, cards, text, headings, borders, shadows, the
+navbar's frosted background, form fields on light bands and the logo. What doesn't: the black,
+charcoal and navy bands, the gold enquiry band, the footer, the heroes and the cookie card, which
+are dark (or gold) by design in both, and the logo tiles, which stay white for the logos' sake.
+
+**Components.** Section labels (`.eyebrow`), headings with a gold bar (`.section-head`), frosted
+`.glass-card`s on dark bands, `.surface-card`s that follow the theme, `.framed-image`s with a
+gold offset outline, `.contact-list` icon rows, `.social-circle` buttons, pill chips on Services,
+rounded buttons (`.btn-gold` filled with a gold gradient and glow, `.btn-outline-gold` on dark,
+`.btn-outline-gold-dark` on light), the floating cookie card and the back-to-top button. Bands
+use gradients with a soft gold radial glow in a corner instead of flat colour.
+
+**Motion.** Scroll reveal (`reveal.js`, 0.7 s fade-up, cards staggered by 80 ms); hover lifts on
+cards, tiles, chips and buttons; arrows that nudge on hover; image zoom in service cards; the
+navbar underline that grows in; the hero's drifting gold light (18 s) and its text fading up on
+load; the dialog and cookie card fading in. With `prefers-reduced-motion: reduce` there is no
+movement: reveals show at once, animations last 0.01 ms, and back to top jumps instead of
+scrolling. Printing shows everything and hides the toggle, cookie card and back to top.

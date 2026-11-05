@@ -1,6 +1,49 @@
-// The site's outlined gold buttons ("Get In Touch").
+// Buttons: rounded, with a lift and a soft gold glow on hover.
 
-// On dark bands and over the hero image: gold outline and text, filled gold on hover.
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  .icon {
+    transition: transform $dcs-duration $dcs-ease;
+  }
+
+  &:hover .icon,
+  &:focus-visible .icon {
+    transform: translateX(3px);
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Filled gold: the main action.
+.btn-gold {
+  --bs-btn-color: #{$dcs-black};
+  --bs-btn-bg: #{$dcs-gold};
+  --bs-btn-border-color: #{$dcs-gold};
+  --bs-btn-hover-color: #{$dcs-black};
+  --bs-btn-hover-bg: #{$dcs-gold-light};
+  --bs-btn-hover-border-color: #{$dcs-gold-light};
+  --bs-btn-active-color: #{$dcs-black};
+  --bs-btn-active-bg: #{$dcs-gold-light};
+  --bs-btn-active-border-color: #{$dcs-gold-light};
+  --bs-btn-disabled-color: #{$dcs-black};
+  --bs-btn-disabled-bg: #{$dcs-gold};
+  --bs-btn-disabled-border-color: #{$dcs-gold};
+  background-image: linear-gradient(135deg, $dcs-gold-light, $dcs-gold);
+  box-shadow: 0 0.5rem 1.25rem rgba($dcs-gold, 0.25);
+
+  &:hover,
+  &:focus-visible {
+    box-shadow: 0 0.75rem 1.75rem rgba($dcs-gold, 0.4);
+  }
+}
+
+// Outlined gold, on dark bands and over the hero.
 .btn-outline-gold {
   --bs-btn-color: #{$dcs-gold};
   --bs-btn-border-color: #{$dcs-gold};
@@ -11,36 +54,19 @@
   --bs-btn-active-color: #{$dcs-black};
   --bs-btn-active-bg: #{$dcs-gold};
   --bs-btn-active-border-color: #{$dcs-gold};
-  --bs-btn-font-weight: 400;
-  --bs-btn-padding-x: 1.25rem;
 }
 
-// On white bands, where plain gold text is too faint (2.1:1): the darker gold.
+// Outlined, on light bands: dark gold in the light theme, gold in the dark one.
 .btn-outline-gold-dark {
-  --bs-btn-color: #{$dcs-gold-dark};
-  --bs-btn-border-color: #{$dcs-gold-dark};
-  --bs-btn-border-width: 2px;
-  --bs-btn-hover-color: #{$dcs-white};
-  --bs-btn-hover-bg: #{$dcs-gold-dark};
-  --bs-btn-hover-border-color: #{$dcs-gold-dark};
-  --bs-btn-active-color: #{$dcs-white};
-  --bs-btn-active-bg: #{$dcs-gold-deeper};
-  --bs-btn-active-border-color: #{$dcs-gold-deeper};
-}
-
-// Filled gold (the cookie banner's "Accept").
-.btn-gold {
-  --bs-btn-color: #{$dcs-black};
-  --bs-btn-bg: #{$dcs-gold};
-  --bs-btn-border-color: #{$dcs-gold};
+  --bs-btn-color: var(--dcs-accent);
+  --bs-btn-border-color: var(--dcs-accent);
   --bs-btn-border-width: 2px;
   --bs-btn-hover-color: #{$dcs-black};
-  --bs-btn-hover-bg: #{$dcs-white};
-  --bs-btn-hover-border-color: #{$dcs-white};
+  --bs-btn-hover-bg: #{$dcs-gold};
+  --bs-btn-hover-border-color: #{$dcs-gold};
   --bs-btn-active-color: #{$dcs-black};
-  --bs-btn-active-bg: #{$dcs-white};
-  --bs-btn-active-border-color: #{$dcs-white};
-  --bs-btn-font-weight: 600;
+  --bs-btn-active-bg: #{$dcs-gold-light};
+  --bs-btn-active-border-color: #{$dcs-gold-light};
 }
 
 // A button that looks like a link ("Cookie settings").
@@ -50,6 +76,7 @@
   color: inherit;
   font: inherit;
   text-decoration: underline;
+  text-underline-offset: 0.2em;
   background: none;
   cursor: pointer;
 
@@ -60,5 +87,57 @@
 
   &[hidden] {
     display: none;
+  }
+}
+
+// ---- Back to top -------------------------------------------------------------------------
+// Always there without JavaScript (a plain link to #top); with it, it appears once the page
+// has scrolled (back-to-top.js).
+
+.back-to-top {
+  position: fixed;
+  right: clamp(1rem, 2vw, 2rem);
+  bottom: clamp(1rem, 2vw, 2rem);
+  z-index: 1070;
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $dcs-gold-light, $dcs-gold);
+  color: $dcs-black;
+  font-size: 1.1rem;
+  box-shadow: 0 0.75rem 1.75rem rgba($dcs-black, 0.3);
+  transition:
+    opacity $dcs-duration ease,
+    transform 0.4s $dcs-ease,
+    visibility $dcs-duration;
+
+  &:hover,
+  &:focus-visible {
+    color: $dcs-black;
+    transform: translateY(-3px);
+  }
+
+  .icon {
+    transition: transform $dcs-duration $dcs-ease;
+  }
+
+  &:hover .icon {
+    transform: translateY(-2px);
+  }
+}
+
+.back-to-top.is-enhanced:not(.is-visible) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(1rem);
+}
+
+// On phones the cookie banner spans the bottom; the button waits until it's answered.
+@include media-breakpoint-down(md) {
+  body:has(.cookie-banner:not([hidden])) .back-to-top {
+    opacity: 0;
+    visibility: hidden;
   }
 }

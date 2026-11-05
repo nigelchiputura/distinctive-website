@@ -1,7 +1,7 @@
 # Phase 1 Scope — Live brochure site
 
-**Status:** Agreed 2026-11-02 · **Length:** 10 working days · **Client:** Distinctive Consultancy
-Services
+**Status:** Agreed 2026-11-02, revised 2026-11-04 (Day 9 UI and components polish added) ·
+**Length:** 11 working days · **Client:** Distinctive Consultancy Services
 
 The single source of truth for what Phase 1 delivers, the decisions behind it, and what is left
 for Phase 2. Every Phase 1 document follows it. If they ever disagree, this one wins, and the
@@ -39,6 +39,8 @@ with section anchors, the deployment), so Phase 2 adds apps without reworking Ph
 | **D13** | Social icons: Facebook, LinkedIn, Instagram, X, each a `SiteSettings` URL shown only when filled in. RSS dropped. | 2026-10-08 |
 | **D14** | Old WordPress URLs get **301 redirects** to their new pages, so links and search rankings survive the cutover. | 2026-11-02 |
 | **D15** | The site's font is **Nunito Sans** (self-hosted), on the site and in the admin, replacing the old site's Open Sans. | 2026-11-04 |
+| **D16** | **Light and dark themes.** The site follows the visitor's system setting (`prefers-color-scheme`) by default; a navbar toggle offers **System, Light and Dark**, remembered in the browser. Black and gold bands look the same in both. | 2026-11-04 |
+| **D17** | **The old site is a reference, not a template.** Its content and structure are kept, but the look is modernised for a business audience: gradients instead of flat bands, cards, rounded buttons and forms, section labels, framed images, a team-bio dialog, scroll and hover animations (off with reduced motion), and a back-to-top button (`frontend.md` §8). | 2026-11-04 |
 
 ## 3. Phase 1 deliverables
 
@@ -62,6 +64,7 @@ with section anchors, the deployment), so Phase 2 adds apps without reworking Ph
 | P4 | Services | Static hero + anchor nav, "What We Do", 13 alternating service bands, NGO Capacity Development diagram, corporate-clients logo grid, enquiry block |
 | P5 | Contact | AJAX contact form with no-JS fallback, "Reach Us" panel, consent-gated Google Map |
 | P6 | Cross-cutting | SEO, sitemap, robots, cookie banner, GA4 after consent, 404/500 pages, 301 redirects from old URLs, Lighthouse targets |
+| P7 | Look and feel (Day 9) | Light and dark themes with the System / Light / Dark toggle (D16); the modernised components, gradients and motion, the bio dialog and back to top (D17) |
 
 ### 3.3 Content
 
@@ -98,14 +101,14 @@ without migrations beyond the search app's own.
 | # | Question | Needed by | Default if unanswered |
 |---|---|---|---|
 | Q1 | Does the client post jobs often enough that the Jobs page must be live in Phase 1? | Day 1 | A3: no Jobs page; vacancies line on Contact |
-| Q2 | Which VPS? (Consult 360's comparison recommends Vultr Johannesburg, 1 vCPU / 2 GB, about $12/month.) Could it share a server with Consult 360 or CVision? | Day 9 | A dedicated Vultr Johannesburg 2 GB server |
-| Q3 | Who controls `distinctive.co.zw` DNS? The CVision notes say Cloudflare; confirm and get access. | Day 7 (Resend), Day 10 (cutover) | Cloudflare |
-| Q4 | Where is the `enquiries@` mailbox hosted (Google Workspace, the WordPress host's cPanel mail, other)? This matters only to keep its MX records intact at cutover. | Day 10 | Leave every mail record as is |
-| Q5 | Exact brand colours and the logo in SVG or high-resolution PNG; the original photos (Home's hero team photo and About's compass photo without text over them, the service-card and value-block images, the capability image, the team portraits, the partner logos) | Day 2 (logo), Day 9 (photos) | A4; images cut from the old site's screenshots, and the two heroes without a photo |
+| Q2 | Which VPS? (Consult 360's comparison recommends Vultr Johannesburg, 1 vCPU / 2 GB, about $12/month.) Could it share a server with Consult 360 or CVision? | Day 10 | A dedicated Vultr Johannesburg 2 GB server |
+| Q3 | Who controls `distinctive.co.zw` DNS? The CVision notes say Cloudflare; confirm and get access. | Day 7 (Resend), Day 11 (cutover) | Cloudflare |
+| Q4 | Where is the `enquiries@` mailbox hosted (Google Workspace, the WordPress host's cPanel mail, other)? This matters only to keep its MX records intact at cutover. | Day 11 | Leave every mail record as is |
+| Q5 | Exact brand colours and the logo in SVG or high-resolution PNG; the original photos (About's compass photo without text over it, the service-card and value-block images, the capability image, the team portraits, the partner logos). *Home's hero: a new team photo received 2026-11-04 and in use.* | Day 2 (logo), Day 10 (photos) | A4; images cut from the old site's screenshots, and About's hero without a photo |
 | Q6 | Who at Distinctive edits content, and do they want Google sign-in? | Day 4 | One superuser plus one Content Editor |
 | Q7 | Keep the "Designed by" footer credit? | Day 2 | Removed |
-| Q8 | Is the WordPress host contract ending, and is a full backup of the old site (files + database) taken before cutover? | Day 10 | The owner takes a backup on Day 9 |
-| Q9 | About: is the board member **Norbet** or **Nobert** Muyaka (the old page uses both)? And the Facebook and LinkedIn links the old page showed for Farai Pilime and Rebecca Matongo | Day 9 | Kept as found ("Norbet" heading, "Nobert" in the bio); no social links |
+| Q8 | Is the WordPress host contract ending, and is a full backup of the old site (files + database) taken before cutover? | Day 11 | The owner takes a backup on Day 10 |
+| Q9 | About: is the board member **Norbet** or **Nobert** Muyaka (the old page uses both)? And the Facebook and LinkedIn links the old page showed for Farai Pilime and Rebecca Matongo | Day 10 | Kept as found ("Norbet" heading, "Nobert" in the bio); no social links |
 
 ## 7. Prerequisites (owner, outside the code)
 
@@ -118,12 +121,14 @@ without migrations beyond the search app's own.
 | Resend sending domain verified (DNS records on `distinctive.co.zw`) and a Sending-access API key | Day 7 |
 | Google Maps Embed API key, restricted by HTTP referrer to the preview host and the live domain | Day 8 |
 | GA4 property and measurement ID | Day 8 |
-| The old site's URL list (its `wp-sitemap.xml` or `sitemap_index.xml`) for the redirect map | Day 9 |
-| VPS ordered, SSH key added, Docker installed (`deployment.md` §7) | Day 9 |
-| DNS access for the preview record and the cutover (Q3) | Day 10 |
+| The old site's URL list (its `wp-sitemap.xml` or `sitemap_index.xml`) for the redirect map | Day 10 |
+| VPS ordered, SSH key added, Docker installed (`deployment.md` §7) | Day 10 |
+| DNS access for the preview record and the cutover (Q3) | Day 11 |
 
 ## 8. Capacity
 
-**10 working days** (`Phase_1/Task_Breakdown.md`). The days are tight but the scope is the
+**11 working days** (`Phase_1/Task_Breakdown.md`): the original 10, plus the UI and components
+polish day added on 2026-11-04 as Day 9, which moved SEO and production files to Day 10 and the
+go-live to Day 11. The days are tight but the scope is the
 mostly-static half of the site. If a day slips, the cutover moves, not the quality bar: the
 client can walk through the preview host while the last cards finish.

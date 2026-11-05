@@ -12,6 +12,9 @@ class PageRepository(BaseRepository[Page]):
     def published_page(self, slug: str) -> Page | None:
         return self.published(slug=slug).first()
 
+    def published_pages(self) -> list[Page]:
+        return list(self.published().order_by("pk"))
+
     def by_slug(self, slug: str) -> Page | None:
         """Published or not (the seed command fills unpublished pages too)."""
         return self.get_or_none(slug=slug)

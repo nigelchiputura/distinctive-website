@@ -6,6 +6,7 @@
 @import "variables";
 @import "bootstrap/scss/bootstrap";
 
+@import "theme";
 @import "fonts";
 @import "base";
 
@@ -23,3 +24,4 @@
 @import "components/forms";
 @import "components/contact";
 @import "components/cookie-banner";
+@import "components/error-page";

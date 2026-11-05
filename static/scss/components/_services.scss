@@ -1,59 +1,96 @@
-// The Services page: the row of links to each service, and the alternating service bands
+// The Services page: chips linking to each service, and the services' alternating bands
 // (templates/includes/_service_bands.html).
-
-.service-nav {
-  padding-block: 2.5rem;
-  border-bottom: 1px solid $dcs-grey-light;
-}
 
 .service-nav__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.65rem;
   margin: 0;
 }
 
 .service-nav__link {
-  display: inline-block;
-  padding: 0.35rem 0.9rem;
-  border: 1px solid $dcs-gold-dark;
-  color: $dcs-gold-dark;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dcs-border-strong);
+  border-radius: $dcs-radius-pill;
+  background: var(--dcs-surface);
+  color: var(--dcs-text);
   font-size: 0.95rem;
-  line-height: 1.4;
+  font-weight: 600;
+  line-height: 1.3;
   text-decoration: none;
+  box-shadow: var(--dcs-shadow);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.3s $dcs-ease;
 
   &:hover,
   &:focus-visible {
-    background: $dcs-gold-dark;
-    color: $dcs-white;
+    border-color: $dcs-gold;
+    background: $dcs-gold;
+    color: $dcs-black;
     text-decoration: none;
+    transform: translateY(-2px);
   }
 }
 
-// As on the old site, the dark bands put their heading on the right (on wide screens).
-@include media-breakpoint-up(lg) {
-  .service-band__heading--right {
-    text-align: right;
-  }
+.service-nav__number {
+  color: var(--dcs-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.service-band--light .band__body ul,
-.service-band--dark .band__body ul {
-  columns: 1;
+.service-nav__link:hover .service-nav__number,
+.service-nav__link:focus-visible .service-nav__number {
+  color: inherit;
+}
+
+// Each service: a large number, the title, then the text, on alternating dark and light bands.
+.service-band__number {
+  display: block;
+  margin-bottom: 0.25rem;
+  background: linear-gradient(180deg, $dcs-gold-light, $dcs-gold-dark);
+  background-clip: text;
+  color: $dcs-gold;
+  -webkit-text-fill-color: transparent;
+  font-size: clamp(2.5rem, 2rem + 2vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.service-band__body {
+  max-width: 62rem;
+  font-size: 1.05rem;
+}
+
+.service-band--dark .service-band__body {
+  color: rgba($dcs-white, 0.88);
+
+  strong {
+    color: $dcs-white;
+  }
 }
 
 // Long lists (the training products) take two columns on wide screens.
 @include media-breakpoint-up(md) {
-  .service-band .band__body--wide ul:has(> li:nth-child(10)) {
+  .service-band__body--wide ul:has(> li:nth-child(10)) {
     columns: 2;
     column-gap: 3rem;
   }
 
-  .service-band .band__body--wide li {
+  .service-band__body--wide li {
     break-inside: avoid;
   }
 }
 
 .service-band__image {
   width: 100%;
+  border-radius: $dcs-radius-lg;
+  background: $dcs-white;
+  box-shadow: var(--dcs-shadow-lift);
 }

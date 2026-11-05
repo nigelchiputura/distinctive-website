@@ -1,0 +1,30 @@
+{% load static %}<!doctype html>
+{% comment %} Django renders this with no request context (the error may be in the database or a
+   context processor), so it uses no site_info, no navigation and nothing that queries. The
+   company details are written in; keep them in step with Site settings. {% endcomment %}
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Something went wrong | Distinctive Consultancy Services</title>
+  <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+  <header class="site-navbar-plain">
+    <div class="container py-3"><a href="/"><img src="{% static 'img/logo.png' %}" alt="Distinctive Consultancy Services, home" width="103" height="60"></a></div>
+  </header>
+  <main id="main">
+    <section class="band band--black on-dark error-page">
+      <div class="container">
+        <p class="error-page__code">500</p>
+        <h1 class="band__heading">Something went wrong on our side</h1>
+        <p class="error-page__lead">We've been told about it. Please try again in a few minutes.</p>
+        <p class="mb-0">If you were sending us a message, you can also email <a href="mailto:enquiries@distinctive.co.zw">enquiries@distinctive.co.zw</a> or call <a href="tel:+263242486642">+263 (24) 2 486 642 - 3</a>.</p>
+        <p class="mt-4 mb-0"><a class="btn btn-outline-gold" href="/">Back to the home page</a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

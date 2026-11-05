@@ -2,16 +2,20 @@
 
 .auth-page {
   padding-block: 4rem;
-  background: $dcs-grey-light;
+  background:
+    radial-gradient(ellipse 50% 50% at 100% 0%, var(--dcs-band-light-glow), transparent 70%),
+    var(--dcs-band-light);
 }
 
 .auth-card {
   max-width: 28rem;
   margin-inline: auto;
   padding: 2rem;
-  background: $dcs-white;
+  border: 1px solid var(--dcs-border);
   border-top: 4px solid $dcs-gold;
-  box-shadow: 0 0.25rem 1.5rem rgba($dcs-black, 0.08);
+  border-radius: $dcs-radius-lg;
+  background: var(--dcs-surface);
+  box-shadow: var(--dcs-shadow-lift);
 
   // allauth's own pages (password reset …) render plain inputs: give them Bootstrap's look.
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(.form-control) {
@@ -20,7 +24,7 @@
 
   button[type="submit"]:not(.btn) {
     @extend .btn;
-    @extend .btn-dark;
+    @extend .btn-gold;
   }
 
   label {
@@ -33,12 +37,12 @@
   align-items: center;
   gap: 0.75rem;
   margin: 1.5rem 0;
-  color: $dcs-grey;
+  color: var(--dcs-text-muted);
 
   &::before,
   &::after {
     content: "";
     flex: 1;
-    border-top: 1px solid rgba($dcs-black, 0.15);
+    border-top: 1px solid var(--dcs-border-strong);
   }
 }
