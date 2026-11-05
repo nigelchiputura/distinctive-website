@@ -18,6 +18,10 @@ $dcs-gold: #d4af37; // on dark backgrounds: headings, labels, links, active nav 
 $dcs-gold-dark: #86691a; // gold TEXT on light backgrounds (5.2:1 on white; plain gold is 2.1:1)
 $dcs-gold-deeper: #6b5415; // hover state of gold-dark links
 
+// Form errors (Day 8): never colour alone, always with a sentence under the field.
+$dcs-error-on-dark: #ff8a80; // on black: 9.2:1
+$dcs-error-on-gold: #6e0000; // on gold: 6.0:1
+
 // About "Our Story" gradient, sampled on Day 6. The old band ran on to #2a85d6, where white text
 // is only 3.9:1; it stops at $dcs-blue here, which keeps it at 6.4:1 or better all the way down.
 $dcs-navy: #02070b;

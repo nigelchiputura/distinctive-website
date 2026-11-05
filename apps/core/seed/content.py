@@ -600,6 +600,15 @@ SERVICES_SECTIONS: tuple[dict[str, Any], ...] = (
         "heading_align": "center",
         "sort_order": 30,
     },
+    {
+        "anchor": "get-in-touch",
+        "section_type": "enquiry_form",
+        "heading": "Get In Touch With Us",
+        "heading_align": "center",
+        "body": "Tell us what you need and we'll get back to you.",
+        "button_label": "Send enquiry",
+        "sort_order": 40,
+    },
 )
 
 CLIENTS: tuple[dict[str, Any], ...] = tuple(
@@ -619,4 +628,30 @@ CLIENTS: tuple[dict[str, Any], ...] = tuple(
         ),
         start=1,
     )
+)
+
+
+# ---- Contact (Day 8) -----------------------------------------------------------------------
+
+CONTACT_META_DESCRIPTION = (
+    "Contact Distinctive Consultancy Services at 62 Mutare Road, Msasa, Harare: send us a "
+    "message, call +263 (24) 2 486 642 - 3 or email enquiries@distinctive.co.zw."
+)
+
+# The address, phone, email, hours and vacancies line come from Site settings, so they are
+# edited in one place; the sections hold only the headings and the button.
+CONTACT_SECTIONS: tuple[dict[str, Any], ...] = (
+    {
+        "anchor": "get-in-touch",
+        "section_type": "contact_form",
+        "heading": "Get In Touch!",
+        "button_label": "Submit",
+        "sort_order": 10,
+    },
+    {
+        "anchor": "find-us",
+        "section_type": "map",
+        "heading": "Find Us",
+        "sort_order": 20,
+    },
 )

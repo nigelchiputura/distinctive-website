@@ -1,4 +1,4 @@
-"""Root URLs. Each app adds its own urls.py as its pages arrive (Days 5–8)."""
+"""Root URLs. Each app adds its own urls.py."""
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,6 +19,7 @@ urlpatterns = [
     path(settings.ADMIN_URL_PATH, admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("healthz/", HealthController.as_view(), name="healthz"),
+    path("", include("apps.contact.urls")),
     path("", include("apps.pages.urls")),
 ]
 

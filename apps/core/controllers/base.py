@@ -6,8 +6,10 @@ repository or the ORM (apps/core/tests/test_layering.py). ServiceErrors raised b
 mapped to responses here, so individual controllers don't repeat try/except blocks.
 """
 
+import ipaddress
 from typing import Any
 
+from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBase, JsonResponse
 from django.shortcuts import render
 from django.views import View
@@ -52,6 +54,25 @@ class BaseController(View):
             return True
         accept = request.headers.get("accept", "")
         return "application/json" in accept and "text/html" not in accept
+
+    @staticmethod
+    def client_ip(request: HttpRequest) -> str:
+        """The visitor's address. Behind Caddy (TRUSTED_PROXY_COUNT=1) it is the last entry
+        Caddy added to X-Forwarded-For; anything before that was sent by the visitor and could
+        be made up. Directly (development), it is REMOTE_ADDR."""
+        remote = request.META.get("REMOTE_ADDR", "")
+        count = settings.TRUSTED_PROXY_COUNT
+        if count > 0:
+            forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+            hops = [part.strip() for part in forwarded.split(",") if part.strip()]
+            if len(hops) >= count:
+                candidate = hops[-count]
+                try:
+                    ipaddress.ip_address(candidate)
+                except ValueError:
+                    return remote
+                return candidate
+        return remote
 
     # ---- error mapping ---------------------------------------------------------------------
 

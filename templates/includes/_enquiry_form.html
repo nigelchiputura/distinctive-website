@@ -1,0 +1,27 @@
+{% comment %} One enquiry form (ContactForm or EnquiryForm), posting to /contact/. With JavaScript,
+   contact-form.js sends it with fetch() and shows the reply in place; without, it is a normal
+   post. Expects: form, kind ("contact" | "enquiry"), button, button_class. {% endcomment %}
+<form id="{{ kind }}-form" class="enquiry-form enquiry-form--{{ kind }}" method="post" action="{% url 'contact:contact' %}" novalidate data-contact-form>
+  {% csrf_token %}
+  <input type="hidden" name="form" value="{{ kind }}">
+  {% for message in messages %}{% if kind in message.tags %}
+    <div class="form-success" role="status" tabindex="-1" data-form-success>{{ message }}</div>
+  {% endif %}{% endfor %}
+  <div class="form-alert" role="alert" data-form-errors{% if not form.non_field_errors %} hidden{% endif %}>{% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}</div>
+  <p class="form-note">All fields are required.</p>
+  <div class="row g-3">
+    {% for field in form %}
+      <div class="col-12{% if field.name in form.half_width %} col-md-6{% endif %}">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        <p class="form-error" id="{{ kind }}-{{ field.name }}-error" data-error-for="{{ field.name }}"{% if not field.errors %} hidden{% endif %}>{{ field.errors|join:" " }}</p>
+      </div>
+    {% endfor %}
+  </div>
+  {# The honeypot: hidden from people and screen readers; bots tend to fill every field. #}
+  <div class="form-honeypot" aria-hidden="true">
+    <label for="{{ kind }}-website">Leave this field empty</label>
+    <input type="text" id="{{ kind }}-website" name="website" tabindex="-1" autocomplete="off">
+  </div>
+  <button type="submit" class="btn {{ button_class }} enquiry-form__submit">{{ button }}</button>
+</form>

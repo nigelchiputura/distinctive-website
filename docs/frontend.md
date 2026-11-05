@@ -1,6 +1,7 @@
 # Frontend
 
-**Project-wide · revised 2026-11-04** (Day 7 as built: the Services page; the font is Nunito Sans;
+**Project-wide · revised 2026-11-04** (Day 8 as built: Contact, the enquiry forms, cookie consent;
+Day 7 as built: the Services page; the font is Nunito Sans;
 Day 6: About, the team and logo blocks, Read more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
 the repo root as in Consult 360, Phase 1 pages, Jobs and Search designs moved to `Phase_2/Phase2_Scope.md`)
 
@@ -78,8 +79,10 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "components/logos";                  // Day 6: partner and client logos
 @import "components/team";                   // Day 6: Our Leadership, Read more
 @import "components/services";               // Day 7: the Services page
-// Day 8: components/forms, components/cookie-banner.
-// pages/about, pages/services, pages/contact only if a page needs rules of its own.
+@import "components/forms";                  // Day 8: the enquiry forms, on black and on gold
+@import "components/contact";                // Day 8: Reach Us, the gold band, the map band
+@import "components/cookie-banner";          // Day 8
+// pages/* only if a page ever needs rules of its own (none has so far).
 ```
 
 `@import` is fine for now: `--silence-deprecation=import` quiets Dart Sass's warning about our own
@@ -102,10 +105,12 @@ outside `_tokens.scss`.
 | `$dcs-grey` | `#666` | Navbar links, muted text on white | 5.7:1 on white |
 | `$dcs-grey-on-dark` | `#a6a6a6` | Copyright line on black (the old `#666` was 3.7:1) | 8.6:1 on black |
 | `$dcs-text` | `#222` | Body text | — |
-| `$dcs-gold` | `#d4af37` (exactly the old theme's) | Headings and links on dark, active-nav underline, CTA outline | 10:1 on black, **2.1:1 on white** |
+| `$dcs-gold` | `#d4af37` (exactly the old theme's) | Headings and links on dark, active-nav underline, CTA outline, the Services enquiry band (black text on it, 10:1) | 10:1 on black, **2.1:1 on white** |
 | `$dcs-gold-dark` | `#86691a` | Gold **text** on light backgrounds (links, active nav) | 5.2:1 on white |
 | `$dcs-gold-deeper` | `#6b5415` | Hover on `$dcs-gold-dark` links | — |
 | `$dcs-white` | `#fff` | Light bands, navbar | — |
+| `$dcs-error-on-dark` | `#ff8a80` | Form errors on black (Contact) | 9.2:1 on black |
+| `$dcs-error-on-gold` | `#6e0000` | Form errors on gold (Services enquiry) | 6.0:1 on gold |
 | `$dcs-navy` → `$dcs-blue` | `#02070b` → `#1f5fa8` | About "Our Story" gradient (sampled on Day 6). The old band ran on to `#2a85d6`; it stops darker here | white text 6.4:1 or better throughout (the old end was 3.9:1) |
 | `$dcs-font-sans` | Nunito Sans 400/600/700, then system fonts | All text, site and admin (`admin.scss` imports `_fonts.scss` too) | — |
 
@@ -127,7 +132,7 @@ base.html
  ├─ <main id="main"> {% block main %}{% block content %}   pages fill "content";
  │                                 a layout can wrap it by overriding "main"
  ├─ includes/_footer.html         "Reach Us", footer nav, copyright, "Cookie settings" link
- ├─ includes/_cookie_banner.html  (Day 8)
+ ├─ includes/_cookie_banner.html  only when GA4 or the map is set up (consent_needed); hidden until JS shows it
  └─ Bootstrap's bundle (defer), then js/main.js (type="module")
 
 pages/page.html                   any page: a visually hidden h1 unless the first section is a hero_text band,
@@ -138,6 +143,7 @@ includes/_service_card.html       one offerings.Service on Home
 includes/_logo_grid.html          partner or client logos (pages.Partner)
 includes/_team_card.html          one team.TeamMember
 includes/_image.html              an admin image with its stored width/height and alt text
+includes/_enquiry_form.html       ContactForm or EnquiryForm: labels, an error slot per field, the honeypot
 ```
 
 The site's details are `site_info` in every template (not `site`: allauth's views use that name).
@@ -167,6 +173,15 @@ Images are `loading="lazy"` except the first hero slide, which gets `fetchpriori
 | `partners` / `clients` | White band with the published logos of that kind, centred, each scaled into the same 8 rem box without cropping, caption below, linked when it has a website |
 | `team` | White band, uppercase dark-gold heading, the published team: four across on wide screens, two on tablets, one on phones; round photos, name, job title in grey, bio, LinkedIn and Facebook icons when filled in |
 | `cta` | A centred line and an outlined gold button ("Get In Touch") |
+| `contact_form` | Contact: black band, the heading ("Get In Touch!") and the form on the left; on the right a gold-framed **Reach Us** box with the address, phone, email, hours and the vacancies line, all from `SiteSettings` (the section's body, if any, goes under them). Button label from the section, default "Submit" |
+| `enquiry_form` | Services: gold band, black heading ("Get In Touch With Us") and text, the enquiry form centred; button label default "Send enquiry" |
+| `map` | Light grey band: heading ("Find Us"), the address and a **Get directions** link; below, when `GOOGLE_MAPS_EMBED_KEY` is set, the map once the visitor accepts cookies (a note and "Cookie settings" until then) |
+
+**Forms.** Labels above fields, "All fields are required." above them, and each field's error as
+a sentence under it (`aria-invalid` and `aria-describedby` link the two), so errors never rely
+on colour. General errors (the rate limit, a network failure) go in an alert above the fields.
+Name and email (Contact), first and last name (Services) share a row from 768 px. Messages are
+capped at 5,000 characters.
 
 The editor picks the look per section and orders sections freely, so each page's order is data,
 not template code. Every section also has a **heading position** (left, centre, right; right
@@ -241,11 +256,14 @@ As built on Day 7, all from sections in the admin:
    its content isn't only in an image. The order groups related services, starting with the
    ones on Home; editors change it in the Services list.
 3. `clients` **Some of Our Corporate Clients**: ten logos, five to a row on wide screens.
-4. Day 8 adds the gold "Get In Touch With Us" block: a general enquiry form (first name, last name,
-   email, message) posting to the contact service with `source_page=services`; button "Send
-   enquiry".
+4. `enquiry_form` **Get In Touch With Us** (Day 8): the gold block with a general enquiry form
+   (first name, last name, email, message) posting to `/contact/`, saved with
+   `source_page=services`; button "Send enquiry".
 
 ### Contact
+
+As built on Day 8, from two sections (`contact_form`, `map`); the page's `h1` is a visually
+hidden "Contact Us", since its first section isn't a `hero_text` band.
 
 - Black band: "Get In Touch!" form (Name, Email Address, Message, Submit) left; "Reach Us" right,
   including the vacancies line until Phase 2 ("Send your CV to recruitment@…", from
@@ -273,8 +291,8 @@ Jobs (list and detail) and Search (dropdown, results page, highlighting) are des
 | `main.js` | The entry point (`<script type="module">` after Bootstrap's bundle); initialises each module | 5 |
 | `modules/hero-slider.js` | Starts the Home carousel (6 s per slide) unless the visitor prefers reduced motion; pauses on hover and while keyboard focus is inside; shows a **Pause slides / Play slides** button (`aria-pressed`) that stops it until pressed again. Without JavaScript, or with reduced motion, the slides change only by the arrows and dots | 5 |
 | `modules/read-more.js` | Cuts each `[data-read-more]` element to about nine lines and adds a **Read more / Show less** button (`aria-expanded`, `aria-controls`), only when the text is actually longer | 6 |
-| `modules/http.js` | `fetch` wrapper: CSRF header from the cookie, JSON parsing, the `{ok, data, errors}` envelope, a timeout | 8 |
-| `modules/contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js`, shows field errors and the success state; the form still works by normal POST if JS fails | 8 |
+| `modules/http.js` | `postForm()`: `fetch` with the CSRF header (from the cookie, else the form's token), `X-Requested-With`, a 15 s timeout; every reply, network failures and Django's HTML 403/500 included, comes back as the `{ok, data, errors}` envelope with a plain-English message | 8 |
+| `modules/contact-form.js` | Intercepts submit on any `[data-contact-form]`, posts through `http.js` (the button is disabled with `aria-busy` meanwhile), puts each error under its field and moves focus to the first, or shows the alert for general errors; on success the form is replaced by the thank-you (`role="status"`, focused). The form still works by normal POST if JS fails | 8 |
 | `modules/cookie-consent.js` | The banner, the stored choice (`localStorage`, wrapped in `try/catch`), a `consent:granted` event, the "Cookie settings" link; injects the GA4 tag and the map iframe only after consent | 8 |
 
 Conventions: ES modules, no globals, feature-detect and fail quietly, `data-*` attributes for
@@ -300,3 +318,23 @@ Necessary cookies only by default (session, CSRF, the consent choice). **Accept*
 `analytics` consent, loads GA4 (`GA_MEASUREMENT_ID` from `SiteSettings`, falling back to the
 environment) and the Google Map. **Decline** loads neither. The footer's "Cookie settings" link
 reopens the choice; withdrawing consent stops loading GA4 on the next page.
+
+**As built on Day 8** (`cookie-consent.js`):
+
+- No Google address is in any page's HTML. The GA4 id is `data-ga-id` on the banner and the map
+  is `data-map-key` and `data-map-query` on its frame; the script and iframe addresses are built in
+  JavaScript after **Accept** (a test checks all four pages, `apps/core/tests/test_consent.py`).
+  "Get directions" is a plain link to Google Maps, which loads nothing until clicked.
+- The banner is a black bar fixed to the bottom with a gold top edge, **Accept** (filled gold)
+  and **Decline** (outlined). It is `hidden` in the HTML and shown by the script, so without
+  JavaScript nothing asks and nothing loads. It isn't rendered at all when neither GA4 nor the
+  map is set up (`consent_needed`), since there would be nothing to ask about.
+- The choice is `{"version": 1, "analytics": true|false, "at": …}` in `localStorage` under
+  `dcs-cookie-consent`, read and written inside `try/catch`; with storage blocked it lasts for
+  the page and the banner asks again on the next. Raising `VERSION` asks everyone again.
+- On Accept: the GA4 tag, the map iframe (Maps Embed API `place` mode, lazy, with a title), and a
+  `consent:granted` event on `document`. On later pages both load straight away.
+- "Cookie settings" (footer, and in the map note) reopens the banner and moves focus to Accept;
+  choosing returns focus to the link, and Escape closes it once a choice exists. Declining after
+  accepting sets GA's own `ga-disable-<id>` switch, deletes the `_ga` cookies and fires
+  `consent:declined`; the map stays until the next page.

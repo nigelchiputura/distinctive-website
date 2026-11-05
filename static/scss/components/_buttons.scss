@@ -27,3 +27,38 @@
   --bs-btn-active-bg: #{$dcs-gold-deeper};
   --bs-btn-active-border-color: #{$dcs-gold-deeper};
 }
+
+// Filled gold (the cookie banner's "Accept").
+.btn-gold {
+  --bs-btn-color: #{$dcs-black};
+  --bs-btn-bg: #{$dcs-gold};
+  --bs-btn-border-color: #{$dcs-gold};
+  --bs-btn-border-width: 2px;
+  --bs-btn-hover-color: #{$dcs-black};
+  --bs-btn-hover-bg: #{$dcs-white};
+  --bs-btn-hover-border-color: #{$dcs-white};
+  --bs-btn-active-color: #{$dcs-black};
+  --bs-btn-active-bg: #{$dcs-white};
+  --bs-btn-active-border-color: #{$dcs-white};
+  --bs-btn-font-weight: 600;
+}
+
+// A button that looks like a link ("Cookie settings").
+.link-button {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  background: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: $dcs-gold;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}

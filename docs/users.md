@@ -144,6 +144,13 @@ notification email** (which reports how many were sent and how many still failed
 message is on each enquiry). Nobody can add an enquiry in the admin; a Content Editor can't delete
 one. A Service has a new tick box, "show the image on the Services page".
 
+**Forms and the map as sections** (Day 8): the Contact page's form and map, and the gold enquiry
+block on Services, are sections like any other ("Contact form beside “Reach Us”", "Enquiry form
+on gold", "Map"). An editor can change their headings, the text under them and the button label,
+reorder or unpublish them. The address, phone, email, hours and vacancies address they show come
+from **Site settings**, so they're edited once for the whole site. Enquiries from Services show
+"sent from: Services page".
+
 Later days add: redirects (Day 9) and Phase 2's job admin.
 
 The admin lives at `ADMIN_URL_PATH` (`admin/` locally; something not guessable in production).

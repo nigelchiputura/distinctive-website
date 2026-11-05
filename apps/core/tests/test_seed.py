@@ -10,7 +10,7 @@ from apps.offerings.models import Service
 from apps.pages.models import HeroSlide, Page, PageSection, Partner
 from apps.team.models import TeamMember
 
-PAGES = ("home", "about", "services")
+PAGES = ("home", "about", "services", "contact")
 
 
 # ---- with fakes: no database -------------------------------------------------------------
@@ -91,13 +91,16 @@ def test_first_run_adds_everything():
         "hero slides": len(content.HOME_SLIDES),
         "sections": len(content.HOME_SECTIONS)
         + len(content.ABOUT_SECTIONS)
-        + len(content.SERVICES_SECTIONS),
+        + len(content.SERVICES_SECTIONS)
+        + len(content.CONTACT_SECTIONS),
     }
     assert [slug for slug, _ in pages.updates] == list(PAGES)  # each page's meta description
     proactive = pages.section(pages.pages["home"], "proactive")
     assert proactive.image == "file:proactive.jpg"
     assert pages.section(pages.pages["about"], "our-story") is not None
     assert pages.section(pages.pages["services"], "services-list") is not None
+    assert pages.section(pages.pages["services"], "get-in-touch").section_type == "enquiry_form"
+    assert pages.section(pages.pages["contact"], "get-in-touch").section_type == "contact_form"
 
 
 def test_existing_items_get_only_their_empty_fields_filled():
@@ -142,7 +145,7 @@ def test_an_existing_description_is_kept():
     pages = FakePages()
     pages.pages["home"].meta_description = "The client's own words"
     seeder(pages).seed()
-    assert [slug for slug, _ in pages.updates] == ["about", "services"]
+    assert [slug for slug, _ in pages.updates] == ["about", "services", "contact"]
 
 
 @pytest.mark.parametrize("missing", PAGES)
@@ -158,6 +161,7 @@ def test_every_seed_image_exists_and_has_a_description():
         *content.HOME_SLIDES,
         *content.ABOUT_SECTIONS,
         *content.SERVICES_SECTIONS,
+        *content.CONTACT_SECTIONS,
         *content.TEAM,
         *content.PARTNERS,
         *content.CLIENTS,
@@ -188,7 +192,10 @@ def test_command_is_idempotent_and_keeps_edits(settings, tmp_path, capsys):
     call_command("seed_site_content")
     assert counts() == (
         len(content.SERVICES),
-        len(content.HOME_SECTIONS) + len(content.ABOUT_SECTIONS) + len(content.SERVICES_SECTIONS),
+        len(content.HOME_SECTIONS)
+        + len(content.ABOUT_SECTIONS)
+        + len(content.SERVICES_SECTIONS)
+        + len(content.CONTACT_SECTIONS),
         len(content.HOME_SLIDES),
         len(content.TEAM),
         len(content.PARTNERS) + len(content.CLIENTS),
@@ -246,3 +253,16 @@ def test_seeded_about_renders(settings, tmp_path, client):
     names = [m["name"] for m in content.TEAM]
     positions = [page.index(n) for n in names]
     assert positions == sorted(positions)  # all eight, in order
+
+
+@pytest.mark.django_db
+def test_seeded_contact_and_services_forms_render(settings, tmp_path, client):
+    settings.MEDIA_ROOT = tmp_path
+    call_command("seed_site_content")
+    contact = client.get("/contact/").content.decode()
+    assert '<h1 class="visually-hidden">Contact Us</h1>' in contact
+    for text in ("Get In Touch!", "Reach Us", "recruitment@distinctive.co.zw", "Find Us"):
+        assert text in contact
+    services = client.get("/services/").content.decode()
+    assert "Get In Touch With Us" in services and ">Send enquiry</button>" in services
+    assert services.index("corporate-clients") < services.index('id="get-in-touch"')

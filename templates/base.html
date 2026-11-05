@@ -24,6 +24,7 @@
   </main>
 
   {% include "includes/_footer.html" %}
+  {% if consent_needed %}{% include "includes/_cookie_banner.html" %}{% endif %}
 
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script type="module" src="{% static 'js/main.js' %}"></script>

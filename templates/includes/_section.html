@@ -40,6 +40,64 @@
     </div>
   </section>
 
+{% elif s.section_type == "contact_form" %}
+  {# Contact: the form on the left, the company's details on the right. #}
+  <section id="{{ s.anchor }}" class="band band--black on-dark contact-band">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-7">
+          {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
+          {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
+          {% include "includes/_enquiry_form.html" with form=contact_form kind="contact" button=s.button_label|default:"Submit" button_class="btn-outline-gold" %}
+        </div>
+        <div class="col-lg-5">
+          <div class="contact-details">
+            <h2 class="band__heading">Reach Us</h2>
+            <dl class="contact-details__list">
+              <div><dt>Address</dt><dd>{{ site_info.address }}</dd></div>
+              <div><dt>Phone</dt><dd><a href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a></dd></div>
+              <div><dt>Email</dt><dd><a href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a></dd></div>
+              <div><dt>Business Hours</dt><dd>{{ site_info.hours }}</dd></div>
+              {% if site_info.recruitment_email %}<div><dt>Vacancies</dt><dd>Send your CV to <a href="mailto:{{ site_info.recruitment_email }}">{{ site_info.recruitment_email }}</a></dd></div>{% endif %}
+            </dl>
+            {% if s.body %}<div class="contact-details__body">{{ s.body|markdown }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "enquiry_form" %}
+  <section id="{{ s.anchor }}" class="band band--gold enquiry-band">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          {% if s.heading %}<h2 class="band__heading band__heading--on-gold align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
+          {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+          {% include "includes/_enquiry_form.html" with form=enquiry_form kind="enquiry" button=s.button_label|default:"Send enquiry" button_class="btn-dark" %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% elif s.section_type == "map" %}
+  {% comment %} The address and "Get directions" always show. The map itself is built by
+     cookie-consent.js after "Accept", from the key and the address below, so no Google address
+     is in the page until then. {% endcomment %}
+  <section id="{{ s.anchor }}" class="map-band" aria-labelledby="{{ s.anchor }}-heading">
+    <div class="container map-band__text">
+      <h2 id="{{ s.anchor }}-heading" class="map-band__heading">{{ s.heading|default:"Find Us" }}</h2>
+      <p class="map-band__address">{{ site_info.address }}</p>
+      {% if s.body %}<div class="map-band__body">{{ s.body|markdown }}</div>{% endif %}
+      <a class="btn btn-outline-gold-dark" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ site_info.map_query|urlencode }}" target="_blank" rel="noopener">Get directions<span class="visually-hidden"> (opens Google Maps in a new tab)</span></a>
+    </div>
+    {% if maps_embed_key %}
+      <div class="map-band__frame" data-consent-map data-map-key="{{ maps_embed_key }}" data-map-query="{{ site_info.map_query }}" data-map-title="Map: {{ site_info.address }}">
+        <div class="container" data-map-note><p class="map-band__note">The map uses cookies from Google, so it shows once you accept cookies. <button type="button" class="link-button" data-cookie-settings hidden>Cookie settings</button></p></div>
+      </div>
+    {% endif %}
+  </section>
+
 {% elif s.section_type == "cta" %}
   <section id="{{ s.anchor }}" class="band band--charcoal band--cta on-dark text-center">
     <div class="container">

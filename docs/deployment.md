@@ -90,8 +90,9 @@ DJANGO_SETTINGS_MODULE=config.settings.prod SECRET_KEY=build-only python manage.
    built" and the rebuild command. In the pushed image the source is baked in, so it always
    passes.
 2. Waits up to 30 seconds for Postgres, using the app's own `DATABASE_URL`.
-3. Runs `migrate --noinput` (this also prints the `core.W00x` checks into the logs) and, from
-   Day 8, `createcachetable` (the rate limiter's shared cache).
+3. Runs `migrate --noinput` (this also prints the `core.W00x` checks into the logs), then
+   `createcachetable` (the `django_cache` table behind the enquiry rate limit; does nothing when
+   it is already there).
 4. Runs `seed_site_content` when `SEED_SITE_CONTENT=true` (first deploy only). It adds what's
    missing and fills in empty fields, and never changes an editor's work; its images are copied into the media
    volume like any upload.
@@ -119,7 +120,9 @@ Phase 2 adds `rebuild_search_index` after step 4.
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | — | only with `EMAIL_PROVIDER=smtp` (fallback, §6) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | the OAuth client | the same client (redirect URIs registered for each host) |
 | `GA_MEASUREMENT_ID` | empty (no analytics locally) | `G-…` (can also be set in `SiteSettings`) |
-| `GOOGLE_MAPS_EMBED_KEY` | a key allowing `localhost` | the referrer-restricted key |
+| `GOOGLE_MAPS_EMBED_KEY` | empty (no map; the address and "Get directions" show), or a key allowing `localhost` | the key restricted by HTTP referrer to the preview and live hosts. Public by design: it ends up in the iframe's address |
+| `CONTACT_RATE_LIMIT` | 5 (default) | 5 (default): enquiries per visitor per hour |
+| `TRUSTED_PROXY_COUNT` | 0 (default; the visitor is `REMOTE_ADDR`) | 1 (the prod default): the visitor is the last `X-Forwarded-For` entry, the one Caddy adds |
 | `SEED_SITE_CONTENT` | `true` (optional) | `true` on the first deploy only, then removed |
 | `SECURE_SSL_REDIRECT` | — | `true` (default) |
 
@@ -390,7 +393,11 @@ volumes:
 ```
 
 - **Caddy** gets and renews certificates, redirects HTTP to HTTPS and serves `/media/` from the
-  volume read-only. Keep `caddy_data`: it holds the certificates.
+  volume read-only. Keep `caddy_data`: it holds the certificates. Its `reverse_proxy` sets
+  `X-Forwarded-For` to the visitor's address (it ignores a value the visitor sent, since no
+  `trusted_proxies` are configured), which the enquiry rate limit reads
+  (`TRUSTED_PROXY_COUNT=1`). If Cloudflare's proxy is ever switched on in front of Caddy, set
+  Caddy's `trusted_proxies` to Cloudflare's ranges and keep the count at 1.
 - **Static files** (CSS, JS, vendor assets) are served by WhiteNoise from the image, with
   long-lived hashed URLs.
 - **Compose, not Kubernetes:** one web container doesn't justify a cluster.
