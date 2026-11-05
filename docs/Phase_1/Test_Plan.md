@@ -102,9 +102,23 @@ Status code, template and one expected string for each:
 - [ ] Prod settings: `DEBUG=False`, secure cookies, HSTS, `SECURE_SSL_REDIRECT`,
   `X-Frame-Options: DENY`, `nosniff`, referrer policy.
 
-## 4. Manual QA checklist (Day 9 and Day 10)
+### 3.8 Look and feel (Day 9, `apps/core/tests/test_polish.py`)
 
-Run on the local prod stack (Day 9) and again on the preview host (Day 10).
+- [x] Every page has `<meta name="color-scheme" content="light dark">` and loads
+  `js/theme-init.js` before the stylesheet, as a file.
+- [x] No inline scripts (JSON-LD aside), so a strict Content-Security-Policy stays possible.
+- [x] The theme toggle offers System, Light and Dark, with System pressed by default, and is
+  hidden in the HTML (shown by JavaScript).
+- [x] The navbar has both logos (dark text and light text); the light one exists.
+- [x] Back to top is a plain link to `#top` without JavaScript.
+- [x] A section's label shows above its heading.
+- [x] `[data-reveal]` is only a hook: no element is hidden in the HTML.
+- [x] The footer has Reach Us and Quick Links; the vacancies line stays on Contact.
+- [x] The seed fills an empty section heading (Home's service cards got "What We Do").
+
+## 4. Manual QA checklist (Day 10 and Day 11)
+
+Run on the local prod stack (Day 10) and again on the preview host (Day 11).
 
 **Pages**
 - [ ] Home, About, Services and Contact at 375, 768 and 1280 px: no sideways scroll, no
@@ -113,6 +127,18 @@ Run on the local prod stack (Day 9) and again on the preview host (Day 10).
   auto-advance with reduced motion on.
 - [ ] Services anchor links scroll to each of the 13 services; the long bios collapse on mobile.
 - [ ] Every top-bar and footer value matches `SiteSettings`; empty social URLs show no icon.
+
+**Look and feel (both themes)**
+- [ ] With the system set to dark, the site opens dark; the toggle's System, Light and Dark
+  each apply at once and survive a reload with no flash of the other theme.
+- [ ] Every page at 375, 768 and 1280 px in light and in dark: text readable on every band,
+  the logo readable in the navbar, logos on white tiles.
+- [ ] Sections fade in as they scroll into view; with reduced motion on, nothing moves and
+  everything is visible straight away.
+- [ ] About: **Read full bio** opens the dialog; Escape, the × and a click outside close it, and
+  focus returns to the button.
+- [ ] Back to top appears after scrolling, returns to the top and works by keyboard; on a phone
+  it waits until the cookie card is answered.
 
 **Enquiries**
 - [ ] Contact form with JavaScript on: success message; the enquiry is in the admin and the
@@ -135,10 +161,11 @@ Run on the local prod stack (Day 9) and again on the preview host (Day 10).
 - [ ] Image uploads show on the site (served by Caddy from the media volume in prod).
 - [ ] Google sign-in works for an existing user and refuses an unknown account.
 
-**Go-live (Day 10)**
+**Go-live (Day 11)**
 - [ ] Valid certificate on the preview host, then on `distinctive.co.zw` and `www`.
 - [ ] `http://` redirects to `https://`; `www` and the apex agree on one canonical host.
 - [ ] Every URL from the old sitemap answers 301 to a live page.
 - [ ] Mail to `enquiries@distinctive.co.zw` still arrives after the DNS change.
 - [ ] Lighthouse on the live domain: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95.
-- [ ] Keyboard-only: skip link, nav, slider, cookie banner, both forms.
+- [ ] Keyboard-only: skip link, nav, theme toggle, slider, bio dialog, cookie banner, both forms,
+  back to top.

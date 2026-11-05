@@ -1,0 +1,65 @@
+# Deploy to the VPS (docs/deployment.md §7). Run by hand: Actions → Deploy VPS → Run workflow.
+# Leave image_tag as "latest", or give an earlier commit SHA to roll back.
+#
+# Secrets (in the "production" environment): VPS_HOST, VPS_USER, VPS_SSH_KEY (a private key
+# whose public half is in the deploy user's authorized_keys), VPS_APP_DIR (/srv/distinctive) and
+# VPS_KNOWN_HOSTS (the output of `ssh-keyscan -t ed25519 <host>`, checked once by hand), so the
+# workflow refuses a server that isn't ours.
+name: Deploy VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag: latest, or a commit SHA to roll back to"
+        required: true
+        default: latest
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: SSH key and known host
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Pull the image and restart
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          DEPLOY_USER: ${{ secrets.VPS_USER }}
+          APP_DIR: ${{ secrets.VPS_APP_DIR }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          case "$IMAGE_TAG" in
+            latest|[0-9a-f]*) ;;
+            *) echo "image_tag must be 'latest' or a commit SHA"; exit 1 ;;
+          esac
+          ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            "$DEPLOY_USER@$HOST" \
+            "cd '$APP_DIR' \
+             && IMAGE_TAG='$IMAGE_TAG' docker compose -f docker-compose.prod.yml pull web \
+             && IMAGE_TAG='$IMAGE_TAG' docker compose -f docker-compose.prod.yml up -d --remove-orphans \
+             && docker image prune -f \
+             && docker compose -f docker-compose.prod.yml ps"
+
+      - name: Health check
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        if: env.SITE_URL != ''
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "$SITE_URL/healthz/" | grep -q '"db": *"ok"'; then echo "healthy"; exit 0; fi
+            sleep 2
+          done
+          echo "The site did not answer /healthz/ within a minute"; exit 1

@@ -8,9 +8,12 @@ from django.http import HttpRequest, HttpResponse
 
 from apps.contact.forms import ContactForm, EnquiryBaseForm, EnquiryForm
 from apps.core.controllers.base import BaseController
+from apps.core.services.seo_service import SeoData, SeoService
+from apps.core.services.site_settings_service import SiteSettingsService
 from apps.pages.models import PageSection
+from apps.pages.routes import page_path
 from apps.pages.services.page_blocks_service import PageBlocksService
-from apps.pages.services.page_service import PageService
+from apps.pages.services.page_service import PageContent, PageService
 
 T = PageSection.SectionType
 
@@ -41,10 +44,22 @@ class PageController(BaseController):
         content = PageService().get_page(slug)
         context = {
             "content": content,
+            "seo": self.seo_for(slug, content),
             **PageBlocksService().for_sections(content.sections),
             **self.form_context(content.sections, forms or {}),
         }
         return self.render_page(request, template_name, context, status=status)
+
+    @staticmethod
+    def seo_for(slug: str, content: PageContent) -> SeoData:
+        page = content.page
+        return SeoService(SiteSettingsService().get()).for_page(
+            path=page_path(slug) or "/",
+            title=page.title,
+            meta_title=page.meta_title,
+            description=page.meta_description,
+            organization=slug == "home",
+        )
 
     @staticmethod
     def form_context(

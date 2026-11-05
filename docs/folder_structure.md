@@ -1,6 +1,6 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-04** (Day 8: Contact, enquiry forms, rate limit, cookie
+**Project-wide · revised 2026-11-04** (Day 9: themes, the polish modules and partials; Day 8: Contact, enquiry forms, rate limit, cookie
 consent; Day 7: Services page, enquiries, Nunito Sans; Day 6: team,
 partners, page blocks; Day 5: seed content,
 Home templates, JS; 2026-11-02: npm
@@ -48,6 +48,7 @@ distinctive-site/
 │   │   ├── admin.scss                  # the Jazzmin admin's few rules → static/css/admin.css
 │   │   ├── _tokens.scss                # $dcs-* brand tokens and --dcs-* custom properties
 │   │   ├── _variables.scss             # Bootstrap variable overrides
+│   │   ├── _theme.scss                 # light and dark: the theme's custom properties
 │   │   ├── _fonts.scss
 │   │   ├── _base.scss
 │   │   ├── components/
@@ -62,7 +63,7 @@ distinctive-site/
 │   │   │   ├── _auth.scss              # sign-in and the other allauth pages
 │   │   │   ├── _buttons.scss           # the outlined gold buttons
 │   │   │   ├── _logos.scss             # partner and client logo grids
-│   │   │   ├── _team.scss              # Our Leadership, Read more
+│   │   │   ├── _team.scss              # Our Leadership, the bio dialog
 │   │   │   ├── _services.scss          # the Services page links and bands
 │   │   │   └── _cookie-banner.scss
 │   │   └── pages/                      # empty so far: no page has needed rules of its own
@@ -71,10 +72,15 @@ distinctive-site/
 │   │   ├── main.css                    # COMPILED, minified, committed
 │   │   └── admin.css                   # COMPILED from admin.scss, committed
 │   ├── js/
+│   │   ├── theme-init.js               # in <head>: a chosen theme before the first paint (not a module)
 │   │   ├── main.js                     # entry (ES module)
 │   │   └── modules/
 │   │       ├── hero-slider.js          # Home carousel: reduced motion, pause on focus, pause button
-│   │       ├── read-more.js            # long bios cut behind Read more
+│   │       ├── theme.js                # the System / Light / Dark toggle
+│   │       ├── reveal.js               # sections and cards fade in as they scroll into view
+│   │       ├── navbar.js               # the navbar's shadow once the page scrolls
+│   │       ├── bio-dialog.js           # long team bios: "Read full bio" in a <dialog>
+│   │       ├── back-to-top.js          # the back-to-top button
 │   │       ├── http.js                 # fetch wrapper: CSRF, JSON envelope, timeout
 │   │       ├── contact-form.js         # [data-contact-form]: fetch(), field errors, thank-you
 │   │       └── cookie-consent.js       # banner, stored choice, GA4 and the map after Accept
@@ -82,7 +88,7 @@ distinctive-site/
 │   ├── vendor/                         # copied from node_modules by `npm run vendor`, committed
 │   │   ├── bootstrap/                  # bootstrap.bundle.min.js (source-map line removed)
 │   │   └── nunito-sans/                # latin woff2, 400/600/700, normal and italic
-│   └── img/                            # logo.png (the client's logo, 172 × 100), later favicons and defaults
+│   └── img/                            # logo.png (the client's logo, 172 × 100), logo-dark.png (light lettering, Day 9), favicon, OG default
 ├── templates/
 │   ├── base.html
 │   ├── includes/
@@ -92,6 +98,9 @@ distinctive-site/
 │   │   ├── _footer.html
 │   │   ├── _cookie_banner.html         # shown by cookie-consent.js; only when GA or the map is set up
 │   │   ├── _enquiry_form.html          # ContactForm or EnquiryForm, posting to /contact/
+│   │   ├── _section_head.html          # a section's label and heading
+│   │   ├── _contact_list.html          # Reach Us as icon rows (Contact, footer)
+│   │   ├── _theme_toggle.html          # System / Light / Dark
 │   │   ├── icons/                      # inline SVG icons, written by `npm run vendor`
 │   │   ├── _hero_slider.html           # Home's slides (pages.HeroSlide)
 │   │   ├── _section.html               # renders one PageSection by type
@@ -186,7 +195,7 @@ apps/core/
 │   └── core_extras.py         # the |markdown filter
 ├── seed/
 │   ├── content.py             # the old site's text, keyed (anchors, headings)
-│   └── images/                # 30 images cut from the old site's screenshots, until the originals come
+│   └── images/                # 30 images cut from the old site's screenshots, until the originals come, and team-photo.jpg (Home's hero)
 ├── management/commands/
 │   └── seed_site_content.py   # loads seed/ through SeedService (idempotent)
 └── tests/
@@ -196,6 +205,7 @@ apps/core/
     ├── test_seed.py           # SeedService with fakes; the command twice on a real database
     ├── test_rate_limit_service.py  # the limit, its window; client_ip behind Caddy
     ├── test_consent.py        # no Google address in any page before consent
+    ├── test_polish.py         # themes, labels, back to top, the reveal hooks (Day 9)
     └── test_security.py       # check --deploy with prod settings
 ```
 
@@ -206,7 +216,8 @@ apps/core/
 `page_blocks_service.py`), `controllers/page_controller.py` (`PageController`, `HomeController`,
 `AboutController`, `ServicesController`), `urls.py`, `templates/pages/` (`page.html`, `home.html`), and migrations
 `0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`, `0004_service_bands`,
-`0005_form_and_map_sections`.
+`0005_form_and_map_sections`, then (Day 10, started early) `0006_redirects`, `0007_search_title_help`,
+and (Day 9) `0008_section_label`.
 `apps/offerings/` has `Service`, its admin, `ServiceRepository` and `OfferingService`.
 `apps/contact/` (Day 7) has `ContactSubmission`, its admin, `ContactRepository`,
 `ContactService` and tests; Day 8 added `forms.py`, `controllers/contact_controller.py` and

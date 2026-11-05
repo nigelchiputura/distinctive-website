@@ -1,4 +1,4 @@
-// Site-wide rules that aren't a component.
+// Site-wide rules that aren't a component: layout, icons, labels, motion.
 
 html {
   scroll-behavior: smooth;
@@ -22,6 +22,11 @@ main {
   flex: 1 0 auto;
 }
 
+// A dialog is open (the team bio): the page behind it doesn't scroll.
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 // Inline SVG icons from templates/includes/icons/ (Font Awesome, fill="currentColor").
 .icon {
   display: inline-block;
@@ -38,6 +43,7 @@ main {
   left: 0.5rem;
   z-index: 2000;
   padding: 0.5rem 1rem;
+  border-radius: $dcs-radius-pill;
   background: $dcs-gold;
   color: $dcs-black;
   font-weight: 600;
@@ -47,15 +53,237 @@ main {
   }
 }
 
-// Text that sits on dark bands.
+// Text on the black and charcoal bands, the same in both themes.
 .on-dark {
   color: $dcs-white;
 
-  a {
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: $dcs-white;
+  }
+
+  a:not(.btn) {
     color: $dcs-gold;
+
+    &:hover,
+    &:focus-visible {
+      color: $dcs-gold-light;
+    }
   }
 }
 
 .text-gold {
   color: $dcs-gold;
+}
+
+// The small label above a section's heading (PageSection "label").
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid rgba($dcs-gold, 0.35);
+  border-radius: $dcs-radius-pill;
+  background: var(--dcs-chip-bg);
+  color: var(--dcs-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+
+  &::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: currentcolor;
+  }
+}
+
+.on-dark .eyebrow {
+  background: rgba($dcs-gold, 0.12);
+  color: $dcs-gold;
+}
+
+.band--gold .eyebrow {
+  border-color: rgba($dcs-black, 0.25);
+  background: rgba($dcs-white, 0.35);
+  color: $dcs-black;
+}
+
+// ---- Motion ---------------------------------------------------------------------------------
+// [data-reveal] fades and rises into place as it scrolls into view (static/js/modules/reveal.js).
+// Only once the script has started (html.reveal-ready) is anything hidden, so without JavaScript,
+// or if it fails, everything shows. Reduced motion: no movement at all.
+
+.reveal-ready [data-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(1.75rem);
+}
+
+.reveal-ready [data-reveal] {
+  transition:
+    opacity 0.7s $dcs-ease,
+    transform 0.7s $dcs-ease;
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal]:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-ready [data-reveal] {
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .back-to-top,
+  .cookie-banner,
+  .theme-toggle {
+    display: none !important;
+  }
+}
+
+@keyframes dcs-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dcs-glow-drift {
+  from {
+    background-position:
+      0% 0%,
+      100% 100%,
+      0 0;
+  }
+
+  to {
+    background-position:
+      30% 20%,
+      70% 80%,
+      0 0;
+  }
+}
+
+// ---- Shared pieces ---------------------------------------------------------------------------
+
+// A framed image: rounded, with a gold offset frame behind it.
+.framed-image {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 1rem -1rem -1rem 1rem;
+    z-index: -1;
+    border: 2px solid rgba($dcs-gold, 0.55);
+    border-radius: $dcs-radius-lg;
+    transition: transform 0.5s $dcs-ease;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: $dcs-radius-lg;
+    box-shadow: var(--dcs-shadow-lift);
+  }
+
+  &:hover::before {
+    transform: translate(-0.4rem, -0.4rem);
+  }
+}
+
+.framed-image--left::before {
+  inset: 1rem 1rem -1rem -1rem;
+}
+
+// A frosted card on dark bands (the Contact form, Our Story's text).
+.glass-card {
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  border: 1px solid rgba($dcs-white, 0.1);
+  border-radius: $dcs-radius-lg;
+  background: linear-gradient(160deg, rgba($dcs-white, 0.07), rgba($dcs-white, 0.02));
+  box-shadow: 0 1.5rem 3rem rgba($dcs-black, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+// A card on light bands and in the dark theme (the Services enquiry form, the map card).
+.surface-card {
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  border: 1px solid var(--dcs-border);
+  border-radius: $dcs-radius-lg;
+  background: var(--dcs-surface);
+  color: var(--dcs-text);
+  box-shadow: var(--dcs-shadow-lift);
+}
+
+// Icon + label + value rows: Reach Us (Contact and the footer).
+.contact-list {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: rgba($dcs-gold, 0.14);
+    color: $dcs-gold;
+  }
+
+  &__label {
+    display: block;
+    color: $dcs-gold;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    overflow-wrap: anywhere;
+  }
+
+  a {
+    color: inherit;
+  }
 }

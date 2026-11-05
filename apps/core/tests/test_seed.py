@@ -7,7 +7,7 @@ from apps.core.exceptions import NotFoundError
 from apps.core.seed import content
 from apps.core.services.seed_service import SEED_IMAGES, SeedService, blank_fields
 from apps.offerings.models import Service
-from apps.pages.models import HeroSlide, Page, PageSection, Partner
+from apps.pages.models import HeroSlide, Page, PageSection, Partner, Redirect
 from apps.team.models import TeamMember
 
 PAGES = ("home", "about", "services", "contact")
@@ -70,13 +70,22 @@ class FakePages:
         self.slides.append(Row(**data))
 
 
-def seeder(pages=None, services=None, team=None, partners=None):
+class FakeRedirects(FakeRows):
+    def __init__(self, existing=()):
+        super().__init__("old_path", existing)
+
+    def by_old_path(self, path):
+        return self.find(path)
+
+
+def seeder(pages=None, services=None, team=None, partners=None, redirects=None):
     return SeedService(
         pages or FakePages(),
         services or FakeRows("anchor"),
         team or FakeRows("name"),
         partners or FakeRows("name"),
         open_image=lambda n: f"file:{n}",
+        redirects=redirects or FakeRedirects(),
     )
 
 
@@ -93,8 +102,10 @@ def test_first_run_adds_everything():
         + len(content.ABOUT_SECTIONS)
         + len(content.SERVICES_SECTIONS)
         + len(content.CONTACT_SECTIONS),
+        "redirects": len(content.REDIRECTS),
     }
-    assert [slug for slug, _ in pages.updates] == list(PAGES)  # each page's meta description
+    assert [slug for slug, _ in pages.updates] == list(PAGES)  # each page's search fields
+    assert dict(pages.updates)["home"]["meta_title"] == content.META_TITLES["home"]
     proactive = pages.section(pages.pages["home"], "proactive")
     assert proactive.image == "file:proactive.jpg"
     assert pages.section(pages.pages["about"], "our-story") is not None
@@ -144,6 +155,7 @@ def test_blank_fields_skips_keys_flags_and_numbers():
 def test_an_existing_description_is_kept():
     pages = FakePages()
     pages.pages["home"].meta_description = "The client's own words"
+    pages.pages["home"].meta_title = "The client's own title"
     seeder(pages).seed()
     assert [slug for slug, _ in pages.updates] == ["about", "services", "contact"]
 
@@ -167,7 +179,7 @@ def test_every_seed_image_exists_and_has_a_description():
         *content.CLIENTS,
     )
     with_images = [i for i in items if i.get("image")]
-    assert len(with_images) == 30
+    assert len(with_images) == 31
     assert all((SEED_IMAGES / i["image"]).is_file() for i in with_images)
     assert all(i.get("image_alt") for i in with_images)
     assert len({i["anchor"] for i in content.SERVICES}) == len(content.SERVICES) == 13
@@ -183,6 +195,7 @@ def counts():
         HeroSlide.objects.count(),
         TeamMember.objects.count(),
         Partner.objects.count(),
+        Redirect.objects.count(),
     )
 
 
@@ -199,6 +212,7 @@ def test_command_is_idempotent_and_keeps_edits(settings, tmp_path, capsys):
         len(content.HOME_SLIDES),
         len(content.TEAM),
         len(content.PARTNERS) + len(content.CLIENTS),
+        len(content.REDIRECTS),
     )
     assert (tmp_path / "services" / "hr-audits.jpg").is_file()
     assert Service.objects.get(anchor="hr-audits").image_width == 359
@@ -240,6 +254,11 @@ def test_seeded_home_renders(settings, tmp_path, client):
     ):
         assert text in page
     assert 'width="635" height="395"' in page  # stored image sizes reach the <img>
+    # The team photo behind the hero, loaded first, with its description.
+    assert "hero__slide--photo" in page and "pages/slides/team-photo" in page
+    assert (
+        'fetchpriority="high"' in page and 'alt="The Distinctive Consultancy Services team' in page
+    )
 
 
 @pytest.mark.django_db
@@ -260,9 +279,9 @@ def test_seeded_contact_and_services_forms_render(settings, tmp_path, client):
     settings.MEDIA_ROOT = tmp_path
     call_command("seed_site_content")
     contact = client.get("/contact/").content.decode()
-    assert '<h1 class="visually-hidden">Contact Us</h1>' in contact
+    assert '<h1 class="page-hero__heading">Contact Us</h1>' in contact
     for text in ("Get In Touch!", "Reach Us", "recruitment@distinctive.co.zw", "Find Us"):
         assert text in contact
     services = client.get("/services/").content.decode()
-    assert "Get In Touch With Us" in services and ">Send enquiry</button>" in services
+    assert "Get In Touch With Us" in services and ">Send enquiry <svg" in services
     assert services.index("corporate-clients") < services.index('id="get-in-touch"')

@@ -1,15 +1,16 @@
 {% load core_extras %}
 {% comment %} One PageSection, drawn by its section_type (docs/frontend.md §3). Markdown bodies go through
-   |markdown, the only place admin text becomes HTML. {% endcomment %}
+   |markdown, the only place admin text becomes HTML. [data-reveal] elements fade in as they
+   scroll into view (static/js/modules/reveal.js); data-reveal-delay staggers a row of cards. {% endcomment %}
 {% with s=section %}
 {% if s.section_type == "service_cards" %}
   <section id="{{ s.anchor }}" class="band band--charcoal on-dark">
     <div class="container">
-      {% if s.heading %}<h2 class="band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      {% include "includes/_section_head.html" %}
+      {% if s.body %}<div class="band__lead" data-reveal>{{ s.body|markdown }}</div>{% endif %}
       <div class="service-grid">
         {% for service in service_cards %}
-          {% include "includes/_service_card.html" with title_tag=s.heading|yesno:"h3,h2" %}
+          {% include "includes/_service_card.html" with title_tag=s.heading|yesno:"h3,h2" delay=forloop.counter0 %}
         {% endfor %}
       </div>
     </div>
@@ -19,48 +20,59 @@
   {% include "includes/_service_bands.html" %}
 
 {% elif s.section_type == "partners" or s.section_type == "clients" %}
-  <section id="{{ s.anchor }}" class="band band--white logo-band">
+  <section id="{{ s.anchor }}" class="band band--light logo-band">
     <div class="container">
-      {% if s.heading %}<h2 class="band__heading band__heading--on-light align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      {% include "includes/_section_head.html" %}
+      {% if s.body %}<div class="band__lead" data-reveal>{{ s.body|markdown }}</div>{% endif %}
       {% if s.section_type == "partners" %}{% include "includes/_logo_grid.html" with logos=partners %}{% else %}{% include "includes/_logo_grid.html" with logos=clients %}{% endif %}
     </div>
   </section>
 
 {% elif s.section_type == "team" %}
-  <section id="{{ s.anchor }}" class="band band--white team-band">
+  <section id="{{ s.anchor }}" class="band band--light team-band">
     <div class="container">
-      {% if s.heading %}<h2 class="band__heading band__heading--on-light team-band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-      {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
+      {% include "includes/_section_head.html" %}
+      {% if s.body %}<div class="band__lead" data-reveal>{{ s.body|markdown }}</div>{% endif %}
       <div class="team-grid">
         {% for member in team %}
-          {% include "includes/_team_card.html" with title_tag=s.heading|yesno:"h3,h2" %}
+          {% include "includes/_team_card.html" with title_tag=s.heading|yesno:"h3,h2" delay=forloop.counter0 %}
         {% endfor %}
       </div>
     </div>
   </section>
 
+{% elif s.section_type == "cta" %}
+  <section id="{{ s.anchor }}" class="band band--black band--cta on-dark">
+    <div class="container">
+      <div class="cta-panel" data-reveal>
+        {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
+        {% if s.heading %}<h2 class="cta__heading">{{ s.heading }}</h2>{% endif %}
+        {% if s.body %}<div class="cta__body">{{ s.body|markdown }}</div>{% endif %}
+        {% if s.button_label and s.button_url %}
+          <a class="btn btn-gold btn-lg" href="{{ s.button_url }}">{{ s.button_label }} {% include "includes/icons/arrow-right.svg" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
 {% elif s.section_type == "contact_form" %}
-  {# Contact: the form on the left, the company's details on the right. #}
+  {# Contact: the form in a glass card on the left, Reach Us on the right. #}
   <section id="{{ s.anchor }}" class="band band--black on-dark contact-band">
     <div class="container">
-      <div class="row g-5">
-        <div class="col-lg-7">
-          {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
-          {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
-          {% include "includes/_enquiry_form.html" with form=contact_form kind="contact" button=s.button_label|default:"Submit" button_class="btn-outline-gold" %}
+      <div class="row g-4 g-lg-5 align-items-stretch">
+        <div class="col-lg-7" data-reveal>
+          <div class="glass-card">
+            {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
+            {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
+            {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
+            {% include "includes/_enquiry_form.html" with form=contact_form kind="contact" button=s.button_label|default:"Submit" button_class="btn-gold" %}
+          </div>
         </div>
-        <div class="col-lg-5">
-          <div class="contact-details">
-            <h2 class="band__heading">Reach Us</h2>
-            <dl class="contact-details__list">
-              <div><dt>Address</dt><dd>{{ site_info.address }}</dd></div>
-              <div><dt>Phone</dt><dd><a href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a></dd></div>
-              <div><dt>Email</dt><dd><a href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a></dd></div>
-              <div><dt>Business Hours</dt><dd>{{ site_info.hours }}</dd></div>
-              {% if site_info.recruitment_email %}<div><dt>Vacancies</dt><dd>Send your CV to <a href="mailto:{{ site_info.recruitment_email }}">{{ site_info.recruitment_email }}</a></dd></div>{% endif %}
-            </dl>
-            {% if s.body %}<div class="contact-details__body">{{ s.body|markdown }}</div>{% endif %}
+        <div class="col-lg-5" data-reveal data-reveal-delay="1">
+          <div class="contact-card">
+            <h2 class="contact-card__heading">Reach Us</h2>
+            {% include "includes/_contact_list.html" with vacancies=True %}
+            {% if s.body %}<div class="contact-card__body">{{ s.body|markdown }}</div>{% endif %}
           </div>
         </div>
       </div>
@@ -68,13 +80,20 @@
   </section>
 
 {% elif s.section_type == "enquiry_form" %}
+  {# Services: the text on gold, the form in a card beside it. #}
   <section id="{{ s.anchor }}" class="band band--gold enquiry-band">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-9">
-          {% if s.heading %}<h2 class="band__heading band__heading--on-gold align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-          {% if s.body %}<div class="band__lead">{{ s.body|markdown }}</div>{% endif %}
-          {% include "includes/_enquiry_form.html" with form=enquiry_form kind="enquiry" button=s.button_label|default:"Send enquiry" button_class="btn-dark" %}
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="col-lg-5" data-reveal>
+          <div class="enquiry-band__text">
+            {% include "includes/_section_head.html" %}
+            {% if s.body %}<div class="enquiry-band__body">{{ s.body|markdown }}</div>{% endif %}
+          </div>
+        </div>
+        <div class="col-lg-7" data-reveal data-reveal-delay="1">
+          <div class="surface-card">
+            {% include "includes/_enquiry_form.html" with form=enquiry_form kind="enquiry" button=s.button_label|default:"Send enquiry" button_class="btn-gold" %}
+          </div>
         </div>
       </div>
     </div>
@@ -84,60 +103,68 @@
   {% comment %} The address and "Get directions" always show. The map itself is built by
      cookie-consent.js after "Accept", from the key and the address below, so no Google address
      is in the page until then. {% endcomment %}
-  <section id="{{ s.anchor }}" class="map-band" aria-labelledby="{{ s.anchor }}-heading">
-    <div class="container map-band__text">
-      <h2 id="{{ s.anchor }}-heading" class="map-band__heading">{{ s.heading|default:"Find Us" }}</h2>
-      <p class="map-band__address">{{ site_info.address }}</p>
-      {% if s.body %}<div class="map-band__body">{{ s.body|markdown }}</div>{% endif %}
-      <a class="btn btn-outline-gold-dark" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ site_info.map_query|urlencode }}" target="_blank" rel="noopener">Get directions<span class="visually-hidden"> (opens Google Maps in a new tab)</span></a>
-    </div>
-    {% if maps_embed_key %}
-      <div class="map-band__frame" data-consent-map data-map-key="{{ maps_embed_key }}" data-map-query="{{ site_info.map_query }}" data-map-title="Map: {{ site_info.address }}">
-        <div class="container" data-map-note><p class="map-band__note">The map uses cookies from Google, so it shows once you accept cookies. <button type="button" class="link-button" data-cookie-settings hidden>Cookie settings</button></p></div>
-      </div>
-    {% endif %}
-  </section>
-
-{% elif s.section_type == "cta" %}
-  <section id="{{ s.anchor }}" class="band band--charcoal band--cta on-dark text-center">
+  <section id="{{ s.anchor }}" class="band band--light map-band" aria-labelledby="{{ s.anchor }}-heading">
     <div class="container">
-      {% if s.heading %}<h2 class="cta__heading">{{ s.heading }}</h2>{% endif %}
-      {% if s.body %}<div class="cta__body">{{ s.body|markdown }}</div>{% endif %}
-      {% if s.button_label and s.button_url %}
-        <a class="btn btn-outline-gold btn-lg" href="{{ s.button_url }}">{{ s.button_label }}</a>
-      {% endif %}
+      <div class="row g-4 g-lg-5 align-items-stretch">
+        <div class="col-lg-4" data-reveal>
+          <div class="surface-card map-card">
+            {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
+            <h2 id="{{ s.anchor }}-heading" class="band__heading">{{ s.heading|default:"Find Us" }}</h2>
+            <p class="map-card__address">{% include "includes/icons/location-dot.svg" %}<span>{{ site_info.address }}</span></p>
+            {% if s.body %}<div class="mb-4">{{ s.body|markdown }}</div>{% endif %}
+            <a class="btn btn-outline-gold-dark" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ site_info.map_query|urlencode }}" target="_blank" rel="noopener">Get directions {% include "includes/icons/arrow-right.svg" %}<span class="visually-hidden"> (opens Google Maps in a new tab)</span></a>
+          </div>
+        </div>
+        {% if maps_embed_key %}
+          <div class="col-lg-8" data-reveal data-reveal-delay="1">
+            <div class="map-frame" data-consent-map data-map-key="{{ maps_embed_key }}" data-map-query="{{ site_info.map_query }}" data-map-title="Map: {{ site_info.address }}">
+              <div class="map-frame__placeholder" data-map-note>
+                {% include "includes/icons/map-location-dot.svg" %}
+                <p>The map uses cookies from Google, so it shows once you accept cookies.</p>
+                <button type="button" class="link-button" data-cookie-settings hidden>Cookie settings</button>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
     </div>
   </section>
 
 {% elif s.section_type == "value_block" %}
-  <section id="{{ s.anchor }}" class="band band--white value-block value-block--image-{{ s.image_position }}">
+  <section id="{{ s.anchor }}" class="band band--light value-block value-block--image-{{ s.image_position }}">
     <div class="container">
-      <div class="row g-4 g-lg-5 align-items-center">
+      <div class="row g-5 align-items-center">
         {% if s.image %}
-          <div class="col-lg-6 value-block__media">
-            {% include "includes/_image.html" with obj=s class="img-fluid value-block__image" %}
+          <div class="col-lg-6 value-block__media" data-reveal>
+            <div class="framed-image{% if s.image_position == 'left' %} framed-image--left{% endif %}">
+              {% include "includes/_image.html" with obj=s class="value-block__image" %}
+            </div>
           </div>
         {% endif %}
-        <div class="{% if s.image %}col-lg-6{% else %}col-lg-8{% endif %} value-block__text">
+        <div class="{% if s.image %}col-lg-6{% else %}col-lg-8{% endif %} value-block__text" data-reveal data-reveal-delay="1">
+          {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
           {% if s.heading %}<h2 class="value-block__heading">{{ s.heading }}</h2>{% endif %}
           <div class="value-block__body">{{ s.body|markdown }}</div>
-          {% if s.button_label and s.button_url %}<a class="btn btn-outline-gold-dark" href="{{ s.button_url }}">{{ s.button_label }}</a>{% endif %}
+          {% if s.button_label and s.button_url %}<a class="btn btn-outline-gold-dark" href="{{ s.button_url }}">{{ s.button_label }} {% include "includes/icons/arrow-right.svg" %}</a>{% endif %}
         </div>
       </div>
     </div>
   </section>
 
 {% elif s.section_type == "two_column" %}
-  {# "Our Story": a navy-to-blue band; heading and short text left, the long text right. #}
+  {# "Our Story": a navy-to-blue band; label, heading and short text left, the long text right. #}
   <section id="{{ s.anchor }}" class="band band--gradient on-dark">
     <div class="container">
       <div class="row g-4 g-lg-5">
-        <div class="col-lg-4">
+        <div class="col-lg-4" data-reveal>
+          {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
           {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
           {% if s.intro %}<div class="band__intro">{{ s.intro|markdown }}</div>{% endif %}
-          {% if s.image %}{% include "includes/_image.html" with obj=s class="img-fluid mt-3" %}{% endif %}
+          {% if s.image %}<div class="framed-image mt-4">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>{% endif %}
         </div>
-        <div class="col-lg-8 band__body band__body--wide">{{ s.body|markdown }}</div>
+        <div class="col-lg-8" data-reveal data-reveal-delay="1">
+          <div class="glass-card band__body band__body--wide">{{ s.body|markdown }}</div>
+        </div>
       </div>
     </div>
   </section>
@@ -147,24 +174,29 @@
     {% if s.image %}{% include "includes/_image.html" with obj=s class="page-hero__image" eager=True %}{% endif %}
     <div class="page-hero__overlay">
       <div class="container">
-        {% if s.heading %}{% if forloop.first %}<h1 class="page-hero__heading">{{ s.heading }}</h1>{% else %}<h2 class="page-hero__heading">{{ s.heading }}</h2>{% endif %}{% endif %}
-        {% if s.body %}<div class="page-hero__body">{{ s.body|markdown }}</div>{% endif %}
+        <div class="page-hero__inner">
+          {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
+          {% if s.heading %}{% if forloop.first %}<h1 class="page-hero__heading">{{ s.heading }}</h1>{% else %}<h2 class="page-hero__heading">{{ s.heading }}</h2>{% endif %}{% endif %}
+          {% if s.body %}<div class="page-hero__body">{{ s.body|markdown }}</div>{% endif %}
+        </div>
       </div>
     </div>
   </section>
 
 {% else %}
   {# intro_dark, band_dark, band_light: a heading and text, with an optional image beside it. #}
-  <section id="{{ s.anchor }}" class="band {% if s.section_type == 'band_light' %}band--white{% elif s.section_type == 'intro_dark' %}band--black on-dark{% else %}band--charcoal on-dark{% endif %}">
+  <section id="{{ s.anchor }}" class="band {% if s.section_type == 'band_light' %}band--light{% elif s.section_type == 'intro_dark' %}band--black on-dark{% else %}band--charcoal on-dark{% endif %}">
     <div class="container">
-      <div class="row g-4 g-lg-5 align-items-center">
-        <div class="{% if s.image %}col-lg-7{% else %}col-12{% endif %}{% if s.image and s.image_position == 'left' %} order-lg-2{% endif %}">
-          {% if s.heading %}<h2 class="band__heading align-{{ s.heading_align }}">{{ s.heading }}</h2>{% endif %}
-          <div class="band__body{% if not s.image %} band__body--wide{% endif %}">{{ s.body|markdown }}</div>
-          {% if s.button_label and s.button_url %}<a class="btn {% if s.section_type == 'band_light' %}btn-outline-gold-dark{% else %}btn-outline-gold{% endif %}" href="{{ s.button_url }}">{{ s.button_label }}</a>{% endif %}
+      <div class="row g-5 align-items-center">
+        <div class="{% if s.image %}col-lg-7{% else %}col-12{% endif %}{% if s.image and s.image_position == 'left' %} order-lg-2{% endif %}" data-reveal>
+          {% include "includes/_section_head.html" %}
+          <div class="band__body{% if not s.image %} band__body--wide{% endif %}{% if s.heading_align == 'right' %} ms-lg-auto{% endif %}">{{ s.body|markdown }}</div>
+          {% if s.button_label and s.button_url %}<a class="btn {% if s.section_type == 'band_light' %}btn-outline-gold-dark{% else %}btn-outline-gold{% endif %} mt-2" href="{{ s.button_url }}">{{ s.button_label }} {% include "includes/icons/arrow-right.svg" %}</a>{% endif %}
         </div>
         {% if s.image %}
-          <div class="col-lg-5">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>
+          <div class="col-lg-5" data-reveal data-reveal-delay="1">
+            <div class="framed-image">{% include "includes/_image.html" with obj=s class="img-fluid" %}</div>
+          </div>
         {% endif %}
       </div>
     </div>

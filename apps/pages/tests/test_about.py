@@ -81,9 +81,7 @@ def test_team_section_in_order_with_bios_and_links(client, about):
     assert page.index("First Person") < page.index("Second Person")
     assert "Former" not in page
     assert '<h3 class="team-card__name">First Person</h3>' in page
-    assert (
-        'id="first-person"' in page and "data-read-more" in page and "<strong>MBA</strong>" in page
-    )
+    assert 'id="first-person"' in page and "data-bio>" in page and "<strong>MBA</strong>" in page
     assert 'aria-label="First Person on LinkedIn (opens in a new tab)"' in page
     assert "Second Person on LinkedIn" not in page  # no URL, no icon
     assert "align-center" in page

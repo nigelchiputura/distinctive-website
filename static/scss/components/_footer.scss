@@ -1,89 +1,100 @@
-// Footer: "Reach Us" on black, a navigation strip, and the copyright line.
+// Footer: the logo and blurb, Reach Us, quick links, then the copyright line. Dark in both
+// themes, with a gold line along the top.
 
 .site-footer {
-  background: $dcs-black;
-  color: $dcs-white;
+  position: relative;
+  background:
+    radial-gradient(ellipse 50% 60% at 100% 0%, rgba($dcs-gold, 0.1), transparent 70%),
+    linear-gradient(180deg, #111 0%, $dcs-black 100%);
+  color: rgba($dcs-white, 0.85);
 
-  a {
-    color: $dcs-white;
-
-    &:hover,
-    &:focus-visible {
-      color: $dcs-gold;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, $dcs-gold, $dcs-gold-light, transparent);
   }
 
   &__main {
-    padding-block: 4rem 3rem;
+    padding-block: clamp(3rem, 2rem + 3vw, 4.5rem) 2.5rem;
   }
 
-  &__heading {
+  &__logo {
+    display: block;
+    height: 4.5rem;
+    width: auto;
+    margin-bottom: 1.25rem;
+  }
+
+  &__tagline {
     color: $dcs-gold;
-    font-size: 1.6rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
+    font-weight: 700;
   }
 
   &__blurb {
-    max-width: 38rem;
+    max-width: 24rem;
   }
 
-  &__details {
+  &__heading {
+    margin-bottom: 1.25rem;
+    color: $dcs-white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__links {
     display: grid;
-    gap: 0.6rem;
-    margin: 1.25rem 0 0;
-
-    div {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 0.4rem;
-    }
-
-    dt {
-      color: $dcs-gold;
-      font-weight: 600;
-    }
-
-    dd {
-      margin: 0;
-    }
-
-    // On phones, label above value for every line (wrapping otherwise varies by label length).
-    @include media-breakpoint-down(sm) {
-      div {
-        flex-direction: column;
-      }
-    }
-  }
-
-  &__nav {
-    background: $dcs-black-soft;
-    padding-block: 1rem;
-
-    ul {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 2rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
     a {
-      color: $dcs-gold;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba($dcs-white, 0.85);
       font-weight: 600;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        transform 0.3s $dcs-ease;
+
+      .icon {
+        color: $dcs-gold;
+        font-size: 0.8em;
+      }
 
       &:hover,
-      &:focus-visible {
-        color: $dcs-white;
+      &:focus-visible,
+      &[aria-current="page"] {
+        color: $dcs-gold;
+        transform: translateX(3px);
       }
+    }
+  }
+
+  &__social {
+    display: flex;
+    gap: 0.6rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    .social-circle {
+      border-color: rgba($dcs-white, 0.25);
+      color: $dcs-white;
     }
   }
 
   &__bottom {
     padding-block: 1.25rem;
-    font-size: 0.9rem;
+    border-top: 1px solid rgba($dcs-white, 0.08);
     color: $dcs-grey-on-dark;
+    font-size: 0.9rem;
 
     .container {
       display: flex;
@@ -92,11 +103,5 @@
       justify-content: space-between;
       gap: 1rem;
     }
-  }
-
-  &__social {
-    display: flex;
-    gap: 1.25rem;
-    font-size: 1.4rem;
   }
 }

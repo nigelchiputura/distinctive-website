@@ -1,0 +1,7 @@
+{% comment %} A section's label and heading, aligned by the editor's "heading position". Expects s. {% endcomment %}
+{% if s.eyebrow or s.heading %}
+  <div class="section-head align-{{ s.heading_align }}" data-reveal>
+    {% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}
+    {% if s.heading %}<h2 class="band__heading">{{ s.heading }}</h2>{% endif %}
+  </div>
+{% endif %}

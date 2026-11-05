@@ -1,5 +1,19 @@
-// The Home hero slider (templates/includes/_hero_slider.html) and the page-top image band
-// (section type hero_text).
+// The Home hero slider (templates/includes/_hero_slider.html) and the page-top band (section
+// type hero_text). Without a photo they are black with slowly drifting gold light.
+
+// The black-and-gold gradient with drifting light: page heroes without a photo, and the Contact
+// form's band (_contact.scss).
+@mixin dcs-hero-glow {
+  background:
+    radial-gradient(ellipse 60% 70% at 80% 20%, rgba($dcs-gold, 0.28), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 10% 90%, rgba($dcs-gold-light, 0.14), transparent 70%),
+    linear-gradient(135deg, $dcs-black 0%, $dcs-charcoal 100%);
+  background-size:
+    140% 140%,
+    140% 140%,
+    100% 100%;
+  animation: dcs-glow-drift 18s ease-in-out infinite alternate;
+}
 
 .hero {
   position: relative;
@@ -8,7 +22,7 @@
 
 .hero__slide {
   position: relative;
-  min-height: clamp(22rem, 62vh, 40rem);
+  min-height: clamp(26rem, 72vh, 44rem);
 }
 
 .hero__image,
@@ -20,15 +34,62 @@
   object-fit: cover;
 }
 
-// A slide without a photo still looks deliberate: black with a soft gold glow.
-.hero__slide--plain,
-.page-hero--plain {
-  background:
-    radial-gradient(ellipse at 70% 30%, rgba($dcs-gold, 0.22), transparent 60%),
-    linear-gradient(135deg, $dcs-black 0%, $dcs-charcoal 100%);
+// "plain" (no photo) is declared after .page-hero below, so the gradient wins over its black.
+.hero__slide--plain {
+  @include dcs-hero-glow;
 }
 
-// Darkens the photo behind the text, so white text keeps its contrast on any image.
+// Home's team photo: the people fill the lower two thirds, so the text sits in the darkened sky
+// and leaves their faces clear; a gold glow ties the photo to the brand.
+.hero__slide--photo {
+  min-height: clamp(30rem, 80vh, 48rem);
+
+  // Wide screens crop the photo top and bottom: keep the trees (where the text goes) and the
+  // whole team, at the cost of the lawn at their feet.
+  .hero__image {
+    object-position: center 12%;
+  }
+
+  .hero__overlay {
+    align-items: flex-start;
+    padding-block: clamp(2rem, 1rem + 4vh, 4rem) 7rem;
+    background:
+      radial-gradient(ellipse 55% 45% at 50% 0%, rgba($dcs-gold, 0.22), transparent 70%),
+      linear-gradient(
+        180deg,
+        rgba($dcs-black, 0.82) 0%,
+        rgba($dcs-black, 0.55) 32%,
+        rgba($dcs-black, 0.12) 60%,
+        rgba($dcs-black, 0.35) 85%,
+        rgba($dcs-black, 0.7) 100%
+      );
+  }
+
+  .hero__heading {
+    font-size: clamp(2.1rem, 1.2rem + 3.2vw, 3.6rem);
+  }
+
+  .hero__subheading {
+    margin-bottom: 1.5rem;
+    text-shadow: 0 1px 10px rgba($dcs-black, 0.8);
+  }
+}
+
+// Faint gold lines over the plain background, so it has some texture.
+.hero__slide--plain::before,
+.page-hero--plain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    transparent 0 46px,
+    rgba($dcs-gold, 0.05) 46px 47px
+  );
+  mask-image: linear-gradient(90deg, transparent, $dcs-black 40%, $dcs-black 60%, transparent);
+}
+
+// Darkens a photo behind the text, so white text keeps its contrast on any image.
 .hero__overlay,
 .page-hero__overlay {
   position: relative;
@@ -36,44 +97,71 @@
   display: flex;
   align-items: center;
   min-height: inherit;
-  padding-block: 4rem 5rem;
-  background: linear-gradient(180deg, rgba($dcs-black, 0.25) 0%, rgba($dcs-black, 0.6) 100%);
+  padding-block: 5rem 6rem;
+  background: linear-gradient(180deg, rgba($dcs-black, 0.2) 0%, rgba($dcs-black, 0.65) 100%);
 }
 
 .hero__text {
+  max-width: 54rem;
   text-align: center;
   color: $dcs-white;
+
+  > * {
+    animation: dcs-fade-up 0.9s $dcs-ease both;
+  }
+
+  > :nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  > :nth-child(3) {
+    animation-delay: 0.24s;
+  }
 }
 
 .hero__heading {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, $dcs-gold-light, $dcs-gold 60%);
+  background-clip: text;
   color: $dcs-gold;
-  font-size: clamp(2rem, 1.2rem + 3.6vw, 3.75rem);
+  -webkit-text-fill-color: transparent;
+  font-size: clamp(2.2rem, 1.2rem + 4vw, 4.25rem);
   font-weight: 700;
-  line-height: 1.15;
-  text-shadow: 0 2px 12px rgba($dcs-black, 0.6);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .hero__subheading {
-  margin-bottom: 1.75rem;
-  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.35rem);
+  margin-bottom: 2rem;
+  color: rgba($dcs-white, 0.9);
+  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.3rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-shadow: 0 1px 8px rgba($dcs-black, 0.7);
 }
 
-// Arrows sit over the image; the dots and the pause button share a bar at the bottom.
+// A soft curve into the section below.
+.hero::after,
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  z-index: 2;
+  height: 2.5rem;
+  background: linear-gradient(180deg, transparent, rgba($dcs-black, 0.35));
+  pointer-events: none;
+}
+
 .hero .carousel-control-prev,
 .hero .carousel-control-next {
-  z-index: 2;
-  width: 4rem;
+  z-index: 3;
+  width: 4.5rem;
 }
 
 .hero__controls {
   position: absolute;
-  inset: auto 0 1rem;
-  z-index: 2;
+  inset: auto 0 1.25rem;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,11 +171,18 @@
 .hero__indicators {
   position: static;
   margin: 0;
+
+  [data-bs-target] {
+    width: 2rem;
+    height: 4px;
+    border-radius: 2px;
+  }
 }
 
 .hero__pause {
-  padding: 0.15rem 0.75rem;
-  border: 1px solid rgba($dcs-white, 0.7);
+  padding: 0.2rem 0.9rem;
+  border: 1px solid rgba($dcs-white, 0.6);
+  border-radius: $dcs-radius-pill;
   background: rgba($dcs-black, 0.45);
   color: $dcs-white;
   font-size: 0.85rem;
@@ -101,13 +196,45 @@
 
 .page-hero {
   position: relative;
-  min-height: clamp(16rem, 40vh, 26rem);
+  min-height: clamp(18rem, 42vh, 28rem);
   background: $dcs-black;
   color: $dcs-white;
 }
 
+.page-hero--plain {
+  @include dcs-hero-glow;
+}
+
+.page-hero__inner {
+  max-width: 50rem;
+
+  > * {
+    animation: dcs-fade-up 0.9s $dcs-ease both;
+  }
+
+  > :nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  > :nth-child(3) {
+    animation-delay: 0.2s;
+  }
+}
+
 .page-hero__heading {
-  color: $dcs-gold;
-  font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem);
+  margin-bottom: 1rem;
+  color: $dcs-white;
+  font-size: clamp(2rem, 1.2rem + 3vw, 3.5rem);
   font-weight: 700;
+  line-height: 1.1;
+}
+
+.page-hero__body {
+  max-width: 44rem;
+  color: rgba($dcs-white, 0.85);
+  font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem);
+
+  p:last-child {
+    margin-bottom: 0;
+  }
 }

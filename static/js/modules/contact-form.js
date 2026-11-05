@@ -58,7 +58,11 @@ function showSuccess(form, message) {
   note.className = "form-success";
   note.setAttribute("role", "status");
   note.tabIndex = -1;
-  note.textContent = message || "Thank you, your message has been sent.";
+  const tick = document.querySelector('template[data-icon="check"]');
+  if (tick) note.append(tick.content.cloneNode(true));
+  const text = document.createElement("span");
+  text.textContent = message || "Thank you, your message has been sent.";
+  note.append(text);
   form.replaceWith(note);
   note.focus();
 }

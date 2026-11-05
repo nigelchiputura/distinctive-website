@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% comment %} Django's page_not_found renders this with the request's context, so it has the
+   site's header and footer. Old addresses are redirected before it shows (RedirectMiddleware). {% endcomment %}
+{% block title %}Page not found | {{ site_info.company_name }}{% endblock %}
+
+{% block content %}
+  <section class="band band--black on-dark error-page">
+    <div class="container">
+      <p class="error-page__code">404</p>
+      <h1 class="band__heading">We couldn't find that page</h1>
+      <p class="error-page__lead">It may have moved when the site was rebuilt, or the address may have a typo. These pages will take you on from here:</p>
+      <ul class="error-page__links">
+        {% for item in nav_items %}<li><a class="btn btn-outline-gold" href="{{ item.url }}">{{ item.label }}</a></li>{% endfor %}
+      </ul>
+      <p class="mb-0">Looking for something in particular? Email <a href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a> or call <a href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a>.</p>
+    </div>
+  </section>
+{% endblock %}

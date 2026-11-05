@@ -1,0 +1,14 @@
+{% comment %} System / Light / Dark (docs/frontend.md §8). A Bootstrap dropdown; theme.js marks the current
+   choice (aria-pressed), shows its icon, stores it and applies it. {% endcomment %}
+<div class="dropdown theme-toggle" data-theme-toggle hidden>
+  <button class="theme-toggle__button" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Colour theme: System" data-theme-button>
+    <span data-theme-icon="system">{% include "includes/icons/circle-half-stroke.svg" %}</span>
+    <span data-theme-icon="light" hidden>{% include "includes/icons/sun.svg" %}</span>
+    <span data-theme-icon="dark" hidden>{% include "includes/icons/moon.svg" %}</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end theme-toggle__menu">
+    <li><button type="button" class="dropdown-item theme-toggle__option" data-theme-choice="system" aria-pressed="true">{% include "includes/icons/circle-half-stroke.svg" %} System <span class="theme-toggle__check">{% include "includes/icons/check.svg" %}</span></button></li>
+    <li><button type="button" class="dropdown-item theme-toggle__option" data-theme-choice="light" aria-pressed="false">{% include "includes/icons/sun.svg" %} Light <span class="theme-toggle__check">{% include "includes/icons/check.svg" %}</span></button></li>
+    <li><button type="button" class="dropdown-item theme-toggle__option" data-theme-choice="dark" aria-pressed="false">{% include "includes/icons/moon.svg" %} Dark <span class="theme-toggle__check">{% include "includes/icons/check.svg" %}</span></button></li>
+  </ul>
+</div>

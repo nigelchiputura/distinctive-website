@@ -2,8 +2,8 @@
 
 Start with `../CLAUDE.md` (the working rules), then `Phase_Gates.md` (where the project is).
 
-**Current phase: Phase 1** (Home, About, Services, Contact, live on `distinctive.co.zw` in 10
-working days). Phase 2 (Jobs and Search) is a draft.
+**Current phase: Phase 1** (Home, About, Services, Contact, live on `distinctive.co.zw` in 11
+working days, since Day 9's UI and components polish was added on 2026-11-04). Phase 2 (Jobs and Search) is a draft.
 
 ## Project-wide (kept current)
 
@@ -13,20 +13,20 @@ working days). Phase 2 (Jobs and Search) is a draft.
 | [Phase_Gates.md](./Phase_Gates.md) | The phases, their status, the completion checklist, where docs live |
 | [architecture.md](./architecture.md) | The five layers, base classes, request flow, content model |
 | [folder_structure.md](./folder_structure.md) | Repository layout, app shape, naming, git hygiene |
-| [frontend.md](./frontend.md) | npm/Sass pipeline, tokens, templates, page notes, JS modules, consent |
+| [frontend.md](./frontend.md) | npm/Sass pipeline, tokens, templates, page notes, JS modules, consent, light and dark themes, motion |
 | [deployment.md](./deployment.md) | Docker image, env vars, CI, Resend, the VPS, go-live and cutover |
 | [users.md](./users.md) | Custom user, allauth (password + Google), groups, Jazzmin |
 | [Testing_Strategy.md](./Testing_Strategy.md) | Testing approach, tooling, coverage gate |
 | [Errors_And_Exceptions.md](./Errors_And_Exceptions.md) | The error-log process; the log itself is [errors-and-exceptions/](./errors-and-exceptions/README.md) |
 | [commands/README.md](./commands/README.md) | What to run after each completed day |
-| `Operations.md` | Running the live site (written on Phase 1 Day 10) |
+| `Operations.md` | Running the live site (written on Phase 1 Day 11) |
 
 ## Phase 1 — Agreed 2026-11-02
 
 | Document | What it covers |
 |---|---|
 | [Phase_1/Phase1_Scope.md](./Phase_1/Phase1_Scope.md) | Decisions, deliverables, deferrals, assumptions, open questions, prerequisites |
-| [Phase_1/Task_Breakdown.md](./Phase_1/Task_Breakdown.md) | Ten days of cards with acceptance criteria |
+| [Phase_1/Task_Breakdown.md](./Phase_1/Task_Breakdown.md) | Eleven days of cards with acceptance criteria |
 | [Phase_1/Test_Plan.md](./Phase_1/Test_Plan.md) | Required tests (§3) and manual QA, including go-live (§4) |
 
 ## Phase 2 — Draft
@@ -45,7 +45,7 @@ working days). Phase 2 (Jobs and Search) is a draft.
 
 ## What changed on 2026-11-02
 
-- The build is split into **Phase 1** (live in 10 days) and **Phase 2** (Jobs and Search, at the
+- The build is split into **Phase 1** (live in 11 days) and **Phase 2** (Jobs and Search, at the
   owner's pace).
 - Email: **Resend** replaces Brevo (`deployment.md` §6).
 - Media: **local storage** (a Docker volume served by Caddy); Cloudflare R2 moves to the backlog.

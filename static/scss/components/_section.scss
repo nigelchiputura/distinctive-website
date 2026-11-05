@@ -1,40 +1,85 @@
-// Page sections (templates/includes/_section.html): full-width bands of colour.
+// Page sections (templates/includes/_section.html): full-width bands. Light bands follow the
+// theme; black, charcoal, gradient and gold bands look the same in both.
 
 .band {
-  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  position: relative;
+  padding-block: clamp(3.5rem, 2rem + 5vw, 6.5rem);
+  overflow: hidden;
 }
 
-.band--white {
-  background: $dcs-white;
+.band--light {
+  background:
+    radial-gradient(ellipse 50% 40% at 100% 0%, var(--dcs-band-light-glow), transparent 70%),
+    var(--dcs-band-light);
+  color: var(--dcs-text);
 }
 
 .band--black {
-  background: $dcs-black;
+  background:
+    radial-gradient(ellipse 55% 50% at 0% 0%, rgba($dcs-gold, 0.13), transparent 70%),
+    linear-gradient(160deg, $dcs-black 0%, #141414 100%);
 }
 
 .band--charcoal,
 .band--dark {
-  background: $dcs-charcoal;
+  background:
+    radial-gradient(ellipse 50% 50% at 100% 100%, rgba($dcs-gold, 0.12), transparent 70%),
+    linear-gradient(200deg, $dcs-charcoal 0%, #161616 100%);
 }
 
 .band--gradient {
-  background: linear-gradient(180deg, $dcs-navy 0%, $dcs-blue 100%);
+  background:
+    radial-gradient(ellipse 45% 55% at 90% 10%, rgba($dcs-gold, 0.16), transparent 70%),
+    linear-gradient(160deg, $dcs-navy 0%, $dcs-blue 100%);
+}
+
+.band--gold {
+  background:
+    radial-gradient(ellipse 60% 70% at 0% 0%, rgba($dcs-white, 0.3), transparent 70%),
+    linear-gradient(135deg, $dcs-gold-light 0%, $dcs-gold 100%);
+  color: $dcs-black;
+
+  h2 {
+    color: $dcs-black;
+  }
+}
+
+// A section's label and heading.
+.section-head {
+  margin-bottom: 2.5rem;
+
+  &.align-center {
+    margin-inline: auto;
+    max-width: 48rem;
+  }
 }
 
 .band__heading {
-  margin-bottom: 1.25rem;
-  color: inherit;
-  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.25rem);
+  margin-bottom: 1rem;
+  color: var(--dcs-heading);
+  font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .on-dark .band__heading {
-  color: $dcs-gold;
+  color: $dcs-white;
 }
 
-// Gold headings on white use the darker gold (plain gold is 2.1:1 on white).
-.band__heading--on-light {
-  color: $dcs-gold-dark;
-  font-weight: 700;
+// A short gold bar under every section heading.
+.section-head .band__heading::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 3px;
+  margin-top: 1rem;
+  border-radius: 3px;
+  background: linear-gradient(90deg, $dcs-gold, $dcs-gold-light);
+}
+
+.align-center .band__heading::after {
+  margin-inline: auto;
 }
 
 // The editor's "heading position".
@@ -52,80 +97,146 @@
 
   @include media-breakpoint-up(lg) {
     text-align: right;
+
+    .band__heading::after {
+      margin-left: auto;
+    }
   }
 }
 
 .band__intro {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
 }
 
-.on-dark .band__intro strong,
-.on-dark .band__body strong {
-  color: $dcs-white;
+.on-dark .band__intro,
+.on-dark .band__body {
+  color: rgba($dcs-white, 0.88);
+
+  strong {
+    color: $dcs-white;
+  }
 }
 
 .band__lead {
   max-width: 46rem;
-  margin: 0 auto 2.5rem;
+  margin: -1rem auto 2.75rem;
+  color: var(--dcs-text-muted);
+  font-size: 1.1rem;
   text-align: center;
+}
+
+.on-dark .band__lead {
+  color: rgba($dcs-white, 0.8);
 }
 
 .band__body {
   max-width: 48rem;
+  font-size: 1.05rem;
 }
 
-// A band with no image beside its text uses the container's width, with lines still short
-// enough to read comfortably.
 .band__body--wide {
   max-width: 62rem;
 }
 
-.band__body ul {
-  padding-left: 1.25rem;
+// Lists in Markdown bodies: gold ticks instead of bullets.
+.band__body ul,
+.service-band__body ul {
+  padding-left: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    padding-left: 1.75rem;
+  }
+
+  li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.9rem;
+    height: 0.5rem;
+    border-bottom: 2px solid $dcs-gold;
+    border-left: 2px solid $dcs-gold;
+    transform: rotate(-45deg) translateY(-25%);
+  }
 }
 
-.band__body li + li {
-  margin-top: 0.4rem;
+.band__body li + li,
+.service-band__body li + li {
+  margin-top: 0.5rem;
 }
 
-// Call to action: one line and a button.
+// ---- Call to action ------------------------------------------------------------------------
+
 .band--cta {
-  padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
+  padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+.cta-panel {
+  position: relative;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding: clamp(2rem, 1.5rem + 3vw, 3.5rem);
+  border: 1px solid rgba($dcs-gold, 0.3);
+  border-radius: $dcs-radius-lg;
+  background:
+    radial-gradient(ellipse 70% 120% at 50% 0%, rgba($dcs-gold, 0.2), transparent 70%),
+    linear-gradient(160deg, rgba($dcs-white, 0.06), rgba($dcs-white, 0.01));
+  box-shadow: 0 1.5rem 3.5rem rgba($dcs-black, 0.4);
+  text-align: center;
 }
 
 .cta__heading {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   color: $dcs-white;
-  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem);
   font-weight: 700;
+  line-height: 1.3;
 }
 
-// Image beside a heading and text ("People Centred", "Proactive"). The image side is set per
-// section; on phones the image always comes first.
+.cta__body {
+  max-width: 40rem;
+  margin: -0.75rem auto 1.75rem;
+  color: rgba($dcs-white, 0.85);
+}
+
+// ---- Image beside a heading and text ("People Centred", "Proactive") --------------------------
+
 .value-block__heading {
   margin-bottom: 1rem;
-  color: $dcs-black;
-  font-size: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem);
+  color: var(--dcs-heading);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
   font-weight: 700;
 }
 
 .value-block__body {
   max-width: 34rem;
-  color: $dcs-grey;
-  font-size: 1.05rem;
-}
-
-.value-block__image {
-  width: 100%;
+  color: var(--dcs-text-muted);
+  font-size: 1.1rem;
 }
 
 @include media-breakpoint-up(lg) {
-  .value-block--image-right .value-block__media {
+  .value-block--image-right // Value blocks follow each other, so a flat background keeps them one calm section.
+.band--light.value-block {
+  background: var(--dcs-page-soft);
+}
+
+.value-block__media {
     order: 2;
   }
 }
 
-// Consecutive white value blocks read as one section, as on the old site.
+// Value blocks follow each other, so a flat background keeps them one calm section.
+.band--light.value-block {
+  background: var(--dcs-page-soft);
+}
+
+.value-block__media {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+// Consecutive value blocks read as one section.
 .value-block + .value-block {
   padding-top: 0;
 }

@@ -1,35 +1,99 @@
-// White navbar: logo left, links right; gold marks active and hover.
+// The sticky navbar: frosted over the page, a shadow once the page scrolls (navbar.js), links
+// with a sliding gold underline, and the theme toggle.
 
 .site-navbar {
-  background: $dcs-white;
-  box-shadow: 0 1px 0 rgba($dcs-black, 0.08);
+  --bs-navbar-color: var(--dcs-text-muted);
+  --bs-navbar-hover-color: var(--dcs-accent);
+  --bs-navbar-active-color: var(--dcs-accent);
+  --bs-navbar-toggler-border-color: var(--dcs-border-strong);
+  border-bottom: 1px solid var(--dcs-border);
+  background: var(--dcs-nav-bg);
   padding-block: 0.5rem;
+  backdrop-filter: saturate(1.4) blur(12px);
+  transition:
+    box-shadow $dcs-duration ease,
+    padding $dcs-duration ease,
+    background-color $dcs-duration ease;
+
+  &.is-scrolled {
+    padding-block: 0.25rem;
+    box-shadow: 0 0.5rem 1.5rem rgba($dcs-black, 0.12);
+  }
 
   .navbar-brand img {
-    display: block;
     height: 3.75rem;
     width: auto;
+    transition: height $dcs-duration ease;
+  }
+
+  .brand-logo--light {
+    display: var(--dcs-logo-light);
+  }
+
+  .brand-logo--dark {
+    display: var(--dcs-logo-dark);
+  }
+
+  &.is-scrolled .navbar-brand img {
+    height: 3rem;
   }
 
   .nav-link {
-    font-size: 1.125rem;
-    font-weight: 600;
     position: relative;
+    font-size: 1.05rem;
+    font-weight: 600;
 
-    // A gold underline marks the current page (colour alone isn't enough for everyone).
-    &.active::after {
+    // The gold underline grows in on hover and stays on the current page (colour alone isn't
+    // enough for everyone).
+    &::after {
       content: "";
       position: absolute;
       left: var(--bs-navbar-nav-link-padding-x);
       right: var(--bs-navbar-nav-link-padding-x);
-      bottom: 0.15rem;
+      bottom: 0.2rem;
       height: 2px;
-      background: $dcs-gold;
+      border-radius: 2px;
+      background: linear-gradient(90deg, $dcs-gold, $dcs-gold-light);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform $dcs-duration $dcs-ease;
+    }
+
+    &:hover::after,
+    &:focus-visible::after,
+    &.active::after {
+      transform: scaleX(1);
     }
   }
 
   .navbar-toggler {
-    border-color: rgba($dcs-black, 0.2);
+    border-radius: $dcs-radius-sm;
+  }
+
+  .navbar-toggler-icon {
+    filter: var(--dcs-toggler-filter, none);
+  }
+}
+
+:root[data-theme="dark"] .site-navbar {
+  --dcs-toggler-filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .site-navbar {
+    --dcs-toggler-filter: invert(1);
+  }
+}
+
+.site-navbar__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@include media-breakpoint-up(lg) {
+  .site-navbar__tools {
+    margin-left: 0.75rem;
   }
 }
 
@@ -39,10 +103,86 @@
       height: 3rem;
     }
 
-    .nav-link.active::after {
+    .nav-link::after {
       left: 0;
       right: auto;
       width: 2rem;
+    }
+
+    .navbar-collapse {
+      padding-block: 0.5rem 1rem;
+    }
+  }
+}
+
+// ---- Theme toggle -------------------------------------------------------------------------
+
+.theme-toggle {
+  &[hidden] {
+    display: none;
+  }
+
+  &__button {
+    display: inline-grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid var(--dcs-border-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--dcs-heading);
+    font-size: 1.05rem;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.4s $dcs-ease;
+
+    &:hover,
+    &:focus-visible,
+    &[aria-expanded="true"] {
+      border-color: $dcs-gold;
+      color: var(--dcs-accent);
+    }
+
+    &:hover .icon {
+      transform: rotate(-20deg);
+    }
+
+    .icon {
+      transition: transform 0.4s $dcs-ease;
+    }
+  }
+
+  &__menu {
+    --bs-dropdown-bg: var(--dcs-surface);
+    --bs-dropdown-color: var(--dcs-text);
+    --bs-dropdown-border-color: var(--dcs-border);
+    --bs-dropdown-link-color: var(--dcs-text);
+    --bs-dropdown-link-hover-color: var(--dcs-heading);
+    --bs-dropdown-link-hover-bg: var(--dcs-chip-bg);
+    --bs-dropdown-link-active-color: var(--dcs-heading);
+    --bs-dropdown-link-active-bg: var(--dcs-chip-bg);
+    min-width: 11rem;
+    padding: 0.4rem;
+    box-shadow: var(--dcs-shadow-lift);
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    border-radius: $dcs-radius-sm;
+    font-weight: 600;
+
+    .theme-toggle__check {
+      margin-left: auto;
+      color: var(--dcs-accent);
+      visibility: hidden;
+    }
+
+    &[aria-pressed="true"] .theme-toggle__check {
+      visibility: visible;
     }
   }
 }

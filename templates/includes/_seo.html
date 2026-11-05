@@ -1,0 +1,18 @@
+{% load core_extras %}{% comment %} The page's search and sharing tags, from SeoService (docs/frontend.md §3). Pages without
+   a `seo` (sign-in, errors) get base.html's plain title and noindex instead. {% endcomment %}
+<title>{{ seo.title }}</title>
+<meta name="description" content="{{ seo.description }}">
+<link rel="canonical" href="{{ seo.canonical }}">
+{% if seo.noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+<meta property="og:site_name" content="{{ seo.site_name }}">
+<meta property="og:type" content="{{ seo.og_type }}">
+<meta property="og:title" content="{{ seo.title }}">
+<meta property="og:description" content="{{ seo.description }}">
+<meta property="og:url" content="{{ seo.canonical }}">
+<meta property="og:image" content="{{ seo.image }}">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo.title }}">
+<meta name="twitter:description" content="{{ seo.description }}">
+<meta name="twitter:image" content="{{ seo.image }}">
+{{ seo.jsonld|jsonld }}

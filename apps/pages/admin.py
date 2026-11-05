@@ -8,7 +8,7 @@ from django.http import HttpRequest
 
 from apps.core.admin_widgets import image_preview
 
-from .models import HeroSlide, Page, PageSection, Partner
+from .models import HeroSlide, Page, PageSection, Partner, Redirect
 
 IMAGE_FIELDS = ("image", "preview", "image_alt", "image_decorative")
 
@@ -24,6 +24,7 @@ class PageSectionInline(admin.StackedInline):
             {
                 "fields": (
                     "section_type",
+                    "eyebrow",
                     "heading",
                     "heading_align",
                     "intro",
@@ -115,3 +116,32 @@ class PartnerAdmin(admin.ModelAdmin):
     @admin.display(description="current logo")
     def preview(self, obj: Partner) -> str:
         return image_preview(obj, height=120)
+
+
+@admin.register(Redirect)
+class RedirectAdmin(admin.ModelAdmin):
+    """Old site addresses (docs/users.md §5). Hits show which old links people still use."""
+
+    list_display = (
+        "old_path",
+        "new_path",
+        "match_prefix",
+        "is_permanent",
+        "is_active",
+        "hits",
+        "last_hit_at",
+    )
+    list_editable = ("is_active",)
+    list_filter = ("is_active", "match_prefix", "is_permanent")
+    search_fields = ("old_path", "new_path", "note")
+    readonly_fields = ("hits", "last_hit_at")
+    fields = (
+        "old_path",
+        "new_path",
+        "match_prefix",
+        "is_permanent",
+        "is_active",
+        "note",
+        "hits",
+        "last_hit_at",
+    )

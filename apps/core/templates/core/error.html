@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% comment %} Shown by BaseController for a ServiceError on a page request (400, 503 …). Day 9 adds the
-   branded 404 and 500 pages, which Django serves itself. {% endcomment %}
+{% comment %} Shown by BaseController for a ServiceError on a page request (400, 503 …). The 404 and
+   500 pages are templates/404.html and 500.html, which Django serves itself. {% endcomment %}
 {% block title %}Sorry · {{ site_info.company_name }}{% endblock %}
 
 {% block content %}

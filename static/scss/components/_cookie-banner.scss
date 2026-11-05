@@ -1,46 +1,45 @@
-// The cookie choice (templates/includes/_cookie_banner.html), fixed to the bottom of the window.
+// The cookie choice (templates/includes/_cookie_banner.html): a card floating bottom left.
 
 .cookie-banner {
   position: fixed;
-  inset: auto 0 0;
+  left: clamp(0.75rem, 2vw, 1.5rem);
+  bottom: clamp(0.75rem, 2vw, 1.5rem);
   z-index: 1080;
-  padding-block: 1.25rem;
+  width: min(30rem, calc(100% - 1.5rem));
+  padding: 1.5rem;
+  border: 1px solid rgba($dcs-gold, 0.35);
+  border-radius: $dcs-radius-lg;
+  background:
+    radial-gradient(ellipse 80% 60% at 100% 0%, rgba($dcs-gold, 0.16), transparent 70%),
+    linear-gradient(160deg, #181818, $dcs-black);
   color: $dcs-white;
-  background: $dcs-black;
-  border-top: 3px solid $dcs-gold;
-  box-shadow: 0 -0.5rem 1.5rem rgba($dcs-black, 0.25);
+  box-shadow: 0 1.5rem 3.5rem rgba($dcs-black, 0.45);
+  animation: dcs-fade-up 0.5s $dcs-ease both;
 
   &[hidden] {
     display: none;
   }
 
-  &__inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem 2rem;
-  }
-
-  &__text {
-    flex: 1 1 32rem;
-    font-size: 0.95rem;
-  }
-
   &__title {
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.5rem;
     color: $dcs-gold;
     font-size: 1.1rem;
     font-weight: 700;
+  }
+
+  &__text {
+    font-size: 0.92rem;
+    color: rgba($dcs-white, 0.88);
   }
 
   &__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+    margin-top: 1.25rem;
 
     .btn {
-      min-width: 7rem;
+      flex: 1 1 8rem;
     }
   }
 }

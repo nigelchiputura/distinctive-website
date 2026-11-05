@@ -20,6 +20,7 @@ from apps.core.services.base import BaseService
 from apps.offerings.repositories.service_repository import ServiceRepository
 from apps.pages.repositories.page_repository import PageRepository
 from apps.pages.repositories.partner_repository import PartnerRepository
+from apps.pages.repositories.redirect_repository import RedirectRepository
 from apps.team.repositories.team_repository import TeamRepository
 
 SEED_IMAGES = Path(__file__).resolve().parent.parent / "seed" / "images"
@@ -31,7 +32,9 @@ def open_seed_image(name: str) -> File:
 
 
 # Keys that identify an item, never "filled in".
-KEY_FIELDS = frozenset({"anchor", "heading", "name", "kind"})
+# Fields items are found by, never rewritten. A section is found by its anchor, so an empty
+# heading on it can be filled (Day 9 gave Home's service cards one).
+KEY_FIELDS = frozenset({"anchor", "name", "kind", "old_path"})
 
 
 def blank_fields(obj: Any, item: dict[str, Any]) -> dict[str, Any]:
@@ -67,12 +70,14 @@ class SeedService(BaseService):
         team: TeamRepository | None = None,
         partners: PartnerRepository | None = None,
         open_image: Callable[[str], Any] = open_seed_image,
+        redirects: RedirectRepository | None = None,
     ):
         self.pages = pages or PageRepository()
         self.services = services or ServiceRepository()
         self.team = team or TeamRepository()
         self.partners = partners or PartnerRepository()
         self.open_image = open_image
+        self.redirects = redirects or RedirectRepository()
 
     def seed(self) -> SeedReport:
         report = SeedReport()
@@ -93,6 +98,7 @@ class SeedService(BaseService):
         self._seed_page(
             report, "contact", content.CONTACT_META_DESCRIPTION, content.CONTACT_SECTIONS
         )
+        self._seed_redirects(report)
         return report
 
     # ---- parts -----------------------------------------------------------------------------
@@ -131,6 +137,17 @@ class SeedService(BaseService):
                 self.partners.update,
             )
 
+    def _seed_redirects(self, report: SeedReport) -> None:
+        for item in content.REDIRECTS:
+            self._add_or_fill(
+                report,
+                "redirects",
+                self.redirects.by_old_path(item["old_path"]),
+                item,
+                self.redirects.create,
+                self.redirects.update,
+            )
+
     def _seed_page(
         self,
         report: SeedReport,
@@ -142,8 +159,11 @@ class SeedService(BaseService):
         page = self.get_or_raise(
             self.pages.by_slug(slug), f"The {slug} page is missing: run `manage.py migrate` first."
         )
-        if not page.meta_description:
-            self.pages.update(page, meta_description=meta_description)
+        page_fields = {"meta_description": meta_description}
+        if slug in content.META_TITLES:
+            page_fields["meta_title"] = content.META_TITLES[slug]
+        if blanks := blank_fields(page, page_fields):
+            self.pages.update(page, **blanks)
         for item in slides:
             self._add_or_fill(
                 report,

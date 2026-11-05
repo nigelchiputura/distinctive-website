@@ -7,7 +7,7 @@
     <div id="hero-slider" class="carousel slide carousel-fade"{% if slides|length > 1 %} data-hero-slider aria-roledescription="carousel"{% endif %}>
       <div class="carousel-inner">
         {% for slide in slides %}
-          <div class="carousel-item hero__slide{% if forloop.first %} active{% endif %}{% if not slide.image %} hero__slide--plain{% endif %}"{% if slides|length > 1 %} role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ slides|length }}"{% endif %}>
+          <div class="carousel-item hero__slide{% if forloop.first %} active{% endif %}{% if slide.image %} hero__slide--photo{% else %} hero__slide--plain{% endif %}"{% if slides|length > 1 %} role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ slides|length }}"{% endif %}>
             {% if slide.image %}
               {% include "includes/_image.html" with obj=slide class="hero__image" eager=forloop.first %}
             {% endif %}

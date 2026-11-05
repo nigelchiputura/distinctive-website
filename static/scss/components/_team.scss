@@ -1,16 +1,11 @@
-// Our Leadership (templates/includes/_team_card.html): four across on wide screens, two on
-// tablets, one on phones. Bios are left-aligned (the old site justified them, leaving gaps).
-
-.team-band__heading {
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 3rem;
-}
+// Our Leadership (templates/includes/_team_card.html): cards, four across on wide screens. A
+// long bio is cut to a few lines with "Read full bio", which opens it in a dialog
+// (static/js/modules/bio-dialog.js). Without JavaScript the whole bio shows on the card.
 
 .team-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem 2.5rem;
+  gap: 1.75rem;
 
   @include media-breakpoint-up(md) {
     grid-template-columns: repeat(2, 1fr);
@@ -22,72 +17,246 @@
 }
 
 .team-card {
-  max-width: 26rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem 1.5rem 1.5rem;
+  border: 1px solid var(--dcs-border);
+  border-radius: $dcs-radius-lg;
+  background: var(--dcs-surface);
+  box-shadow: var(--dcs-shadow);
+  text-align: center;
+  transition:
+    transform 0.4s $dcs-ease,
+    box-shadow 0.4s ease;
+
+  &:hover {
+    box-shadow: var(--dcs-shadow-lift);
+    transform: translateY(-4px);
+  }
+}
+
+// The photo in a gold ring.
+.team-card__photo-wrap {
+  display: inline-block;
+  margin: 0 auto 1.25rem;
+  padding: 4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $dcs-gold-light, $dcs-gold, $dcs-gold-dark);
 }
 
 .team-card__photo {
   display: block;
-  width: 11rem;
-  height: 11rem;
-  margin-bottom: 1.25rem;
+  width: 9.5rem;
+  height: 9.5rem;
+  border: 4px solid var(--dcs-surface);
   border-radius: 50%;
   object-fit: cover;
 }
 
 .team-card__name {
   margin-bottom: 0.25rem;
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: var(--dcs-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .team-card__title {
-  margin-bottom: 0.75rem;
-  color: $dcs-grey;
+  margin-bottom: 1rem;
+  color: var(--dcs-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
   line-height: 1.4;
 }
 
 .team-card__bio {
+  color: var(--dcs-text-muted);
   font-size: 0.95rem;
   line-height: 1.65;
+  text-align: left;
 
   p {
     margin-bottom: 0.75rem;
   }
 
-  // Cut to about nine lines until "Read more" (read-more.js adds the class only when it's needed).
-  &.is-collapsed {
-    max-height: 15.5rem;
+  &.is-clamped {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
     overflow: hidden;
-    mask-image: linear-gradient(180deg, $dcs-black 70%, transparent);
+
+    p {
+      display: inline;
+    }
+
+    p + p::before {
+      content: " ";
+    }
   }
 }
 
-.read-more__toggle {
+.team-card__more {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
   padding: 0;
   border: 0;
   background: none;
-  color: $dcs-gold-dark;
-  font-weight: 600;
+  color: var(--dcs-accent);
+  font-weight: 700;
+
+  .icon {
+    transition: transform $dcs-duration $dcs-ease;
+  }
 
   &:hover,
   &:focus-visible {
-    color: $dcs-gold-deeper;
-    text-decoration: underline;
+    color: var(--dcs-accent-hover);
+
+    .icon {
+      transform: translateX(4px);
+    }
   }
 }
 
 .team-card__social {
   display: flex;
-  gap: 0.9rem;
-  margin: 1rem 0 0;
-  font-size: 1.1rem;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: auto 0 0;
+  padding-top: 1.25rem;
+}
 
-  a {
-    color: $dcs-grey;
+.social-circle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid var(--dcs-border-strong);
+  border-radius: 50%;
+  color: var(--dcs-text-muted);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.3s $dcs-ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $dcs-gold;
+    background: $dcs-gold;
+    color: $dcs-black;
+    transform: translateY(-2px);
+  }
+}
+
+// ---- The bio dialog ------------------------------------------------------------------------
+
+.bio-dialog {
+  width: min(42rem, calc(100% - 2rem));
+  max-height: min(85vh, 48rem);
+  padding: 0;
+  border: 1px solid var(--dcs-border);
+  border-radius: $dcs-radius-lg;
+  background: var(--dcs-surface);
+  color: var(--dcs-text);
+  box-shadow: 0 2rem 4rem rgba($dcs-black, 0.45);
+
+  &[open] {
+    animation: dcs-dialog-in 0.35s $dcs-ease;
+  }
+
+  &::backdrop {
+    background: rgba($dcs-black, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  &[open]::backdrop {
+    animation: dcs-backdrop-in 0.35s ease;
+  }
+
+  &__inner {
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+
+  &__header {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-right: 2.5rem;
+  }
+
+  &__photo {
+    flex: 0 0 auto;
+    width: 5.5rem;
+    height: 5.5rem;
+    border: 3px solid $dcs-gold;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__name {
+    margin: 0 0 0.25rem;
+    color: var(--dcs-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--dcs-accent);
+    font-weight: 600;
+  }
+
+  &__bio {
+    line-height: 1.7;
+  }
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--dcs-border-strong);
+    border-radius: 50%;
+    background: var(--dcs-surface);
+    color: var(--dcs-heading);
+    transition:
+      transform 0.3s $dcs-ease,
+      border-color 0.2s ease;
 
     &:hover,
     &:focus-visible {
-      color: $dcs-gold-dark;
+      border-color: $dcs-gold;
+      transform: rotate(90deg);
     }
+  }
+}
+
+@keyframes dcs-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dcs-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

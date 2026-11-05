@@ -18,9 +18,28 @@ $dcs-gold: #d4af37; // on dark backgrounds: headings, labels, links, active nav 
 $dcs-gold-dark: #86691a; // gold TEXT on light backgrounds (5.2:1 on white; plain gold is 2.1:1)
 $dcs-gold-deeper: #6b5415; // hover state of gold-dark links
 
-// Form errors (Day 8): never colour alone, always with a sentence under the field.
-$dcs-error-on-dark: #ff8a80; // on black: 9.2:1
-$dcs-error-on-gold: #6e0000; // on gold: 6.0:1
+$dcs-gold-light: #e8c766; // the light end of gold gradients (black text on it: 12.8:1)
+
+// Warm off-whites for light bands and cards (Day 9 polish), and the dark theme's inks.
+$dcs-paper: #faf8f3;
+$dcs-paper-deep: #f3eee2;
+$dcs-ink: #0e0f11; // dark theme: page
+$dcs-ink-soft: #1a1d21; // dark theme: light bands, a step up from the page
+$dcs-ink-raised: #23272c; // dark theme: cards
+$dcs-text-on-ink: #e9e7e2; // dark theme: body text (15:1 on the page)
+$dcs-muted-on-ink: #a9adb3; // dark theme: muted text (6.6:1 on cards)
+
+// Form errors: never colour alone, always with a sentence under the field.
+$dcs-error: #b42318; // 6.6:1 on white, 6.2:1 on paper
+$dcs-error-on-dark: #ff8a80; // 9.2:1 on black, 6.6:1 on dark cards
+
+// Shape and motion (Day 9 polish).
+$dcs-radius-sm: 0.5rem;
+$dcs-radius: 1rem;
+$dcs-radius-lg: 1.5rem;
+$dcs-radius-pill: 50rem;
+$dcs-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+$dcs-duration: 0.3s;
 
 // About "Our Story" gradient, sampled on Day 6. The old band ran on to #2a85d6, where white text
 // is only 3.9:1; it stops at $dcs-blue here, which keeps it at 6.4:1 or better all the way down.

@@ -1,36 +1,56 @@
-// Partner and client logos (templates/includes/_logo_grid.html).
+// Partner and client logos (templates/includes/_logo_grid.html): each on a white tile, in both
+// themes, because the logos themselves are made for white.
 
+// Centred rows, so a short last row sits in the middle (ten clients: five and five).
 .logo-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2.5rem; // five 11.5 rem logos fit across the 1140 px container
-  margin: 2rem 0 0;
+  gap: 1.25rem;
+  margin: 0;
 }
 
 .logo-grid__item {
-  width: 11.5rem;
+  flex: 0 1 12.5rem;
+  min-width: 9.5rem;
   text-align: center;
 }
 
-.logo-grid__link {
-  display: block;
-  color: inherit;
+.logo-grid__tile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+  border: 1px solid var(--dcs-border);
+  border-radius: $dcs-radius;
+  background: var(--dcs-surface);
+  color: var(--dcs-text);
+  box-shadow: var(--dcs-shadow);
   text-decoration: none;
-
-  &:hover .logo-grid__caption,
-  &:focus-visible .logo-grid__caption {
-    color: $dcs-gold-dark;
-    text-decoration: underline;
-  }
+  transition:
+    transform 0.4s $dcs-ease,
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
 }
 
-// Logos come in every shape: each sits in the same box, scaled to fit, never cropped.
+a.logo-grid__tile:hover,
+a.logo-grid__tile:focus-visible {
+  border-color: rgba($dcs-gold, 0.6);
+  box-shadow: var(--dcs-shadow-lift);
+  color: var(--dcs-accent);
+  text-decoration: none;
+  transform: translateY(-4px);
+}
+
+// Logos come in every shape: each sits in the same white box, scaled to fit, never cropped.
 .logo-grid__frame {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 8rem;
+  height: 6.5rem;
+  padding: 0.5rem;
+  border-radius: $dcs-radius-sm;
+  background: $dcs-white;
 }
 
 .logo-grid__image {
@@ -39,12 +59,17 @@
   width: auto;
   height: auto;
   object-fit: contain;
+  transition: transform 0.4s $dcs-ease;
+}
+
+a.logo-grid__tile:hover .logo-grid__image {
+  transform: scale(1.05);
 }
 
 .logo-grid__caption {
   display: block;
-  margin-top: 0.75rem;
-  color: $dcs-text;
-  font-size: 1.05rem;
+  margin-top: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1.35;
 }

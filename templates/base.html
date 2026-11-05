@@ -3,14 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  {# Day 9 replaces this with includes/_seo.html (canonical, Open Graph, JSON-LD). #}
-  <meta name="description" content="{% block meta_description %}{{ site_info.meta_description }}{% endblock %}">
-  <title>{% block title %}{{ site_info.company_name }}{% endblock %}</title>
+  <meta name="color-scheme" content="light dark">
+  {# Applies a chosen Light or Dark theme before the first paint (docs/frontend.md §8). #}
+  <script src="{% static 'js/theme-init.js' %}"></script>
+  {% if seo %}{% include "includes/_seo.html" %}{% else %}
+    {# Sign-in, error and other utility pages: a plain title, kept out of search results. #}
+    <title>{% block title %}{{ site_info.company_name }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ site_info.meta_description }}{% endblock %}">
+    <meta name="robots" content="noindex">
+  {% endif %}
+  <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
   <link rel="preload" href="{% static 'vendor/nunito-sans/nunito-sans-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body id="top">
   <a class="skip-link visually-hidden-focusable" href="#main">Skip to content</a>
 
   <header>
@@ -25,6 +32,11 @@
 
   {% include "includes/_footer.html" %}
   {% if consent_needed %}{% include "includes/_cookie_banner.html" %}{% endif %}
+  {# Icons the scripts copy into what they build (bio-dialog.js, contact-form.js). #}
+  <template data-icon="xmark">{% include "includes/icons/xmark.svg" %}</template>
+  <template data-icon="arrow-right">{% include "includes/icons/arrow-right.svg" %}</template>
+  <template data-icon="check">{% include "includes/icons/check.svg" %}</template>
+  <a class="back-to-top" href="#top" data-back-to-top aria-label="Back to top">{% include "includes/icons/arrow-up.svg" %}</a>
 
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script type="module" src="{% static 'js/main.js' %}"></script>

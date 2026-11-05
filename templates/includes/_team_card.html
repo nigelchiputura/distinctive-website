@@ -1,20 +1,20 @@
 {% load core_extras %}
-{% comment %} One team member (team.TeamMember) on About. A long bio is shortened behind "Read more" by
-   static/js/modules/read-more.js; without JavaScript the whole bio shows.
-   title_tag: h2 when the section has no heading, h3 under one. {% endcomment %}
-<article class="team-card" id="{{ member.anchor }}">
+{% comment %} One team member (team.TeamMember) on About. A long bio is cut to a few lines with "Read full
+   bio", which opens it in a dialog (static/js/modules/bio-dialog.js); without JavaScript the
+   whole bio shows on the card. title_tag: h2 when the section has no heading, h3 under one. {% endcomment %}
+<article class="team-card" id="{{ member.anchor }}" data-bio-card data-reveal data-reveal-delay="{{ delay|default:0 }}">
   {% if member.image %}
-    {% include "includes/_image.html" with obj=member class="team-card__photo" %}
+    <span class="team-card__photo-wrap">{% include "includes/_image.html" with obj=member class="team-card__photo" %}</span>
   {% endif %}
   <{{ title_tag|default:"h3" }} class="team-card__name">{{ member.name }}</{{ title_tag|default:"h3" }}>
   <p class="team-card__title">{{ member.title }}</p>
   {% if member.bio %}
-    <div class="team-card__bio" id="bio-{{ member.anchor }}" data-read-more>{{ member.bio|markdown }}</div>
+    <div class="team-card__bio" id="bio-{{ member.anchor }}" data-bio>{{ member.bio|markdown }}</div>
   {% endif %}
   {% if member.linkedin_url or member.facebook_url %}
     <ul class="team-card__social list-unstyled" aria-label="{{ member.name }} on social media">
-      {% if member.linkedin_url %}<li><a href="{{ member.linkedin_url }}" rel="noopener" target="_blank" aria-label="{{ member.name }} on LinkedIn (opens in a new tab)">{% include "includes/icons/linkedin.svg" %}</a></li>{% endif %}
-      {% if member.facebook_url %}<li><a href="{{ member.facebook_url }}" rel="noopener" target="_blank" aria-label="{{ member.name }} on Facebook (opens in a new tab)">{% include "includes/icons/facebook.svg" %}</a></li>{% endif %}
+      {% if member.linkedin_url %}<li><a class="social-circle" href="{{ member.linkedin_url }}" rel="noopener" target="_blank" aria-label="{{ member.name }} on LinkedIn (opens in a new tab)">{% include "includes/icons/linkedin.svg" %}</a></li>{% endif %}
+      {% if member.facebook_url %}<li><a class="social-circle" href="{{ member.facebook_url }}" rel="noopener" target="_blank" aria-label="{{ member.name }} on Facebook (opens in a new tab)">{% include "includes/icons/facebook.svg" %}</a></li>{% endif %}
     </ul>
   {% endif %}
 </article>
