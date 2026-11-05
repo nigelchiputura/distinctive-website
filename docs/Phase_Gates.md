@@ -8,7 +8,7 @@ work on the next phase starts.
 
 | Phase | Purpose | Status (2026-11-03) | Docs |
 |---|---|---|---|
-| **Phase 1** | Something visual, live: Home, About, Services and Contact, all admin-editable, replacing the WordPress site on `distinctive.co.zw` | **In progress.** Days 1–3 completed 2026-11-03 | `Phase_1/` |
+| **Phase 1** | Something visual, live: Home, About, Services and Contact, all admin-editable, replacing the WordPress site on `distinctive.co.zw` | **In progress.** Days 1–4 completed 2026-11-03 | `Phase_1/` |
 | **Phase 2** | Jobs (list, detail, Markdown postings) and site-wide Search (dropdown, results, highlighting) | **Draft.** Built at the owner's pace after the Phase 1 gate; no fixed deadline | `Phase_2/` |
 | **Backlog** | Optional improvements, built when the client needs them | Listed only | `Phase_2/Phase2_Scope.md` §6 |
 

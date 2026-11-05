@@ -6,8 +6,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "build:css": "sass static/scss/main.scss static/css/main.css --style=compressed --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
-    "watch:css": "sass static/scss/main.scss static/css/main.css --watch --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
+    "build:css": "sass static/scss/main.scss:static/css/main.css static/scss/admin.scss:static/css/admin.css --style=compressed --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
+    "watch:css": "sass static/scss/main.scss:static/css/main.css static/scss/admin.scss:static/css/admin.css --watch --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import",
     "vendor": "node scripts/copy-vendor.mjs"
   },
   "devDependencies": {

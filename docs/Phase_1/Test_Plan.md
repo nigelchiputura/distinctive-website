@@ -73,14 +73,14 @@ Controller:
 
 ### 3.5 Users (`users.md` §8)
 
-- [ ] Both adapters' `is_open_for_signup` return `False`; the sign-up URL offers no form.
-- [ ] Google login: an existing active user's email → signed in; an unknown email → refused; an
+- [x] Both adapters' `is_open_for_signup` return `False`; the sign-up URL offers no form.
+- [x] Google login: an existing active user's email → signed in; an unknown email → refused; an
   inactive user → refused.
-- [ ] `UserService.onboard_user` lower-cases the email, generates a unique username, sets an
+- [x] `UserService.onboard_user` lower-cases the email, generates a unique username, sets an
   unusable password and sends the set-password email.
-- [ ] A Content Editor can change pages, sections, slides, services, team and partners, view
+- [x] A Content Editor can change pages, sections, slides, services, team and partners, view
   submissions, and **cannot** see users or groups.
-- [ ] The admin is not at `/admin/` with prod settings when `ADMIN_URL_PATH` is set.
+- [x] The admin is not at `/admin/` with prod settings when `ADMIN_URL_PATH` is set.
 
 ### 3.6 Controller smoke tests
 

@@ -6,3 +6,5 @@ django-anymail==15.2
 Markdown==3.11.2
 nh3==0.3.7
 pillow==13.0.0
+django-allauth[socialaccount]==65.21.1
+django-jazzmin==3.0.5

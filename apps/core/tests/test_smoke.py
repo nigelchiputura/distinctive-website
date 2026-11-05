@@ -19,9 +19,9 @@ def test_placeholder_home_page(client):
 
 
 @pytest.mark.django_db
-def test_admin_login_is_reachable(client):
+def test_admin_login_goes_to_the_sign_in_page(client):
     response = client.get(f"/{settings.ADMIN_URL_PATH}login/")
-    assert response.status_code == 200
+    assert response.status_code == 302 and response.url.startswith("/accounts/login/")
 
 
 def test_requirements_only_grow():

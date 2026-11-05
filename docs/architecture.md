@@ -44,7 +44,8 @@ either happens.
 - **Data migrations and management commands** are operator tooling outside the layering. They
   may use the ORM, but prefer services (`seed_site_content` goes through services where
   practical).
-- **Signals** (Phase 2, search) call a service, never the ORM.
+- **Signals** call a service, never the ORM: the users app's `post_migrate` handler calls
+  `UserService.sync_content_editor_group`; Phase 2's search signals call `SearchIndexService`.
 
 ## 3. How this deviates from Django's MVT, and why it still works
 
@@ -86,7 +87,7 @@ testability, no extra files.
 | `BaseController` (a `View`) | `render_page`, `json_ok`, `json_error`, `is_ajax`; maps `ServiceError` to responses (404, 400, 503). |
 | `SeoMixin` + `SeoData` | Controllers return title, description, canonical and OG image; `_seo.html` renders them with JSON-LD. |
 | `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
-| `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template. |
+| `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template as **`site_info`** (not `site`, which allauth's views use for the Sites record). |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
 

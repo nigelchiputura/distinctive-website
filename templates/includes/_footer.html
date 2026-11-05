@@ -3,12 +3,12 @@
   <div class="site-footer__main">
     <div class="container">
       <h2 class="site-footer__heading">Reach Us</h2>
-      <p class="site-footer__blurb mb-0">{{ site.footer_blurb }}</p>
+      <p class="site-footer__blurb mb-0">{{ site_info.footer_blurb }}</p>
       <dl class="site-footer__details">
-        <div><dt>Address:</dt><dd>{{ site.address }}</dd></div>
-        <div><dt>Phone:</dt><dd><a href="tel:{{ site.phone_href }}">{{ site.phone_display }}</a></dd></div>
-        <div><dt>Business Hours:</dt><dd>{{ site.hours }}</dd></div>
-        <div><dt>Email:</dt><dd><a href="mailto:{{ site.enquiries_email }}">{{ site.enquiries_email }}</a></dd></div>
+        <div><dt>Address:</dt><dd>{{ site_info.address }}</dd></div>
+        <div><dt>Phone:</dt><dd><a href="tel:{{ site_info.phone_href }}">{{ site_info.phone_display }}</a></dd></div>
+        <div><dt>Business Hours:</dt><dd>{{ site_info.hours }}</dd></div>
+        <div><dt>Email:</dt><dd><a href="mailto:{{ site_info.enquiries_email }}">{{ site_info.enquiries_email }}</a></dd></div>
       </dl>
     </div>
   </div>
@@ -25,11 +25,11 @@
 
   <div class="site-footer__bottom">
     <div class="container">
-      <p class="mb-0">&copy; {{ current_year }} {{ site.company_name }}. All rights reserved.</p>
+      <p class="mb-0">&copy; {{ current_year }} {{ site_info.company_name }}. All rights reserved.</p>
       {# Day 8 adds the "Cookie settings" link here. #}
-      {% if site.visible_social_links %}
+      {% if site_info.visible_social_links %}
         <ul class="site-footer__social list-unstyled mb-0" aria-label="Social media">
-          {% for link in site.visible_social_links %}
+          {% for link in site_info.visible_social_links %}
             <li><a href="{{ link.url }}" rel="noopener" target="_blank" aria-label="{{ link.label }} (opens in a new tab)">{% include "includes/icons/"|add:link.name|add:".svg" %}</a></li>
           {% endfor %}
         </ul>

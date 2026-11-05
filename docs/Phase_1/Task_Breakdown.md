@@ -117,19 +117,19 @@ critical-path cards. A day also isn't done until `commands/Phase_1/day-N.md` is 
 
 **Goal:** admins can onboard users who sign in by password or Google; strangers can't sign up.
 
-- [ ] **allauth.** Email login, sign-up closed (both adapters), Google provider, password reset,
+- [x] **allauth.** Email login, sign-up closed (both adapters), Google provider, password reset,
   branded `templates/account/` (`users.md` §3).
   AC: `/accounts/signup/` doesn't offer a form; an unknown Google account is refused politely.
-- [ ] **UserService.** `onboard_user` (lower-cased email, generated username, unusable password,
+- [x] **UserService.** `onboard_user` (lower-cased email, generated username, unusable password,
   set-password email), `deactivate`; `onboard_user` management command.
   AC: service tests with a fake repository pass.
-- [ ] **Groups.** Data migration creating **Content Editor** with the Phase 1 content
+- [x] **Groups.** Data migration creating **Content Editor** with the Phase 1 content
   permissions (`users.md` §4).
   AC: a Content Editor can edit pages but not users.
-- [ ] **Jazzmin.** Brand title, logo, accent, menu order (`users.md` §5); admin at
+- [x] **Jazzmin.** Brand title, logo, accent, menu order (`users.md` §5); admin at
   `ADMIN_URL_PATH` (default `admin/` in dev).
   AC: the admin login shows the Distinctive branding.
-- [ ] **Google OAuth.** Owner registers redirect URIs for localhost, the preview host and the
+- [ ] **Google OAuth.** *(code done and tested up to the redirect to Google on 2026-11-03; the owner creates the OAuth client and confirms a real sign-in with `commands/Phase_1/day-4.md` step 9)* Owner registers redirect URIs for localhost, the preview host and the
   live domain; `GOOGLE_CLIENT_ID`/`SECRET` in `.env`.
   AC: an existing user signs in with Google locally.
 

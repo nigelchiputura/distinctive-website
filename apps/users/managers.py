@@ -13,13 +13,18 @@ from django.utils.text import slugify
 
 
 class UserManager(DjangoUserManager):
-    def _username_from(self, email: str) -> str:
+    @staticmethod
+    def username_for(model, email: str) -> str:
+        """A unique username from the email's local part: tendai.m, then tendai.m2, …"""
         local = email.split("@", 1)[0]
         base = (slugify(local.replace(".", "-")).replace("-", ".") or "user")[:140]
         candidate, n = base, 2
-        while self.model._default_manager.filter(username=candidate).exists():
+        while model._default_manager.filter(username=candidate).exists():
             candidate, n = f"{base}{n}", n + 1
         return candidate
+
+    def _username_from(self, email: str) -> str:
+        return self.username_for(self.model, email)
 
     def create_user(  # type: ignore[override]
         self, email: str, password: str | None = None, **extra_fields: Any

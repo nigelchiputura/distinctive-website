@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {# Shown by BaseController for a ServiceError on a page request (400, 503 …). Day 9 adds the
    branded 404 and 500 pages, which Django serves itself. #}
-{% block title %}Sorry · {{ site.company_name }}{% endblock %}
+{% block title %}Sorry · {{ site_info.company_name }}{% endblock %}
 
 {% block content %}
   <section class="container py-5">

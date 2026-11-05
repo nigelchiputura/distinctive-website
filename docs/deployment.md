@@ -208,9 +208,9 @@ jobs:
       - run: npm ci
       - run: npm run build:css
       - name: Compiled CSS must match the committed file
-        run: git diff --exit-code -- static/css/main.css
+        run: git diff --exit-code -- static/css/
       - name: No source-map references may ship
-        run: "! grep -q 'sourceMappingURL' static/css/main.css static/vendor/bootstrap/bootstrap.bundle.min.js"
+        run: "! grep -q 'sourceMappingURL' static/css/*.css static/vendor/bootstrap/bootstrap.bundle.min.js"
 
   build-and-push:
     needs: [test, css-fresh]
