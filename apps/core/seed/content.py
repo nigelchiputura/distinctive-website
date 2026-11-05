@@ -8,8 +8,10 @@ because the old site printed its text over it; the slide shows on a plain backgr
 original photo is uploaded.
 
 Each item has a key the seed uses to tell whether it's already there (a section's anchor, a slide's
-heading, a service's anchor, a person's name, a logo's kind and name). Day 5 seeded Home, Day 6
-About; Days 7 and 9 add Services and Contact.
+heading, a service's anchor, a person's name, a logo's kind and name). An item that is already
+there gets only its **empty** text fields and a missing image filled in (Day 7 added the full text
+to services Day 5 had created); nothing an editor has filled in is changed. Day 5 seeded Home,
+Day 6 About, Day 7 Services; Day 9 adds Contact.
 """
 
 from typing import Any
@@ -65,30 +67,161 @@ HOME_SECTIONS: tuple[dict[str, Any], ...] = (
     },
 )
 
-# The six services on Home's cards. Day 7 adds the rest of the 13 and every service's full text.
+# The 13 services from the old Services page (Day 7). The first six (Day 5) are Home's cards;
+# Day 7 added the full text to them and the other seven. The text is the old page's, tidied;
+# NGO Capacity Development's text is written out from its diagram, so the content isn't only in
+# an image. The order groups related services; the old page's order differed, and editors set
+# their own in the admin.
 SERVICES: tuple[dict[str, Any], ...] = (
     {
         "anchor": "industrial-employee-relations",
         "title": "Industrial / Employee Relations",
         "summary": "We assess the state of IR in an organisation and give relevant advice.",
+        "body": "We assess the state of industrial relations in an organisation and give advice "
+        "on disciplinary matters, works councils, grievances, codes of conduct and related "
+        "issues. We also offer:\n\n"
+        "- Designing codes of conduct\n"
+        "- Training for works councils (including legal connotations, the works council "
+        "constitution, conflict management, payroll management, negotiations and communication)\n"
+        "- Disciplinary management training (including preferring the right charges, the rules "
+        "of natural justice, understanding labour laws and understanding the code of conduct)",
         "image": "employee-relations.jpg",
         "image_alt": "Hands together holding a seedling, with the words Employee Relations",
         "show_on_home": True,
         "sort_order": 10,
     },
     {
+        "anchor": "services-for-the-nec",
+        "title": "Services for the NEC",
+        "body": "We offer breadth and depth of knowledge and experience in the issues that help "
+        "the administration and secretarial side of NECs. Our specialist services are:\n\n"
+        "- NEC administration\n"
+        "- CBA drafting\n"
+        "- Personal injury and workman's compensation\n"
+        "- Drafting and reviewing codes of conduct\n"
+        "- Policy drafting\n"
+        "- Conciliation, mediation and arbitration\n"
+        "- Working hours related to COVID-19\n"
+        "- Job evaluation for NECs\n"
+        "- Labour Act pre-empting\n"
+        "- Health and safety practices linked to COVID-19 and other pandemics\n"
+        "- COVID-19 related misconduct\n"
+        "- COVID-19 and reasonable accommodation",
+        "sort_order": 12,
+    },
+    {
+        "anchor": "learning-and-development",
+        "title": "Learning and Development (Training)",
+        "body": "We aim to improve group and individual performance by honing skills and "
+        "knowledge. We provide employees at all levels with tools and skills, showing them how "
+        "to apply those tools within their department, organisation and role. E-learning "
+        "platforms are available to make the transfer of knowledge and skills easier. "
+        "Distinctive Consultancy provides customised solutions for the specific needs of each "
+        "and every organisation.\n\n"
+        "**Training products on offer:**\n\n"
+        "- Evidence Based Training\n"
+        "- Training Needs Analysis\n"
+        "- Personal Development\n"
+        "- Grooming and Deportment\n"
+        "- Powerful Personal Presentations\n"
+        "- Effective Report Writing Skills\n"
+        "- Corporate Governance Skills\n"
+        "- Change Management\n"
+        "- Disciplinary Management\n"
+        "- Workers Committee\n"
+        "- Public Relations\n"
+        "- Presentation Skills\n"
+        "- Customer Care\n"
+        "- Management Development\n"
+        "- Personal Development and Effectiveness\n"
+        "- Problem Solving and Decision Making\n"
+        "- Effective Planning and Budgeting\n"
+        "- HR for Non-HR People\n"
+        "- Strategic Planning Skills",
+        "sort_order": 14,
+    },
+    {
+        "anchor": "organisational-development",
+        "title": "Organisational Development",
+        "body": "We have the capability to undertake most organisational development activities, "
+        "such as:\n\n"
+        "- **Performance management**\n"
+        "- **Change management**\n"
+        "- **Policy and procedure development**: remote work, occupational health and safety, "
+        "leave, employee onboarding and many more\n"
+        "- **Balanced scorecard development**",
+        "sort_order": 16,
+    },
+    {
         "anchor": "hr-audits",
         "title": "HR Audits",
         "summary": "HR compliance auditing solutions that meet the needs of your organisation.",
+        "body": "**Distinctive Consultancy Services** provides HR compliance auditing solutions "
+        "that meet the needs of your organisation, and reviews employers' human resources "
+        "functions to ensure compliance with the latest labour and employment laws and "
+        "alignment with organisational goals. We provide full-service HR compliance audits to "
+        "assess the employment practices, compliance and human resources functions within an "
+        "organisation.\n\n"
+        "HR audits can focus on staffing, regulatory compliance, cost savings, organisational "
+        "objectives or other human resources issues. Human resources audits should be performed "
+        "regularly to avoid costly legal disputes. They are particularly valuable after "
+        "significant changes in an organisation, such as a restructuring, an expansion or a "
+        "reduction in force.",
         "image": "hr-audits.jpg",
         "image_alt": "A hand touching the letters HR among human resources icons",
         "show_on_home": True,
         "sort_order": 20,
     },
     {
+        "anchor": "organisational-design-and-restructuring",
+        "title": "Organisational Design and Restructuring",
+        "body": "This is an area of specialty for us.\n\n"
+        "At some point, all organisations either mature or need to rethink their business model "
+        "or processes, grow, shrink or change, and as we all know, one size does not fit all!\n\n"
+        "Restructuring and making redundancies can be a difficult process for both employers and "
+        "employees, even those who are not directly affected. It can affect morale and "
+        "productivity, and take considerable management time, affecting the day-to-day running "
+        "of the business. We can help by leading the entire restructuring or redundancy process, "
+        "or by providing guidance or resources at a particular stage.",
+        "sort_order": 22,
+    },
+    {
+        "anchor": "team-building",
+        "title": "Team Building",
+        "body": "Successful results in business are usually accomplished through teamwork. We "
+        "provide themed, energising and results-oriented team building sessions for small and "
+        "large teams.",
+        "sort_order": 24,
+    },
+    {
+        "anchor": "outsourced-hr-services",
+        "title": "Outsourced HR Services",
+        "body": "Do you lack the time and experience to deal with some or all of your human "
+        "resources activities? Then outsourcing your HR can be the right move for your company. "
+        "**Distinctive Consultancy Services** can take care of all your HR requirements, "
+        "allowing you to concentrate on growing your company's profitability and productivity. "
+        "We provide a comprehensive range of outsourcing services, from payroll and benefits "
+        "administration to designing and arranging contracts, hiring, recruitment and training. "
+        "We provide ongoing support packages for organisations in Africa with or without an "
+        "existing HR department or HR function, so your organisation benefits from packages "
+        "tailored to its size, structure, business needs and budget.",
+        "sort_order": 26,
+    },
+    {
         "anchor": "talent-acquisition",
         "title": "Talent Acquisition",
         "summary": "Culture and candidate profile analysis for placements and assessments.",
+        "body": "Distinctive Consultancy Services also does placements and assessments. Our "
+        "emphasis is on investing our time and effort in getting to know our customers and their "
+        "needs very well. We give support for the successful execution of a product or "
+        "programme. We also take the time to study our clients' culture and analyse candidates' "
+        "profiles to make sure they will fit into the organisation. To achieve this we headhunt "
+        "candidates, use our existing database and advertise to find new candidates who fit the "
+        "role. We have candidates with vast regional experience. We can also assist with "
+        "replacing employees if there are any shortfalls in personnel.\n\n"
+        "We provide private facilities for interviews and can also take part in them. We conduct "
+        "thorough background checks to make sure the correct candidate is hired. We offer "
+        "psychometric tests for our clients, provided by our strategic partner EPZ Global.",
         "image": "talent-acquisition.jpg",
         "image_alt": "A chalkboard with the words Talent Management",
         "show_on_home": True,
@@ -98,6 +231,21 @@ SERVICES: tuple[dict[str, Any], ...] = (
         "anchor": "people-strategy",
         "title": "People Strategy",
         "summary": "Enable employees to excel and focus on organisational goals.",
+        "body": "We perform and go beyond strategic reviews and strategic planning sessions for a "
+        "wide variety of progressive organisations. We believe that people are the most "
+        "important part of the formula for business success. Organisations should be equipped "
+        "to select the right people, enable those people to excel and get them to focus on the "
+        "right goals. In that regard we help organisations with:\n\n"
+        "- Strategic planning facilitation\n"
+        "- Team building\n"
+        "- Culture audits\n"
+        "- Executive coaching\n"
+        "- Organisational effectiveness\n"
+        "- Organisation structure design\n"
+        "- Human capital strategy\n"
+        "- Goal alignment\n"
+        "- Employee retention strategies\n"
+        "- Change management",
         "image": "people-strategy.jpg",
         "image_alt": "A hand arranging wooden blocks marked with people",
         "show_on_home": True,
@@ -109,6 +257,20 @@ SERVICES: tuple[dict[str, Any], ...] = (
         "summary": (
             "Employee engagement, culture audits, salary surveys, mystery shopping and more."
         ),
+        "body": "Distinctive Consultancy provides business research surveys.\n\n"
+        "- Methodologies include face-to-face and telephone interviews, mail questionnaires and "
+        "online forms, paying due regard to prevailing economic changes, and tailored to the "
+        "client's needs.\n"
+        "- Employee engagement, culture audit, salary, mystery shopping, market analysis, "
+        "baseline, brand loyalty and client satisfaction surveys are regularly undertaken.\n"
+        "- Reports are succinct, with a full analysis of the data gathered in graphs and tables, "
+        "and conclusions and recommendations.\n"
+        "- All fieldwork is conducted by a team of interviewers experienced in surveys in the "
+        "world of business.\n"
+        "- *Our questionnaires purposely go from open and projective questions to more "
+        "close-ended and focused ones.*\n"
+        "- *The questionnaire is open enough to let respondents express their views without "
+        "being overly influenced.*",
         "image": "research-surveys.jpg",
         "image_alt": "Open hands beneath a network of people icons",
         "show_on_home": True,
@@ -120,13 +282,40 @@ SERVICES: tuple[dict[str, Any], ...] = (
         "summary": (
             "Structurally designed to advise on all areas of business design and rightsizing."
         ),
+        "body": "We have structurally designed our firm "
+        "to advise clients on all areas of organisational design and rightsizing. We provide "
+        "specialist services to employers and employees on these issues:\n\n"
+        "- Retrenchment and redundancy\n"
+        "- How to retrench during the COVID-19 pandemic\n"
+        "- Training on alternatives to job losses\n"
+        "- Retrenchment package calculation\n"
+        "- Organisational change management\n"
+        "- How to manage legal and reputational risks when downsizing",
         "image": "organisational-design.jpg",
         "image_alt": "Three business people in silhouette by an office window",
         "show_on_home": True,
         "sort_order": 60,
     },
+    {
+        "anchor": "ngo-capacity-development",
+        "title": "NGO Capacity Development Partners",
+        "body": "We work with non-governmental organisations to develop their capacity in five "
+        "areas:\n\n"
+        "- **Corporate governance:** board training; board induction and evaluation\n"
+        "- **Capacity building:** the basic principles of running small businesses; finance for "
+        "non-finance staff\n"
+        "- **Organisational development and structuring:** business regulation and unification; "
+        "structuring the organisation for statutory compliance\n"
+        "- **Safeguarding:** safeguarding training; instituting a culture of respectful "
+        "interactions in the workplace\n"
+        "- **Strategy development:** strategic thinking, planning and management; designing "
+        "policies, systems and processes",
+        "image": "ngo-capacity-development.jpg",
+        "image_alt": "Diagram of the five capacity development areas listed beside it",
+        "image_on_services_page": True,
+        "sort_order": 70,
+    },
 )
-
 
 # ---- About (Day 6) -------------------------------------------------------------------------
 # The hero photo is left out for the same reason as Home's: the old site printed its heading
@@ -375,4 +564,59 @@ TEAM: tuple[dict[str, Any], ...] = (
         "International Business Law from the University of Cumbria, UK.",
         "sort_order": 80,
     },
+)
+
+
+# ---- Services (Day 7) ----------------------------------------------------------------------
+# Day 8 adds the enquiry block after the client logos.
+
+SERVICES_META_DESCRIPTION = (
+    "Human resources consultancy services: employee relations, NEC services, training, "
+    "organisational development, HR audits, restructuring, outsourced HR, talent acquisition, "
+    "research surveys and NGO capacity development."
+)
+
+SERVICES_SECTIONS: tuple[dict[str, Any], ...] = (
+    {
+        "anchor": "what-we-do",
+        "section_type": "hero_text",
+        "heading": "Our Services",
+        "body": "At Distinctive Consultancy Services, we specialise in Human Resources "
+        "Consultancy Services. Our core business is offering a wide range of strategic "
+        "management and specialised and unique Human Resources solutions customised to meet "
+        "differing and varying corporate client needs.",
+        "sort_order": 10,
+    },
+    {
+        "anchor": "services-list",
+        "section_type": "service_bands",
+        "heading": "What We Do",
+        "sort_order": 20,
+    },
+    {
+        "anchor": "corporate-clients",
+        "section_type": "clients",
+        "heading": "Some of Our Corporate Clients",
+        "heading_align": "center",
+        "sort_order": 30,
+    },
+)
+
+CLIENTS: tuple[dict[str, Any], ...] = tuple(
+    {"kind": "client", "name": name, "image": image, "image_alt": f"{name} logo", "sort_order": n}
+    for n, (name, image) in enumerate(
+        (
+            ("Zimbabwe Consolidated Diamond Company", "zcdc.png"),
+            ("NOIC", "noic.png"),
+            ("Reserve Bank of Zimbabwe", "rbz.png"),
+            ("TelOne", "telone.png"),
+            ("ZIMRA", "zimra.png"),
+            ("FBC Holdings Limited", "fbc.png"),
+            ("UNDP", "undp.png"),
+            ("Bull Red Distribution", "bull-red.png"),
+            ("City Parking", "city-parking.png"),
+            ("Masimba", "masimba.png"),
+        ),
+        start=1,
+    )
 )

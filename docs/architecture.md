@@ -1,6 +1,7 @@
 # Architecture
 
-**Project-wide · revised 2026-11-04** (Day 6: team, partners, the page blocks; Day 5:
+**Project-wide · revised 2026-11-04** (Day 7: Services page, enquiries, the seed fills blanks;
+Day 6: team, partners, the page blocks; Day 5:
 `ImageMixin`, pages and services as built, the seed; 2026-11-02: two phases; Resend; local media; VPS go-live)
 
 The Distinctive Consultancy Services website: Django SSR, Postgres, Docker. It replaces the
@@ -91,7 +92,7 @@ testability, no extra files.
 | `MarkdownService` + `{{ text\|markdown }}` | Markdown → sanitised HTML (`markdown` + `nh3`). **The only place HTML is made from admin text.** Allowed: `h2`–`h6` (a `# heading` becomes an `h2`; the page owns its `h1`), paragraphs, lists, emphasis, blockquotes, code, tables, links (`http`, `https`, `mailto`, `tel`, all with `rel="noopener noreferrer"`). Scripts and styles are removed with their contents. `to_plain_text()` gives the text without markup. |
 | `SiteSettings` (singleton) | Phones, enquiries and recruitment emails, address, hours, footer blurb, social URLs, default meta and OG image, GA4 ID, map query. Always row 1 (a database check constraint); a data migration creates it with the old site's details. `SiteSettingsService` returns a `SiteDetails` value with `DEFAULTS` filling any empty field; the `site` context processor puts it in every template as **`site_info`** (not `site`, which allauth's views use for the Sites record). |
 | `checks.py` | Start-up warnings for email misconfiguration (`deployment.md` §6). |
-| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds only what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name), and never changes what's there, so an editor's changes survive a re-run. Day 5 seeded Home and its six services, Day 6 About, its eight team members and two partners; Days 7 and 9 add the rest. |
+| `SeedService` + `seed/` | `manage.py seed_site_content` loads the old site's content (`seed/content.py`, images in `seed/images/`). It adds what's missing, by each item's key (a section's anchor, a slide's heading, a service's anchor, a person's name, a logo's kind and name). For an item that's already there it fills in only **empty** text fields and a missing image (`blank_fields`), so a later day's fuller content reaches a database seeded earlier; flags, numbers and anything an editor has filled in are never changed. Day 5 seeded Home and its six services, Day 6 About, its team and partners, Day 7 Services, the full text of all 13 services and ten clients; Day 9 adds Contact. |
 | Nav list | The context processor's ordered nav items. Phase 2 adds Jobs and the search icon here. |
 
 ## 5. Request flow — worked example
@@ -119,12 +120,26 @@ The submission is **saved before** the email is attempted. A provider failure ne
 enquiry: it stays in the admin with `email_sent=False` and the provider's message, and an admin
 action resends it.
 
+**As built on Day 7** (the form and controller arrive on Day 8): `ContactService.submit(data,
+source_page, ip, user_agent)` saves through `ContactRepository.create`, then calls its mailer
+(by default Django's `EmailMessage.send`, so the configured backend: Resend in production). Any
+exception from the mailer is caught, logged as a warning (`apps.contact`) and stored, cut to 1,000
+characters, as `email_error`. The email is plain text to `CONTACT_RECIPIENT`, `Reply-To` the
+visitor, subject "Website enquiry from <name> (<page>)"; line breaks are removed from the name
+so it can't add headers. The visitor's IP is stored only as an HMAC-SHA256 keyed with
+`SECRET_KEY` (`ip_hash`), for Day 8's rate limit. The repository and mailer are injected, so the
+service's tests use fakes.
+
 **A visitor opens `/about/`.** `AboutController` (a `PageController` with `slug = "about"`) →
 `PageService.get_page("about")` (the published page, its published sections and slides, in order;
 `NotFoundError` → 404 if the page is unpublished) → `PageBlocksService.for_sections(sections)`,
 which calls `TeamService.leadership()` because a section is a `team` block and
 `PartnerService.partners()` because one is a `partners` block, and nothing else →
 `pages/page.html`.
+
+**A visitor opens `/services/`.** `ServicesController` does the same with `slug = "services"`;
+its `service_bands` section brings in `OfferingService.all()` and its `clients` section
+`PartnerService.clients()`.
 
 **A visitor opens `/`.** `HomeController` does the same with `slug = "home"` and
 `pages/home.html`; its `service_cards` section brings in `OfferingService.home_cards()`
@@ -174,13 +189,14 @@ erDiagram
     }
 ```
 
-**As built (Days 5–6):**
+**As built (Days 5–7):**
 
 - `Page`: one row per fixed page (`home`, `about`, `services`, `contact`), created by the
   migration `pages.0002_the_four_pages`, so every URL works on a fresh database. Title, published,
   and the search-engine title and description. The admin can't add or delete pages.
 - `PageSection`: `section_type` (`hero_text`, `intro_dark`, `band_light`, `band_dark`,
-  `two_column`, `value_block`, `service_cards`, `partners`, `clients`, `team`, `cta`), heading
+  `two_column`, `value_block`, `service_cards`, `service_bands`, `partners`, `clients`, `team`,
+  `cta`), heading
   and its position, a short text (`intro`, the left column of `two_column`), Markdown body,
   optional image (`ImageMixin`) and its position, an optional button, order, published, and an `anchor`. The
   anchor is made from the heading when empty, unique within its page (`our-story`, `our-story-2`),
@@ -188,12 +204,16 @@ erDiagram
   without a developer, and Phase 2 search can link straight to a section.
 - `HeroSlide`: heading, subheading, optional image and button, order, published. Home only.
 - `offerings.Service`: title, `anchor` (unique site-wide, same rules), summary (the Home card),
-  Markdown body (the Services page, Day 7), image, `show_on_home`, order, published.
+  Markdown body (its band on the Services page), image (the Home card) and whether it also shows
+  on the Services page (`image_on_services_page`), `show_on_home`, order, published.
 - `pages.Partner` (Day 6): `kind` (strategic partner or corporate client), name, caption,
   website, logo (`ImageMixin`), order, published.
 - `team.TeamMember` (Day 6): name, job title, Markdown bio, photo, LinkedIn and Facebook URLs,
   order, published, and an `anchor` from the name (unique, kept), so a person can be linked to
   (`/about/#rose-nhamo`) and Phase 2 search can point at them.
+- `contact.ContactSubmission` (Day 7): name, email, optional phone, message, `source_page`
+  (`contact` or `services`), `email_sent`, `emailed_at`, `email_error`, `handled`, `handled_at`,
+  `ip_hash`, `user_agent`; newest first.
 
 **Phase 2 additions** (`Phase_2/Phase2_Scope.md`): `JobPosting`, and `SearchEntry` with one row per
 searchable section, service, team member and open job.

@@ -1,8 +1,0 @@
-# Local development and CI. Includes prod (and so base). Never shipped.
--r prod.txt
-pytest==9.2.0
-pytest-django==4.14.0
-pytest-cov==7.1.0
-ruff==0.17.3
-basedpyright==1.40.2
-django-stubs==5.2.9

@@ -61,6 +61,7 @@ class PageSection(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         TWO_COLUMN = "two_column", "Two columns (short text left, long text right)"
         VALUE_BLOCK = "value_block", "Image beside heading and text"
         SERVICE_CARDS = "service_cards", "Service cards (the services ticked “show on Home”)"
+        SERVICE_BANDS = "service_bands", "Every service, in alternating bands (Services page)"
         PARTNERS = "partners", "Strategic partners (logos)"
         CLIENTS = "clients", "Corporate clients (logos)"
         TEAM = "team", "Leadership team"

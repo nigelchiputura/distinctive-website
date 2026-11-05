@@ -15,6 +15,9 @@
     </div>
   </section>
 
+{% elif s.section_type == "service_bands" %}
+  {% include "includes/_service_bands.html" %}
+
 {% elif s.section_type == "partners" or s.section_type == "clients" %}
   <section id="{{ s.anchor }}" class="band band--white logo-band">
     <div class="container">

@@ -1,16 +1,16 @@
-// Open Sans, self-hosted (copied by `npm run vendor`). Paths are relative to static/css/main.css.
+// Nunito Sans, self-hosted (copied by `npm run vendor`). Paths are relative to static/css/main.css.
 
-@mixin open-sans($weight, $style) {
+@mixin nunito-sans($weight, $style) {
   @font-face {
-    font-family: "Open Sans";
+    font-family: "Nunito Sans";
     font-style: $style;
     font-weight: $weight;
     font-display: swap;
-    src: url("../vendor/open-sans/open-sans-latin-#{$weight}-#{$style}.woff2") format("woff2");
+    src: url("../vendor/nunito-sans/nunito-sans-latin-#{$weight}-#{$style}.woff2") format("woff2");
   }
 }
 
 @each $weight in (400, 600, 700) {
-  @include open-sans($weight, normal);
-  @include open-sans($weight, italic);
+  @include nunito-sans($weight, normal);
+  @include nunito-sans($weight, italic);
 }

@@ -4,12 +4,12 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2.5rem 3.5rem;
+  gap: 2.5rem; // five 11.5 rem logos fit across the 1140 px container
   margin: 2rem 0 0;
 }
 
 .logo-grid__item {
-  width: 12rem;
+  width: 11.5rem;
   text-align: center;
 }
 

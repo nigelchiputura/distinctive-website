@@ -1,6 +1,7 @@
 # Folder Structure
 
-**Project-wide · revised 2026-11-04** (Day 6: team, partners, page blocks; Day 5: seed content,
+**Project-wide · revised 2026-11-04** (Day 7: Services page, enquiries, Nunito Sans; Day 6: team,
+partners, page blocks; Day 5: seed content,
 Home templates, JS; 2026-11-02: npm
 and SCSS at the repo root, as in Consult 360; Phase 2 apps marked; no R2)
 
@@ -39,7 +40,7 @@ distinctive-site/
 │   └── Caddyfile                       # HTTPS, /media/ from the volume, proxy to web
 ├── docs/                               # this doc set (index: docs/README.md)
 ├── scripts/
-│   └── copy-vendor.mjs                 # Bootstrap JS + Open Sans → static/vendor/; Font Awesome SVGs → templates/includes/icons/
+│   └── copy-vendor.mjs                 # Bootstrap JS + Nunito Sans → static/vendor/; Font Awesome SVGs → templates/includes/icons/
 ├── static/
 │   ├── scss/                           # SOURCE, compiled on the dev machine (not in the image)
 │   │   ├── main.scss                   # entry: tokens → variables → bootstrap → partials
@@ -60,6 +61,7 @@ distinctive-site/
 │   │   │   ├── _buttons.scss           # the outlined gold buttons
 │   │   │   ├── _logos.scss             # partner and client logo grids
 │   │   │   ├── _team.scss              # Our Leadership, Read more
+│   │   │   ├── _services.scss          # the Services page links and bands
 │   │   │   └── _cookie-banner.scss
 │   │   └── pages/
 │   │       ├── _home.scss
@@ -79,7 +81,7 @@ distinctive-site/
 │   │       └── cookie-consent.js       # Phase 2 adds search-dropdown.js, highlight.js
 │   ├── vendor/                         # copied from node_modules by `npm run vendor`, committed
 │   │   ├── bootstrap/                  # bootstrap.bundle.min.js (source-map line removed)
-│   │   └── open-sans/                  # latin woff2, 400/600/700, normal and italic
+│   │   └── nunito-sans/                # latin woff2, 400/600/700, normal and italic
 │   └── img/                            # logo.png (the client's logo, 172 × 100), later favicons and defaults
 ├── templates/
 │   ├── base.html
@@ -94,6 +96,7 @@ distinctive-site/
 │   │   ├── _section.html               # renders one PageSection by type
 │   │   ├── _service_card.html          # one offerings.Service card
 │   │   ├── _logo_grid.html             # pages.Partner logos
+│   │   ├── _service_bands.html         # every service as a band, with links
 │   │   ├── _team_card.html             # one team.TeamMember
 │   │   └── _image.html                 # an admin image with its stored size and alt text
 │   ├── errors/
@@ -180,7 +183,7 @@ apps/core/
 │   └── core_extras.py         # the |markdown filter
 ├── seed/
 │   ├── content.py             # the old site's text, keyed (anchors, headings)
-│   └── images/                # 19 images cut from the old site's screenshots, until the originals come
+│   └── images/                # 30 images cut from the old site's screenshots, until the originals come
 ├── management/commands/
 │   └── seed_site_content.py   # loads seed/ through SeedService (idempotent)
 └── tests/
@@ -196,9 +199,11 @@ apps/core/
 `repositories/` (`page_repository.py`, `partner_repository.py`), `services/`
 (`page_service.py` with `PageService` and `PageContent`, `partner_service.py`,
 `page_blocks_service.py`), `controllers/page_controller.py` (`PageController`, `HomeController`,
-`AboutController`), `urls.py`, `templates/pages/` (`page.html`, `home.html`), and migrations
-`0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`. `apps/offerings/` has
-`Service`, its admin, `ServiceRepository` and `OfferingService`. `apps/team/` has `TeamMember`,
+`AboutController`, `ServicesController`), `urls.py`, `templates/pages/` (`page.html`, `home.html`), and migrations
+`0001_initial`, `0002_the_four_pages`, `0003_partner_section_layout`, `0004_service_bands`.
+`apps/offerings/` has `Service`, its admin, `ServiceRepository` and `OfferingService`.
+`apps/contact/` (Day 7) has `ContactSubmission`, its admin, `ContactRepository`,
+`ContactService` and tests; its forms, controller and templates (§2) arrive on Day 8. `apps/team/` has `TeamMember`,
 its admin, `TeamRepository` and `TeamService`.
 
 `Redirect` is a model in `apps/pages` (editable in the admin); the middleware in `apps/core`

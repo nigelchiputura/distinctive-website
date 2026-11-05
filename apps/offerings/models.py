@@ -28,6 +28,12 @@ class Service(BaseModel, PublishableMixin, OrderableMixin, ImageMixin):
         blank=True,
         help_text="The full description on the Services page. Markdown: **bold**, *italic*, lists.",
     )
+    image_on_services_page = models.BooleanField(
+        "show the image on the Services page",
+        default=False,
+        help_text="The image always shows on the Home card. Tick to show it beside this service's "
+        "text on the Services page too (a diagram, say).",
+    )
     show_on_home = models.BooleanField(
         "show on Home",
         default=False,

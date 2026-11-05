@@ -1,7 +1,7 @@
 # Frontend
 
-**Project-wide · revised 2026-11-04** (Day 6 as built: About, the team and logo blocks, Read
-more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
+**Project-wide · revised 2026-11-04** (Day 7 as built: the Services page; the font is Nunito Sans;
+Day 6: About, the team and logo blocks, Read more; Day 5: Home, the section partial, the hero slider and its JS; Day 2: sampled brand colours, inline SVG icons, Node 22; 2026-11-02: npm and SCSS at
 the repo root as in Consult 360, Phase 1 pages, Jobs and Search designs moved to `Phase_2/Phase2_Scope.md`)
 
 Django templates (SSR) + Bootstrap 5 (customised) + vanilla JS ES modules + CSS compiled from
@@ -16,9 +16,9 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 | Components | Bootstrap 5 from npm, its Sass variables overridden before import |
 | Styles | SCSS in `static/scss/`, compiled with **Dart Sass** (the `sass` npm package) |
 | Behaviour | Vanilla JS ES modules in `static/js/`, no bundler |
-| Vendor assets | Bootstrap's JS bundle (`static/vendor/bootstrap/`, source-map line removed) and Open Sans `woff2` (`static/vendor/open-sans/`), copied from `node_modules` by `npm run vendor` and committed |
+| Vendor assets | Bootstrap's JS bundle (`static/vendor/bootstrap/`, source-map line removed) and Nunito Sans `woff2` (`static/vendor/nunito-sans/`), copied from `node_modules` by `npm run vendor` and committed |
 | Icons | Font Awesome Free SVGs, written by `npm run vendor` as inline partials in `templates/includes/icons/` (`{% include "includes/icons/phone.svg" %}`). No icon webfont to download; each icon takes the text colour |
-| Fonts | Open Sans (the old site's face), self-hosted |
+| Fonts | **Nunito Sans** (the owner's choice, 2026-11-04; the old site used Open Sans), self-hosted, on the site and in the admin |
 
 ### Node on the dev machine only
 
@@ -33,7 +33,7 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
   },
   "engines": { "node": ">=22" },
   "devDependencies": {
-    "@fontsource/open-sans": "5.3.0",
+    "@fontsource/nunito-sans": "5.3.0",
     "@fortawesome/fontawesome-free": "7.3.1",
     "bootstrap": "5.3.8",
     "sass": "1.107.1"
@@ -77,6 +77,7 @@ Sass. AJAX only where it helps: the contact and enquiry forms (Phase 1), the sea
 @import "components/cards";                  // Day 5: service cards
 @import "components/logos";                  // Day 6: partner and client logos
 @import "components/team";                   // Day 6: Our Leadership, Read more
+@import "components/services";               // Day 7: the Services page
 // Day 8: components/forms, components/cookie-banner.
 // pages/about, pages/services, pages/contact only if a page needs rules of its own.
 ```
@@ -106,7 +107,7 @@ outside `_tokens.scss`.
 | `$dcs-gold-deeper` | `#6b5415` | Hover on `$dcs-gold-dark` links | — |
 | `$dcs-white` | `#fff` | Light bands, navbar | — |
 | `$dcs-navy` → `$dcs-blue` | `#02070b` → `#1f5fa8` | About "Our Story" gradient (sampled on Day 6). The old band ran on to `#2a85d6`; it stops darker here | white text 6.4:1 or better throughout (the old end was 3.9:1) |
-| Body font | Open Sans 400/600/700 | All text | — |
+| `$dcs-font-sans` | Nunito Sans 400/600/700, then system fonts | All text, site and admin (`admin.scss` imports `_fonts.scss` too) | — |
 
 **The logo** is the file the client sent on 2026-11-03: `static/img/logo.png`, a transparent PNG
 trimmed to 172 × 100 and reduced to 128 colours (3.9 KB). It shows at 60 px high, so on high-density
@@ -161,6 +162,7 @@ Images are `loading="lazy"` except the first hero slide, which gets `fetchpriori
 | `band_light` / `band_dark` | Alternating bands used on Services; heading left- or right-aligned |
 | `two_column` | "Our Story": a navy-to-blue band; heading and the section's **short text** (`intro`) left, the body right |
 | `value_block` | Image one side (the section's "image position"), heading and paragraph the other; image first on phones. Consecutive value blocks share one white band |
+| `service_bands` | The Services page: a row of links to every service, then each published service in its own band, alternating black (heading on the right on wide screens) and white, with `id="<anchor>"`. A service's image shows beside its text only when "show the image on the Services page" is ticked (the NGO diagram); the Home card images don't. Long lists go into two columns on wide screens |
 | `service_cards` | Charcoal band with the services ticked "show on Home" (at most six), as framed cards linking to `/services/#<anchor>`. Card titles are `h2` when the section has no heading, `h3` under one |
 | `partners` / `clients` | White band with the published logos of that kind, centred, each scaled into the same 8 rem box without cropping, caption below, linked when it has a website |
 | `team` | White band, uppercase dark-gold heading, the published team: four across on wide screens, two on tablets, one on phones; round photos, name, job title in grey, bio, LinkedIn and Facebook icons when filled in |
@@ -228,16 +230,20 @@ As built on Day 6, all from sections in the admin:
 
 ### Services
 
-1. A static hero with anchor navigation to each service (the old site had a 13-slide slider).
-2. "What We Do" intro on black.
-3. Alternating light/dark service bands, each with its anchor: Industrial / Employee Relations;
-   Rightsizing / Organisational Design; Services for the NEC; Research Surveys; Learning and
-   Development (Training); Organizational Development; HR Audits; Organizational Design and
-   Restructuring; Team Building; Outsourced HR Services; Talent Acquisition; People Strategy; NGO
-   Capacity Development Partners (with its diagram image).
-4. "Some of our corporate clients": a logo grid of 10 (`Partner`, kind = client).
-5. The gold "Get In Touch With Us" block: a general enquiry form (first name, last name, email,
-   message) posting to the contact service with `source_page=services`; button "Send enquiry".
+As built on Day 7, all from sections in the admin:
+
+1. `hero_text` **Our Services** (the `h1`) with the old "What We Do" paragraph under it. The old
+   page's 13-slide slider is gone: it repeated the service names, which the links below now do.
+2. `service_bands` **What We Do**: links to all 13 services, then their bands. The old page's
+   wording is kept, tidied ("Organizational" → "Organisational", run-on lists as lists).
+   "Rightsizing / Organisational Design" is the service called **Organisational Design** (one name
+   for its Home card and its band). The NGO Capacity Development diagram also appears as text, so
+   its content isn't only in an image. The order groups related services, starting with the
+   ones on Home; editors change it in the Services list.
+3. `clients` **Some of Our Corporate Clients**: ten logos, five to a row on wide screens.
+4. Day 8 adds the gold "Get In Touch With Us" block: a general enquiry form (first name, last name,
+   email, message) posting to the contact service with `source_page=services`; button "Send
+   enquiry".
 
 ### Contact
 
@@ -251,8 +257,8 @@ As built on Day 6, all from sections in the admin:
   host.
 
 **Seed images.** Until the client sends the originals, every seeded image (cards, value blocks,
-the capability image, team portraits, partner logos) is cut from the old site's screenshots
-(`apps/core/seed/images/`, 19 files, 356 KB). They look right at
+the capability image, team portraits, partner and client logos, the NGO diagram) is cut from the old site's screenshots
+(`apps/core/seed/images/`, 30 files, about 0.5 MB). They look right at
 their displayed size but are small; replacing them is an upload in the admin (Phase 1 Q5).
 
 ### Phase 2 pages

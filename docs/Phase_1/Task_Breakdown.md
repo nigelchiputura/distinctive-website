@@ -67,7 +67,7 @@ critical-path cards. A day also isn't done until `commands/Phase_1/day-N.md` is 
 **Goal:** an empty page with the final header and footer on desktop and mobile.
 
 - [x] **npm Sass pipeline.** Root `package.json` with exact versions of `sass`, `bootstrap`,
-  `@fortawesome/fontawesome-free`, `@fontsource/open-sans`; scripts `build:css`, `watch:css`,
+  `@fortawesome/fontawesome-free`, `@fontsource/open-sans` (Nunito Sans since Day 7); scripts `build:css`, `watch:css`,
   `vendor` (`frontend.md` §1); `scripts/copy-vendor.mjs` copies Bootstrap's JS bundle and Open
   Sans `woff2` into `static/vendor/`, and Font Awesome icons as inline SVGs into
   `templates/includes/icons/`.
@@ -75,7 +75,7 @@ critical-path cards. A day also isn't done until `commands/Phase_1/day-N.md` is 
 - [x] **Brand tokens.** `static/scss/_tokens.scss` (`$dcs-*` and the `--dcs-*` custom
   properties), `_variables.scss` (Bootstrap overrides), `main.scss` import order
   (`frontend.md` §2).
-  AC: `$primary` is the brand gold; body text is Open Sans.
+  AC: `$primary` is the brand gold; body text is Open Sans (Nunito Sans since 2026-11-04).
 - [x] **Base templates.** `base.html`, `includes/_topbar.html`, `_navbar.html` (Home, About Us,
   Services, Contact Us, from a nav list in the context processor), `_footer.html`; skip link;
   placeholder values until `SiteSettings` exists tomorrow.
@@ -198,17 +198,23 @@ can't sign up.
 **Goal:** the Services page is complete, and enquiries are saved and emailed (tested, not yet
 wired to a page).
 
-- [ ] **Services page.** Static hero with anchor nav, "What We Do", 13 alternating bands (each
+- [x] **Font** (added 2026-11-04, the owner's choice): Nunito Sans replaces Open Sans on the site
+  and in the admin (`frontend.md` §1).
+- [x] **Services page.** Static hero with anchor nav, "What We Do", 13 alternating bands (each
   with its `id` anchor), NGO Capacity Development with diagram, corporate-clients logo grid
   (`frontend.md` §4).
   AC: all 13 old-site services exist as `Service` records; anchor links scroll to each.
-- [ ] **Contact model and service.** `contact.ContactSubmission` (first/last name or name,
+  *(As built: a `service_bands` section type; the seed now also fills empty fields on items an
+  earlier day created, which is how Home's six services got their full text.)*
+- [x] **Contact model and service.** `contact.ContactSubmission` (first/last name or name,
   email, phone optional, message, `source_page`, `email_sent`, `email_error`, `handled`,
   IP hash, user agent); `ContactService.submit` saves first, then emails `CONTACT_RECIPIENT`
   with the submitter as `Reply-To`; failure logged with the provider's message, never raised
   to the visitor (`architecture.md` §5).
   AC: the ContactService tests in `Phase_1/Test_Plan.md` §3.3 pass.
-- [ ] **Resend wiring.** `django-anymail` and the `EMAIL_PROVIDER` setting (`console` | `resend` |
+- [ ] **Resend wiring.** *(code done 2026-11-04 and tested through Django's test backend and a
+  failing one; the owner proves a real send with `commands/Phase_1/day-7.md` step 9 once the domain
+  is verified)* `django-anymail` and the `EMAIL_PROVIDER` setting (`console` | `resend` |
   `smtp`) were added on Day 3 with the email checks (`config/settings/email.py`); today proves a
   real send (`deployment.md` §6).
   AC: with `EMAIL_PROVIDER=resend` locally and a real key, a test enquiry arrives in the
@@ -216,7 +222,7 @@ wired to a page).
 - [ ] **Resend domain (owner).** Verify the sending subdomain in the existing Resend account;
   add its DNS records; create a Sending-access key limited to that domain.
   AC: the domain shows **Verified** in Resend.
-- [ ] **Admin.** Submissions read-only, filters (`email_sent`, `handled`, `source_page`),
+- [x] **Admin.** Submissions read-only, filters (`email_sent`, `handled`, `source_page`),
   actions "Mark as handled" and "Resend notification email".
   AC: an unsent submission can be resent from the admin.
 
