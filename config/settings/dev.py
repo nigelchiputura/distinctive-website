@@ -9,5 +9,4 @@ from .base import env
 DEBUG = True
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "0.0.0.0"])
 
-# Emails print to the console. Day 7 adds EMAIL_PROVIDER=resend for real sends while testing.
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Emails print to the console unless .env sets EMAIL_PROVIDER=resend (config/settings/email.py).

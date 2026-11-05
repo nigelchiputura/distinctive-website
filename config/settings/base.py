@@ -11,6 +11,8 @@ from pathlib import Path
 
 import environ
 
+from .email import email_settings
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
@@ -34,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "anymail",
     # Project apps. Phase 2 adds apps.jobs and apps.search.
     "apps.core",
     "apps.users",
@@ -101,6 +104,13 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Email: EMAIL_PROVIDER picks the backend (config/settings/email.py, docs/deployment.md §6).
+# Locally it prints emails; set EMAIL_PROVIDER=resend in .env to send for real.
+globals().update(email_settings(env, default_provider="console"))
+
+# Google Analytics 4. The admin's SiteSettings value wins; this is the fallback.
+GA_MEASUREMENT_ID: str = env("GA_MEASUREMENT_ID", default="")
 
 # Warnings and errors go to the container output. Without this, Django logs almost nothing
 # with DEBUG off (lesson from Consult 360; docs/deployment.md §6).

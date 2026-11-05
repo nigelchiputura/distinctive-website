@@ -2,8 +2,12 @@
 
 from .base import *  # noqa: F403
 from .base import MIDDLEWARE, env
+from .email import email_settings
 
 DEBUG = False
+
+# Production sends through Resend unless EMAIL_PROVIDER says otherwise (docs/deployment.md §6).
+globals().update(email_settings(env, default_provider="resend"))
 
 # WhiteNoise serves static files from inside the container, right after SecurityMiddleware.
 MIDDLEWARE = [MIDDLEWARE[0], "whitenoise.middleware.WhiteNoiseMiddleware", *MIDDLEWARE[1:]]

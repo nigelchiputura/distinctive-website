@@ -10,30 +10,30 @@ match the Consult 360 layout.
 
 ### 3.1 Core (`apps/core`)
 
-- [ ] `BaseRepository`: `get`, `get_or_none`, `list`, `create`, `update`, `delete`, `exists`,
+- [x] `BaseRepository`: `get`, `get_or_none`, `list`, `create`, `update`, `delete`, `exists`,
   `count`, and `published()` on a publishable model (DB).
-- [ ] `OrderableMixin` default ordering; `SluggedMixin` generates unique slugs (`about`,
+- [x] `OrderableMixin` default ordering; `SluggedMixin` generates unique slugs (`about`,
   `about-2`).
-- [ ] `BaseController` maps `NotFoundError` → 404, `ValidationError` → 400 (JSON) or the form
+- [x] `BaseController` maps `NotFoundError` → 404, `ValidationError` → 400 (JSON) or the form
   re-rendered (HTML), `ExternalServiceError` → 503 JSON / friendly page; the JSON envelope shape
   is `{ok, data}` / `{ok, errors}`.
-- [ ] `SiteSettingsService`: returns defaults when no row exists; only one row can exist; social
+- [x] `SiteSettingsService`: returns defaults when no row exists; only one row can exist; social
   links with empty URLs are left out.
-- [ ] Layering test: a controller importing a repository or the ORM fails; a service using
+- [x] Layering test: a controller importing a repository or the ORM fails; a service using
   `.objects` fails.
-- [ ] Checks: `core.W001` for a `localhost`/`example.*`/empty sender; `W002` for Resend without
+- [x] Checks: `core.W001` for a `localhost`/`example.*`/empty sender; `W002` for Resend without
   a key; `W003` for SMTP without a login; none with a correct configuration.
 
 ### 3.2 Markdown sanitiser (`MarkdownService`, mandatory)
 
 Admin Markdown is rendered publicly, so these are as important as any business rule.
 
-- [ ] `<script>`, inline event handlers (`onerror=`, `onclick=`), `javascript:` and `data:`
+- [x] `<script>`, inline event handlers (`onerror=`, `onclick=`), `javascript:` and `data:`
   links, `<iframe>`, `<style>` and `<form>` are stripped.
-- [ ] Headings, paragraphs, lists, bold, italic, blockquotes and links survive; external links
+- [x] Headings, paragraphs, lists, bold, italic, blockquotes and links survive; external links
   get `rel="noopener noreferrer"`; `mailto:` and `tel:` links survive.
-- [ ] Raw HTML in the Markdown source is escaped or stripped, never rendered as written.
-- [ ] Empty or `None` input returns an empty string.
+- [x] Raw HTML in the Markdown source is escaped or stripped, never rendered as written.
+- [x] Empty or `None` input returns an empty string.
 
 ### 3.3 Contact (`ContactService`, `ContactController`)
 

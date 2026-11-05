@@ -3,18 +3,22 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .managers import UserManager
+
 
 class User(AbstractUser):
     """A staff member who manages the website. The public site has no accounts.
 
-    Login is by email. ``username`` is kept because AbstractUser requires it; Day 4's
-    UserService fills it from the email, so admins only type an email.
+    Login is by email. ``username`` is kept because AbstractUser requires it; the manager fills
+    it from the email, so admins and createsuperuser only ask for an email.
     """
 
     email = models.EmailField("email address", unique=True)
 
+    objects = UserManager()
+
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = []  # createsuperuser asks only for the email and password
 
     class Meta:
         ordering = ["email"]

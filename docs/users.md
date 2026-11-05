@@ -22,13 +22,15 @@ class User(AbstractUser):
     # Login is by email; username kept (AbstractUser requires it) but auto-filled.
     # Add profile fields here only when needed (display name, job title).
 
+    objects = UserManager()       # apps/users/managers.py
+
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = []          # createsuperuser asks only for the email and password
 ```
 
 Notes:
 - **Set `AUTH_USER_MODEL = "users.User"` before the first migration of any app.** Changing it later is painful. So the `User` model and its `0001` migration are created on **Phase 1 Day 1**, before anything else is migrated; allauth and the admin follow on Day 4.
-- Username: auto-generate from the email local-part in the service layer if blank, so admins only type an email.
+- Username: `UserManager` (`apps/users/managers.py`, added Phase 1 Day 3) generates it from the email's local part (`tendai.m`, then `tendai.m2` if taken), so admins and `createsuperuser` only type an email. It lives on the manager, not in a service, because Django's own machinery (createsuperuser, the admin, test fixtures) calls `create_user`/`create_superuser` directly.
 - Email is lower-cased on save and unique (case-insensitive).
 - No `role` field. Roles are Django **Groups** (see §4).
 

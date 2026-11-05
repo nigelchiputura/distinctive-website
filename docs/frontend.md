@@ -105,8 +105,10 @@ outside `_tokens.scss`.
 | `$dcs-navy`, `$dcs-blue` | placeholders | About "Our Story" gradient; sampled on Day 6 | — |
 | Body font | Open Sans 400/600/700 | All text | — |
 
-**The logo** is a stand-in cropped from the old site's screenshot (`static/img/logo.png`, 149 × 87,
-low resolution). Replace it with the real file (SVG preferred) when the client sends it.
+**The logo** is the file the client sent on 2026-11-03: `static/img/logo.png`, a transparent PNG
+trimmed to 172 × 100 and reduced to 128 colours (3.9 KB). It shows at 60 px high, so on high-density
+screens it is slightly soft; an SVG (or a PNG at least 2× the size) would make it crisp. Its gold
+is a gradient around `#d2a22f`, close to the site's `#d4af37`, which stays as the old theme's.
 
 Bootstrap overrides: `$primary: $dcs-gold`, `$body-color`, `$font-family-sans-serif`,
 `$link-color: $dcs-gold-dark`, `$navbar-light-*`, `$btn-border-radius`, `$headings-color`.
@@ -134,7 +136,7 @@ base.html
 | `value_block` | Image one side, heading and paragraph the other; alternates |
 | `cta` | A centred line and an outlined gold button ("Get In Touch") |
 
-Markdown bodies go through `{% markdown section.body %}`. Nothing else turns admin text into HTML.
+Markdown bodies go through `{{ section.body|markdown }}` (load `core_extras`). Nothing else turns admin text into HTML.
 
 ## 4. Page notes (from the reference screenshots)
 
