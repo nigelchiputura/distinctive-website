@@ -189,6 +189,7 @@ apps/core/
 ├── checks.py                  # core.W001–W003 (email configuration)
 ├── context_processors.py      # site_info (SiteDetails), nav_items, current_year, consent_needed
 ├── middleware.py              # RedirectMiddleware (old WordPress URLs → 301)
+├── storage.py                 # StaticStorage: WhiteNoise's manifest storage, passing Jazzmin's one folder (prod)
 ├── services/seo_service.py    # SeoService, SeoData, absolute_url (Day 10)
 ├── services/image_variant_service.py  # WebP copies for srcset (Day 10)
 ├── templatetags/
@@ -208,6 +209,7 @@ apps/core/
     ├── test_polish.py         # themes, labels, back to top, the reveal hooks, gutters (Day 9)
     ├── test_seo.py            # titles, canonicals, noindex, JSON-LD, sitemap, robots, 404, 500
     ├── test_image_variant_service.py  # the WebP copies
+    ├── test_static_storage.py # the admin with the production static storage
     └── test_security.py       # check --deploy with prod settings
 ```
 

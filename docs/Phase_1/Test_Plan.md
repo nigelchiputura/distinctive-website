@@ -101,6 +101,9 @@ Status code, template and one expected string for each:
   ones, `security.W005` and `W021` (`apps/core/tests/test_security.py`).
 - [x] Prod settings: `DEBUG=False`, secure cookies, HSTS, `SECURE_SSL_REDIRECT`,
   `X-Frame-Options: DENY`, `nosniff`, referrer policy.
+- [x] The admin renders with the production static storage after `collectstatic`; Jazzmin's
+  `vendor/bootswatch` folder passes, any other name missing from the manifest still raises
+  (`apps/core/tests/test_static_storage.py`, added 2026-11-09).
 
 ### 3.8 Look and feel (Day 9, `apps/core/tests/test_polish.py`)
 
@@ -165,6 +168,8 @@ Run on the local prod stack (Day 10) and again on the preview host (Day 11).
 - [ ] Accept: GA4 loads, the map loads; the footer link reopens the choice.
 
 **Admin**
+- [ ] Signing in opens the admin's index, and its pages load (prod settings: the admin is a
+  third-party template, so the public pages loading proves nothing about it).
 - [ ] A Content Editor edits a Home section, reorders a slide, adds a team member with a photo,
   and sees each change on the site.
 - [ ] Image uploads show on the site (served by Caddy from the media volume in prod).

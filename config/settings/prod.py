@@ -14,7 +14,8 @@ MIDDLEWARE = [MIDDLEWARE[0], "whitenoise.middleware.WhiteNoiseMiddleware", *MIDD
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    # WhiteNoise's compressed manifest storage, letting through the one folder Jazzmin asks for.
+    "staticfiles": {"BACKEND": "apps.core.storage.StaticStorage"},
 }
 
 # Caddy terminates TLS and forwards the scheme and the visitor's address (docs/deployment.md §7).

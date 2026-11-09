@@ -9,6 +9,7 @@ log browsable, since the folder names sort by error name, not by date.
 
 | Date | Error | Layer/Area | Severity | Folder |
 |---|---|---|---|---|
+| 2026-11-09 16:06 | Every admin page answered 500 on the demo host: Jazzmin asks for the static URL of a folder (`vendor/bootswatch`), which WhiteNoise's manifest storage refuses | Admin | High (demo host only; public pages worked) | [jazzmin-bootswatch-folder-breaks-admin-in-prod__2026-11-09_1606](./jazzmin-bootswatch-folder-breaks-admin-in-prod__2026-11-09_1606/) |
 | 2026-11-04 19:50 | Every page scrolled sideways on phones: rows with Bootstrap's `g-5` gutter were 12 px wider than the screen; the footer's row widened the page | Frontend/SCSS | Medium (caught before shipping) | [row-g5-gutter-made-phones-scroll-sideways__2026-11-04_1950](./row-g5-gutter-made-phones-scroll-sideways__2026-11-04_1950/) |
 | 2026-11-03 11:35 | Home returned 500 with a `RecursionError`: a multi-line `{# #}` comment isn't a comment, and the `{% include %}` inside it made `_image.html` include itself | View | High (caught before shipping) | [multiline-template-comment-recursion__2026-11-03_1135](./multiline-template-comment-recursion__2026-11-03_1135/) |
 | 2026-11-03 11:20 | Sign-in pages lost the top bar's and footer's details: allauth's `site` context variable silently replaced ours (renamed `site_info`) | View | Medium (caught before shipping) | [allauth-site-context-hid-site-details__2026-11-03_1120](./allauth-site-context-hid-site-details__2026-11-03_1120/) |
