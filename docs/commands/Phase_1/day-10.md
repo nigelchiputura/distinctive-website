@@ -1,7 +1,7 @@
 # Phase 1 · Day 10: SEO, redirects, responsive images, production files and the demo
 
 **Cards:** `Phase_1/Task_Breakdown.md`, Day 10
-**Completed:** 2026-11-05 (the code; steps 8, 10 and 11 are the owner's) · **Revised:** —
+**Completed:** 2026-11-05 (the code; steps 8, 10 and 11 are the owner's) · **Revised:** 2026-11-09 (the admin with production static storage: 306 tests)
 
 Run from the repo root. Commands are bash; on Windows or macOS see
 [`../Terminal_Note.md`](../Terminal_Note.md). Steps 1–9 are on your machine; step 10 merges, which
@@ -146,7 +146,7 @@ docker compose -f docker/docker-compose.yml exec -e DJANGO_SETTINGS_MODULE=confi
 ```
 
 **Expect:** `All checks passed!`; `… files already formatted`; `0 errors, 0 warnings, 0 notes`;
-`No changes detected`; `302 passed` with `Required test coverage of 85% reached`;
+`No changes detected`; `306 passed` with `Required test coverage of 85% reached`;
 `System check identified no issues (2 silenced).`
 
 ## 10. Merge, which builds the image
@@ -225,5 +225,6 @@ docker compose -f docker-compose.prod.yml exec web python manage.py createsuperu
 
 **Expect:** in the log, the migrations and `Added …` from the seed, and no `core.W00x` warnings
 (with `EMAIL_PROVIDER=resend`, a `W001` or `W002` means the sender or key is missing). Then remove `SEED_SITE_CONTENT` from
-`.env` (so later deploys don't run it), send a test enquiry from the Contact page and see it in
-the admin. The site is ready to walk the stakeholders through.
+`.env` (so later deploys don't run it), sign in at `/<ADMIN_URL_PATH>` (the admin's index must
+open; until 2026-11-09 it answered 500 under production settings, see the error log), send a test
+enquiry from the Contact page and see it in the admin. The site is ready to walk the stakeholders through.
